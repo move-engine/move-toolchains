@@ -391,7 +391,10 @@ function artifactMatchesHost(artifact, host) {
 }
 
 function inspectArchive(file) {
-    const entries = run("tar", ["-tf", file]).split(/\r?\n/)
+    const listing = file.toLowerCase().endsWith(".zip") && process.platform !== "win32"
+        ? run("unzip", ["-Z1", file])
+        : run("tar", ["-tf", file]);
+    const entries = listing.split(/\r?\n/)
         .map((entry) => entry.replaceAll("\\", "/").replace(/^\.\//, ""))
         .filter(Boolean);
     for (const entry of entries) {
@@ -402,6 +405,14 @@ function inspectArchive(file) {
         }
     }
     return entries;
+}
+
+function extractArchive(file, destination) {
+    if (file.toLowerCase().endsWith(".zip") && process.platform !== "win32") {
+        run("unzip", ["-q", file, "-d", destination]);
+    } else {
+        run("tar", ["-xf", file, "-C", destination]);
+    }
 }
 
 async function downloadToolchain(settings, component, tag) {
@@ -446,7 +457,7 @@ async function downloadToolchain(settings, component, tag) {
         await mkdir(staging);
         try {
             inspectArchive(archive);
-            run("tar", ["-xf", archive, "-C", staging]);
+            extractArchive(archive, staging);
             if (component === "clangd") {
                 const revision = releaseManifest.source?.components?.["clang-p2996"]?.revision;
                 if (!/^[0-9a-f]{40}$/.test(revision ?? "")) {
@@ -587,7 +598,7 @@ async function setupXmake(settings) {
         let executable;
         if (settings.host === "win32-x64") {
             inspectArchive(download);
-            run("tar", ["-xf", download, "-C", staging]);
+            extractArchive(download, staging);
             const pending = [staging];
             executable = null;
             while (pending.length && !executable) {

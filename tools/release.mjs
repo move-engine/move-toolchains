@@ -158,7 +158,10 @@ function normalizeArchiveEntry(entry) {
 }
 
 function inspectArchive(file) {
-    const entries = run("tar", ["-tf", file]).split(/\r?\n/)
+    const listing = file.toLowerCase().endsWith(".zip") && process.platform !== "win32"
+        ? run("unzip", ["-Z1", file])
+        : run("tar", ["-tf", file]);
+    const entries = listing.split(/\r?\n/)
         .map(normalizeArchiveEntry).filter(Boolean);
     for (const entry of entries) {
         if (entry.startsWith("/") || /^[A-Za-z]:\//.test(entry) ||

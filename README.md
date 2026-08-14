@@ -47,6 +47,7 @@ later macOS to use different build volumes from the same checkout.
 
 - Node.js 20 or newer;
 - Git, CMake, Ninja, and the platform compiler prerequisites for source builds;
+- `unzip` on Linux/macOS for cross-host ZIP release verification;
 - at least 80 GiB free for a clang-p2996 build; and
 - GitHub CLI (`gh`) only when publishing a release.
 
