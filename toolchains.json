@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "release": {
+    "tag": "toolchains-2026.08.1",
+    "title": "Move toolchains 2026.08.1",
+    "notes": "Pinned reflection-capable language-server builds for Move development. GCC packages will join this release set after their relocation boundary is qualified."
+  },
+  "components": {
+    "gcc": {
+      "version": "16.2.0",
+      "minimumCompatibleVersion": "16.1.0",
+      "repository": "https://gcc.gnu.org/git/gcc.git",
+      "releaseBaseUrl": "https://ftp.gnu.org/gnu/gcc"
+    },
+    "clang-p2996": {
+      "repository": "https://github.com/bloomberg/clang-p2996.git",
+      "revision": "7220baffd57ea5b0f8cf59bee494dd5b7cc2b748",
+      "qualificationSchemaVersion": 3,
+      "minimumFreeGiB": 80,
+      "hosts": {
+        "linux-x64": {
+          "qualificationKind": "full-toolchain",
+          "configuration": {
+            "generator": "Ninja",
+            "buildType": "Release",
+            "projects": "clang;clang-tools-extra",
+            "runtimes": "libcxx;libcxxabi;libunwind",
+            "targets": "X86"
+          },
+          "installTargets": [
+            "install-clang",
+            "install-clang-resource-headers",
+            "install-clangd",
+            "install-cxx",
+            "install-cxxabi",
+            "install-unwind"
+          ]
+        },
+        "win32-x64": {
+          "qualificationKind": "language-server",
+          "stageLibcxxHeaders": true,
+          "gccVersion": "16.2.0",
+          "gccTarget": "x86_64-w64-mingw32",
+          "clangTarget": "x86_64-w64-windows-gnu",
+          "configuration": {
+            "generator": "Ninja",
+            "buildType": "Release",
+            "projects": "clang;clang-tools-extra",
+            "runtimes": "libcxx",
+            "targets": "X86"
+          },
+          "installTargets": [
+            "install-clang",
+            "install-clang-resource-headers",
+            "install-clangd"
+          ]
+        }
+      }
+    },
+    "xmake": {
+      "minimumVersion": "3.0.1",
+      "distribution": "official-release"
+    }
+  },
+  "artifacts": [
+    {
+      "id": "clang-p2996-windows-x64",
+      "host": "windows-x86_64",
+      "file": "clangd-p2996-7220baff-windows-x86_64.zip",
+      "checksumFile": "clangd-p2996-7220baff-windows-x86_64.zip.sha256",
+      "archiveRoot": "clang-p2996/7220baffd57ea5b0f8cf59bee494dd5b7cc2b748/install",
+      "requiredEntries": [
+        "bin/clangd.exe",
+        "bin/clang.exe",
+        "include/c++/v1/meta",
+        "move-qualification.json"
+      ],
+      "requirements": {
+        "target": "x86_64-w64-windows-gnu",
+        "ucrt64Gcc": "16.2.0"
+      }
+    },
+    {
+      "id": "clang-p2996-linux-x64",
+      "host": "linux-x86_64-glibc2.38",
+      "file": "clangd-p2996-7220baff-linux-x86_64-glibc2.38.tar.gz",
+      "checksumFile": "clangd-p2996-7220baff-linux-x86_64-glibc2.38.tar.gz.sha256",
+      "archiveRoot": "clang-p2996/7220baffd57ea5b0f8cf59bee494dd5b7cc2b748/install",
+      "requiredEntries": [
+        "bin/clangd",
+        "bin/clang",
+        "include/c++/v1/meta",
+        "move-qualification.json"
+      ],
+      "requirements": {
+        "architecture": "x86-64-baseline",
+        "minimumGlibc": "2.38"
+      }
+    }
+  ]
+}

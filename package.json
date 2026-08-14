@@ -1,0 +1,17 @@
+{
+  "name": "move-toolchains",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "start": "node toolchains.mjs",
+    "toolchains": "node toolchains.mjs",
+    "doctor": "node tools/release.mjs doctor",
+    "package:clang-p2996": "node tools/package-clang-p2996.mjs",
+    "test": "node --test",
+    "verify-release": "node tools/release.mjs verify"
+  }
+}
