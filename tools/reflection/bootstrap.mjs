@@ -35,12 +35,11 @@ function usage() {
     console.log(`Move experimental reflection toolchain bootstrap
 
 Usage:
-  node tools/reflection/bootstrap.mjs help
-  node tools/reflection/bootstrap.mjs doctor [--root PATH] [--ucrt64-root PATH]
-  node tools/reflection/bootstrap.mjs status [--root PATH] [--ucrt64-root PATH]
-  node tools/reflection/bootstrap.mjs install --accept-cost [--root PATH] [--ucrt64-root PATH] [--jobs N]
-  node tools/reflection/bootstrap.mjs adopt --accept-prebuilt [--root PATH] [--ucrt64-root PATH]
-  node tools/reflection/bootstrap.mjs configure [--force] [--root PATH] [--ucrt64-root PATH]
+  npm run doctor:clangd -- [--root PATH] [--ucrt64-root PATH]
+  npm run status:clangd -- [--root PATH] [--ucrt64-root PATH]
+  npm run install:clangd -- --accept-cost [--root PATH] [--ucrt64-root PATH] [--jobs N]
+  npm run adopt:clangd -- [--root PATH] [--ucrt64-root PATH]
+  npm run configure:clangd -- [--force] [--root PATH] [--ucrt64-root PATH]
 
 Linux installs and qualifies pinned Clang, clangd, libc++, libc++abi, and
 libunwind as one experimental toolchain. Windows installs a native clangd plus

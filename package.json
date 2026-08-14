@@ -10,8 +10,15 @@
     "start": "node toolchains.mjs",
     "toolchains": "node toolchains.mjs",
     "doctor": "node tools/release.mjs doctor",
+    "doctor:clangd": "node tools/reflection/bootstrap.mjs doctor",
+    "status:clangd": "node tools/reflection/bootstrap.mjs status",
+    "adopt:clangd": "node tools/reflection/bootstrap.mjs adopt --accept-prebuilt",
+    "configure:clangd": "node tools/reflection/bootstrap.mjs configure",
+    "install:clangd": "node tools/reflection/bootstrap.mjs install",
     "package:clang-p2996": "node tools/package-clang-p2996.mjs",
     "test": "node --test",
+    "release:verify": "node tools/release.mjs verify",
+    "release:publish": "node tools/release.mjs publish",
     "verify-release": "node tools/release.mjs verify"
   }
 }

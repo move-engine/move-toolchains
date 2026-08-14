@@ -33,7 +33,7 @@ function usage() {
     console.log(`Package a qualified Windows clang-p2996 build
 
 Usage:
-  node tools/package-clang-p2996.mjs [--root PATH] [--output-dir PATH]
+  npm run package:clang-p2996 -- [--root PATH] [--output-dir PATH]
       [--ucrt64-root PATH] [--vc-runtime-dir PATH] [--force]
 
 The package is assembled from ROOT/clang-p2996/<revision>/install, receives the

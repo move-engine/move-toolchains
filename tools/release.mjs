@@ -25,9 +25,9 @@ function usage() {
     console.log(`Move toolchain release manager
 
 Usage:
-  node tools/release.mjs doctor
-  node tools/release.mjs verify [--artifact-dir PATH] [--output-dir PATH]
-  node tools/release.mjs publish --repository OWNER/REPO [--tag TAG]
+  npm run doctor
+  npm run release:verify -- [--artifact-dir PATH] [--output-dir PATH]
+  npm run release:publish -- --repository OWNER/REPO [--tag TAG]
       [--artifact-dir PATH] [--output-dir PATH] [--publish]
 
 verify is read-only except for generated release metadata beneath --output-dir.

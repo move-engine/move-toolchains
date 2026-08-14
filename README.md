@@ -1,9 +1,14 @@
 # Move toolchains
 
-This repository contains the local build, qualification, packaging, and release
-scripts for the reflection-capable compiler and language-server toolchains used
-by Move projects. The scripts are the source artifact; portable binary archives
-are published as GitHub Release assets.
+This repository collects toolchain automation extracted from private Move
+repositories. Move currently depends on C++26 static reflection, so a coherent
+development environment requires both a reflection-capable production compiler
+and editor tooling that can understand the same code. It provides local build,
+qualification, packaging, and release scripts for GCC 16 and a reflection-aware
+clangd built from Bloomberg's `clang-p2996` fork. Check the
+[GitHub Releases page](https://github.com/move-engine/move-toolchains/releases)
+for the latest prebuilt toolchains. The release artifacts are portable and
+structured to be easily consumed by Move's new Xmake toolchain.
 
 The initial implementation deliberately targets the two environments already
 qualified by the project:
@@ -13,6 +18,11 @@ qualified by the project:
 - Debian/WSL2 x86-64 with native GCC 16.2 and the full clang-p2996/libc++
   toolchain.
 
+Setup guides:
+
+- [Windows](docs/setup-windows.md)
+- [Linux and WSL2](docs/setup-linux.md)
+
 It is local-first. GitHub Actions and broader host detection can be added after
 the package protocol and relocation tests are stable.
 
@@ -21,7 +31,7 @@ the package protocol and relocation tests are stable.
 Run the top-level manager without arguments:
 
 ```text
-node toolchains.mjs
+npm start
 ```
 
 It presents the host-appropriate operations for assigning or integrating
@@ -33,7 +43,7 @@ publishing.
 Every operation also has a non-interactive command. See:
 
 ```text
-node toolchains.mjs help
+npm start -- help
 ```
 
 Host-local assignments are saved under `.local/config.json`. They can be
@@ -63,8 +73,8 @@ The migrated bootstrap uses an exact shallow fetch of the Bloomberg fork,
 qualifies the result, and preserves resumable build state:
 
 ```text
-node tools/reflection/bootstrap.mjs doctor --root M:\src
-node tools/reflection/bootstrap.mjs install --accept-cost --root M:\src --jobs 20
+npm run doctor:clangd
+npm start -- build clangd --jobs 20
 ```
 
 On Windows, `--ucrt64-root` defaults to `C:\msys64\ucrt64`. On Linux, the
@@ -74,9 +84,7 @@ toolchain.
 Package and relocation-test the qualified Windows installation with:
 
 ```text
-node tools/package-clang-p2996.mjs \
-  --root M:\src \
-  --output-dir .local\prebuilt
+npm start -- package clangd
 ```
 
 The packager discovers the latest installed x64 `Microsoft.VC143.CRT`
@@ -110,7 +118,7 @@ The first manifest describes the already-qualified clang-p2996 archives. Point
 the verifier at the directory holding them:
 
 ```text
-node tools/release.mjs verify \
+npm run release:verify -- \
   --artifact-dir .local\prebuilt
 ```
 
@@ -123,9 +131,8 @@ notes and a machine-readable release manifest beneath `.local/releases`.
 Publication is dry-run by default:
 
 ```text
-node tools/release.mjs publish \
-  --repository OWNER/move-toolchains \
-  --artifact-dir .local\prebuilt
+npm start -- assign releases OWNER/move-toolchains
+npm start -- publish
 ```
 
 After reviewing the exact tag and asset list, add `--publish`. A real publish

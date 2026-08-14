@@ -49,17 +49,17 @@ function usage() {
     console.log(`Move toolchain manager
 
 Usage:
-  node toolchains.mjs                         interactive menu
-  node toolchains.mjs status
-  node toolchains.mjs assign workspace|clangd|gcc|releases|xmake VALUE
-  node toolchains.mjs integrate ROOT
-  node toolchains.mjs build clangd [--jobs N]
-  node toolchains.mjs build gcc [--jobs N] [--latest-release]
-  node toolchains.mjs download clangd|gcc [--tag TAG]
-  node toolchains.mjs package clangd [--force]
-  node toolchains.mjs publish [--tag TAG] [--publish]
-  node toolchains.mjs setup msys2 [--accept-system-changes]
-  node toolchains.mjs setup xmake
+  npm start                                      interactive menu
+  npm start -- status
+  npm start -- assign workspace|clangd|gcc|releases|xmake VALUE
+  npm start -- integrate ROOT
+  npm start -- build clangd [--jobs N]
+  npm start -- build gcc [--jobs N] [--latest-release]
+  npm start -- download clangd|gcc [--tag TAG]
+  npm start -- package clangd [--force]
+  npm start -- publish [--tag TAG] [--publish]
+  npm start -- setup msys2 [--accept-system-changes]
+  npm start -- setup xmake
 
 Configuration precedence is command line, process environment, .env, saved
 host configuration, then repository defaults. Saved assignments live in:
@@ -732,7 +732,7 @@ async function main() {
     } else if (command === "setup" && subject === "xmake") {
         await setupXmake(settings);
     } else {
-        fail("unsupported command; run node toolchains.mjs help");
+        fail("unsupported command; run npm start -- help");
     }
 }
 

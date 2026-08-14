@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import path from "node:path";
 import test from "node:test";
 import {
     hostEnvironmentSuffix,
@@ -25,15 +26,10 @@ test("host environment root overrides saved and global roots", () => {
         MOVE_TOOLCHAINS_LOCAL_ROOT: "C:\\global",
         MOVE_TOOLCHAINS_WIN32_X64_ROOT: "M:\\host",
     }, "win32-x64");
-    assert.equal(settings.localRoot, pathResolve("M:\\host"));
-    assert.equal(settings.clangRoot, pathResolve("C:\\clang"));
+    assert.equal(settings.localRoot, path.resolve("M:\\host"));
+    assert.equal(settings.clangRoot, path.resolve("C:\\clang"));
 });
 
 test("host names map to stable environment suffixes", () => {
     assert.equal(hostEnvironmentSuffix("linux-x64"), "LINUX_X64");
 });
-
-function pathResolve(value) {
-    return new URL(`file:///${value.replaceAll("\\", "/")}`).pathname
-        .replace(/^\/([A-Za-z]:)/, "$1").replaceAll("/", "\\");
-}
