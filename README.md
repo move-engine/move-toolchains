@@ -2,7 +2,7 @@
 
 This repository contains the local build, qualification, packaging, and release
 scripts for the reflection-capable compiler and language-server toolchains used
-by Move and Nez. The scripts are the source artifact; portable binary archives
+by Move projects. The scripts are the source artifact; portable binary archives
 are published as GitHub Release assets.
 
 The initial implementation deliberately targets the two environments already
@@ -137,15 +137,16 @@ inspection.
 Enable immutable releases in the GitHub repository before the first public
 release. Never run release publication from untrusted pull-request code.
 
-## Consumer/bootstrap boundary
+## Consumer bootstrap boundary
 
-Nez should eventually carry only a small consumer bootstrap. It should:
+A consuming repository should carry only a small bootstrap adapter. It should:
 
 1. accept a system GCC only after version, target, ABI, `<meta>`, and reflection
    feature probes pass;
 2. offer a pinned portable Xmake when Xmake is absent or too old;
-3. download the latest release compatible with Nez's declared toolchain channel,
-   rather than executing this repository's latest source revision; and
+3. download the latest release compatible with the consumer's declared
+   toolchain channel, rather than executing this repository's latest source
+   revision; and
 4. verify the release manifest and checksum before extraction and local
    qualification.
 
