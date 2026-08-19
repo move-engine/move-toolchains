@@ -19,6 +19,7 @@ import {availableParallelism} from "node:os";
 import path from "node:path";
 import process from "node:process";
 import {fileURLToPath} from "node:url";
+import {parseLdd} from "../elf-compatibility.mjs";
 
 const scriptPath = fileURLToPath(import.meta.url);
 const projectRoot = path.resolve(path.dirname(scriptPath), "..", "..");
@@ -745,19 +746,17 @@ async function qualifyFullToolchain(config, profile, install) {
     if (linked.includes("libstdc++")) {
         fail("qualification detected forbidden mixed libstdc++ linkage");
     }
+    const linkedLibraries = parseLdd(linked);
     for (const library of ["libc++.so", "libc++abi.so", "libunwind.so"]) {
-        const row = linked.split(/\r?\n/)
-            .map((line) => line.trim().split(/\s+/))
-            .find((fields) =>
-                (fields[0] === library ||
-                 fields[0]?.startsWith(`${library}.`)) &&
-                fields[1] === "=>");
-        if (!row || row[2] === "not" || !path.isAbsolute(row[2])) {
+        const row = linkedLibraries.find((entry) =>
+            entry.name === library || entry.name.startsWith(`${library}.`));
+        if (!row || row.resolved === "not found" ||
+            !path.isAbsolute(row.resolved)) {
             fail(
                 `qualification did not resolve ${library} from the ` +
                 "isolated toolchain");
         }
-        const resolved = await realpath(row[2]);
+        const resolved = await realpath(row.resolved);
         const relative = path.relative(runtimeLibraryRoot, resolved);
         if (relative === ".." || relative.startsWith(`..${path.sep}`) ||
             path.isAbsolute(relative)) {
