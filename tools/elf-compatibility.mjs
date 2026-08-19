@@ -59,11 +59,16 @@ async function collectFiles(root) {
     return files.sort();
 }
 
-function parseLdd(output) {
+export function parseLdd(output) {
     const rows = [];
     for (const line of output.split(/\r?\n/)) {
-        const match = line.trim().match(/^(\S+)\s+=>\s+(\S+)/);
-        if (match) rows.push({name: match[1], resolved: match[2]});
+        const match = line.trim().match(/^(\S+)\s+=>\s+(.+)$/);
+        if (match) {
+            rows.push({
+                name: match[1],
+                resolved: match[2].replace(/\s+\(0x[0-9a-f]+\)$/i, ""),
+            });
+        }
     }
     return rows;
 }
@@ -91,7 +96,7 @@ export async function auditElfTree(install, maximumGlibc) {
         if (/\(NEEDED\)/.test(dynamic)) {
             const linked = run("ldd", [file]);
             if (/=>\s+not found\b/.test(linked)) {
-                fail(`${file} has an unresolved shared-library dependency`);
+                fail(`${file} has an unresolved shared-library dependency:\n${linked.trim()}`);
             }
             for (const row of parseLdd(linked)) {
                 const isolated = /^(?:libstdc\+\+|libgcc_s|libc\+\+|libc\+\+abi|libunwind)\.so(?:\.|$)/
