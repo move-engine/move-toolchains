@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "release": {
-    "tag": "toolchains-2026.08.2",
-    "title": "Move toolchains 2026.08.2",
+    "tag": "toolchains-2026.08.3",
+    "title": "Move toolchains 2026.08.3",
     "notes": "Adds an Ubuntu 22.04-built clang-p2996 artifact for glibc 2.35 hosts while retaining the existing glibc 2.38 and Windows artifacts. Linux downloads select the newest compatible glibc floor before transferring an archive. GCC packages will join this release set after their relocation boundary is qualified."
   },
   "components": {
