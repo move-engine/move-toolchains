@@ -15,8 +15,9 @@ qualified by the project:
 
 - Windows x86-64 with MSYS2 UCRT64 GCC 16.2 and a native clang-p2996 language
   server; and
-- Debian/WSL2 x86-64 with native GCC 16.2 and the full clang-p2996/libc++
-  toolchain.
+- Linux x86-64 with native GCC 16.2 and the full clang-p2996/libc++
+  toolchain. Published Linux artifacts declare a glibc floor; the manager
+  selects the newest artifact compatible with the running glibc.
 
 Setup guides:
 
@@ -79,7 +80,9 @@ npm start -- build clangd --jobs 20
 
 On Windows, `--ucrt64-root` defaults to `C:\msys64\ucrt64`. On Linux, the
 bootstrap builds clang, clangd, libc++, libc++abi, and libunwind as one isolated
-toolchain.
+toolchain. Linux release artifacts are built with explicit x86-64-baseline
+flags and are audited file-by-file for their maximum required GLIBC symbol
+version.
 
 Package and relocation-test the qualified Windows installation with:
 
@@ -95,6 +98,21 @@ Pass `--vc-runtime-dir` to override Visual Studio discovery. Public
 redistribution remains subject to the applicable Microsoft and upstream
 licenses; license collection is a release gate, not implied by successful
 packaging.
+
+The maintained glibc 2.35 Linux release lane uses a pinned Ubuntu 22.04 image.
+On Windows, create its dedicated M:-backed WSL2 distribution and then build:
+
+```powershell
+npm run ubuntu2204:clangd -- setup-wsl --storage-root M:\wsl\MoveToolchains-Ubuntu2204
+npm run ubuntu2204:clangd -- build --jobs 20
+npm run ubuntu2204:clangd -- package --output-dir M:\src\move-toolchains\.local\prebuilt
+```
+
+The package step audits every ELF executable and shared library, runs clang,
+clang++, and clangd, extracts beneath a different path containing spaces, and
+reruns the pinned reflection/libc++ qualification. It never changes the host
+glibc. The Dockerfile used to seed that WSL2 distribution is also suitable for
+CI or a Docker host with bind-mounted Linux storage.
 
 ## Linux GCC
 
@@ -151,9 +169,9 @@ A consuming repository should carry only a small bootstrap adapter. It should:
 1. accept a system GCC only after version, target, ABI, `<meta>`, and reflection
    feature probes pass;
 2. offer a pinned portable Xmake when Xmake is absent or too old;
-3. download the latest release compatible with the consumer's declared
-   toolchain channel, rather than executing this repository's latest source
-   revision; and
+3. detect Linux libc through Node's process report and download the newest
+   release artifact whose declared glibc floor is compatible, rather than
+   executing this repository's latest source revision; and
 4. verify the release manifest and checksum before extraction and local
    qualification.
 

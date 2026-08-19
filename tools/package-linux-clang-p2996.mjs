@@ -18,7 +18,7 @@ import path from "node:path";
 import process from "node:process";
 import {fileURLToPath} from "node:url";
 import {auditElfTree} from "./elf-compatibility.mjs";
-import {compareVersions, detectLinuxLibc} from "./host-compatibility.mjs";
+import {detectLinuxLibc} from "./host-compatibility.mjs";
 
 const scriptPath = fileURLToPath(import.meta.url);
 const repositoryRoot = path.resolve(path.dirname(scriptPath), "..");
@@ -98,6 +98,16 @@ function firstLine(value) {
     return value.split(/\r?\n/)[0];
 }
 
+function parseOsRelease(text) {
+    const values = {};
+    for (const line of text.split(/\r?\n/)) {
+        const match = line.match(/^([A-Z_]+)=(.*)$/);
+        if (!match) continue;
+        values[match[1]] = match[2].replace(/^['"]|['"]$/g, "");
+    }
+    return values;
+}
+
 async function qualifyInstall(install, root, revision, maximumGlibc) {
     const binary = (name) => path.join(install, "bin", name);
     const versions = {
@@ -138,9 +148,13 @@ async function main() {
         fail("--minimum-glibc requires a dotted version");
     }
     const libc = detectLinuxLibc();
-    if (libc.family !== "glibc" ||
-        compareVersions(libc.version, maximumGlibc) > 0) {
-        fail(`packaging must run on glibc ${maximumGlibc} or older; found ${libc.family} ${libc.version ?? "unknown"}`);
+    const osRelease = parseOsRelease(await readFile("/etc/os-release", "utf8"));
+    if (libc.family !== "glibc" || libc.version !== maximumGlibc ||
+        osRelease.ID !== "ubuntu" || osRelease.VERSION_ID !== "22.04") {
+        fail(
+            `packaging requires Ubuntu 22.04/glibc ${maximumGlibc}; found ` +
+            `${osRelease.ID ?? "unknown"} ${osRelease.VERSION_ID ?? "unknown"}/` +
+            `${libc.family} ${libc.version ?? "unknown"}`);
     }
     const configuration = JSON.parse(await readFile(configurationPath, "utf8"));
     const reflection = configuration.components?.["clang-p2996"];
@@ -182,7 +196,7 @@ async function main() {
             host: `linux-x86_64-glibc${maximumGlibc}`,
             qualificationKind: "full-toolchain",
             buildEnvironment: {
-                distribution: "Ubuntu 22.04",
+                distribution: `${osRelease.ID} ${osRelease.VERSION_ID}`,
                 glibc: libc.version,
                 image: values.get("--build-image") ?? null,
             },

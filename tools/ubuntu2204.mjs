@@ -97,6 +97,26 @@ function assertWslDistro(distro) {
     if (glibc !== "glibc 2.35") {
         fail(`WSL distribution ${distro} is not the Ubuntu 22.04 baseline: ${glibc}`);
     }
+    const osRelease = normalizedWslOutput(run("wsl", [
+        "--distribution", distro, "--exec", "cat", "/etc/os-release",
+    ], {capture: true}));
+    if (!/^ID=ubuntu$/m.test(osRelease) || !/^VERSION_ID="?22\.04"?$/m.test(osRelease)) {
+        fail(`WSL distribution ${distro} is not Ubuntu 22.04`);
+    }
+    const node = normalizedWslOutput(run("wsl", [
+        "--distribution", distro, "--exec", "node", "--version",
+    ], {capture: true}));
+    if (node !== "v20.18.0") {
+        fail(`WSL distribution ${distro} has unexpected Node.js: ${node}`);
+    }
+    const listing = normalizedWslOutput(run("wsl", [
+        "--list", "--verbose",
+    ], {capture: true}));
+    const row = listing.split("\n").find((line) =>
+        line.toLowerCase().includes(distro.toLowerCase()));
+    if (!row || !/\s2\s*$/.test(row)) {
+        fail(`WSL distribution ${distro} is not running as WSL2`);
+    }
 }
 
 function wslPath(distro, windowsPath) {

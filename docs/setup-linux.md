@@ -6,10 +6,10 @@ This guide configures a Linux x86-64 development environment with:
 - the pinned Bloomberg `clang-p2996` toolchain for clangd/editor tooling; and
 - Xmake 3.0.1 or newer.
 
-The currently published Linux clang-p2996 artifact targets x86-64 baseline and
-requires glibc 2.38 or newer. Debian 13 and the corresponding WSL2 environment
-are the qualified baseline. Other distributions must satisfy the same runtime
-contract or build locally.
+Published Linux clang-p2996 artifacts target x86-64 baseline and declare their
+minimum glibc. The manager reads the runtime glibc from Node's process report
+and selects the newest artifact whose floor is no greater than the host. It
+does not parse localized `ldd` output for selection.
 
 ## 1. Clone the repository
 
@@ -100,10 +100,10 @@ Assign the release repository once:
 npm start -- assign releases move-engine/move-toolchains
 ```
 
-Check the host glibc version before using the current prebuilt:
+Inspect the glibc version Node will use for selection when diagnosing a host:
 
 ```bash
-ldd --version | head -n 1
+node -p 'process.report.getReport().header.glibcVersionRuntime'
 ```
 
 Then download and qualify the latest compatible artifact:
@@ -119,11 +119,17 @@ npm start -- download clangd --tag toolchains-2026.08.1
 ```
 
 The manager verifies the release manifest and archive checksums, rejects unsafe
-archive entries, publishes the versioned install beneath the configured root,
+archive entries, selects by the declared `minimumGlibc` before downloading the
+large archive, publishes the versioned install beneath the configured root,
 and runs the full trusted-prebuilt qualification at the final location. The
 Linux qualification executes clang, clangd, and a reflection/libc++ smoke test;
 it also verifies that libc++, libc++abi, and libunwind resolve from the isolated
 installation rather than the host.
+
+If no artifact supports the runtime glibc, the command fails before downloading
+the archive and prints the explicit source-build command. It never silently
+starts an LLVM build. musl and environments whose libc cannot be identified
+remain unsupported and receive a distinct diagnostic.
 
 To use an already extracted qualified tree:
 
@@ -210,8 +216,11 @@ wrong-revision source checkout is rejected.
 - **`installation: absent or unqualified`:** confirm the configured root and
   run `npm start -- download clangd`, or use `npm run adopt:clangd --` only for
   a checksum-verified archive.
-- **glibc is older than 2.38:** build clang-p2996 on the older target baseline;
-  do not force the Debian 13 artifact to run on an unsupported loader.
+- **No compatible glibc artifact:** use the printed opt-in source-build command
+  or publish a package built on the required older baseline. Do not replace the
+  system glibc or force a newer artifact onto an unsupported loader.
+- **musl or unknown libc:** no glibc prebuilt is selected. Use a separately
+  qualified source build rather than assuming ABI compatibility.
 - **clangd resolves host `libstdc++`:** reject the installation. The qualified
   Linux package must use its isolated libc++/libc++abi/libunwind runtime.
 - **GCC reports 16.x but integration fails:** preserve the failure; target and
