@@ -16,6 +16,8 @@
     "configure:clangd": "node tools/reflection/bootstrap.mjs configure",
     "install:clangd": "node tools/reflection/bootstrap.mjs install",
     "package:clang-p2996": "node tools/package-clang-p2996.mjs",
+    "package:clang-p2996:linux": "node tools/package-linux-clang-p2996.mjs",
+    "ubuntu2204:clangd": "node tools/ubuntu2204.mjs",
     "test": "node --test",
     "release:verify": "node tools/release.mjs verify",
     "release:publish": "node tools/release.mjs publish",

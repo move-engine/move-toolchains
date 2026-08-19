@@ -591,6 +591,20 @@ function cmakeArguments(profile, paths, python) {
         "-DLLVM_ENABLE_LIBXML2=OFF",
         "-DLLVM_ENABLE_CURL=OFF",
     ];
+    if (configuration.cFlags) {
+        args.push(`-DCMAKE_C_FLAGS=${configuration.cFlags}`);
+    }
+    if (configuration.cxxFlags) {
+        args.push(`-DCMAKE_CXX_FLAGS=${configuration.cxxFlags}`);
+    }
+    if (configuration.linkerFlags) {
+        args.push(`-DCMAKE_EXE_LINKER_FLAGS=${configuration.linkerFlags}`);
+        args.push(`-DCMAKE_SHARED_LINKER_FLAGS=${configuration.linkerFlags}`);
+        args.push(`-DCMAKE_MODULE_LINKER_FLAGS=${configuration.linkerFlags}`);
+    }
+    if (configuration.staticLinkCxxStdlib === true) {
+        args.push("-DLLVM_STATIC_LINK_CXX_STDLIB=ON");
+    }
     if (python?.executable) {
         args.push(`-DPython3_EXECUTABLE=${python.executable}`);
     }

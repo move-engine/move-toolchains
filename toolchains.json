@@ -25,7 +25,11 @@
             "buildType": "Release",
             "projects": "clang;clang-tools-extra",
             "runtimes": "libcxx;libcxxabi;libunwind",
-            "targets": "X86"
+            "targets": "X86",
+            "cFlags": "-march=x86-64 -mtune=generic",
+            "cxxFlags": "-march=x86-64 -mtune=generic",
+            "linkerFlags": "-static-libgcc",
+            "staticLinkCxxStdlib": true
           },
           "installTargets": [
             "install-clang",

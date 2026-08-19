@@ -1,0 +1,30 @@
+FROM ubuntu@sha256:2edbbc5dc405e9612ba3584ce95480277e3eb374407b5505fe26f17df77c7dbc
+
+ARG DEBIAN_FRONTEND=noninteractive
+ARG NODE_VERSION=20.18.0
+ARG NODE_SHA256=4543670b589593f8fa5f106111fd5139081da42bb165a9239f05195e405f240a
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        binutils \
+        build-essential \
+        ca-certificates \
+        cmake \
+        curl \
+        file \
+        git \
+        ninja-build \
+        patchelf \
+        python3 \
+        xz-utils \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN curl --fail --location --silent --show-error \
+        "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz" \
+        --output /tmp/node.tar.xz \
+    && echo "${NODE_SHA256}  /tmp/node.tar.xz" | sha256sum --check --strict \
+    && tar -xJf /tmp/node.tar.xz --strip-components=1 -C /usr/local \
+    && rm /tmp/node.tar.xz \
+    && node --version \
+    && test "$(getconf GNU_LIBC_VERSION)" = "glibc 2.35"
+
+WORKDIR /repo
