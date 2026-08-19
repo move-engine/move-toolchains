@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "release": {
-    "tag": "toolchains-2026.08.1",
-    "title": "Move toolchains 2026.08.1",
-    "notes": "Pinned reflection-capable language-server builds for Move development. GCC packages will join this release set after their relocation boundary is qualified."
+    "tag": "toolchains-2026.08.2",
+    "title": "Move toolchains 2026.08.2",
+    "notes": "Adds an Ubuntu 22.04-built clang-p2996 artifact for glibc 2.35 hosts while retaining the existing glibc 2.38 and Windows artifacts. Linux downloads select the newest compatible glibc floor before transferring an archive. GCC packages will join this release set after their relocation boundary is qualified."
   },
   "components": {
     "gcc": {
@@ -82,6 +82,28 @@
       "requirements": {
         "target": "x86_64-w64-windows-gnu",
         "ucrt64Gcc": "16.2.0"
+      }
+    },
+    {
+      "id": "clang-p2996-linux-x64-glibc235",
+      "host": "linux-x86_64-glibc2.35",
+      "file": "clangd-p2996-7220baff-linux-x86_64-glibc2.35.tar.gz",
+      "checksumFile": "clangd-p2996-7220baff-linux-x86_64-glibc2.35.tar.gz.sha256",
+      "archiveRoot": "clang-p2996/7220baffd57ea5b0f8cf59bee494dd5b7cc2b748/install",
+      "requiredEntries": [
+        "bin/clangd",
+        "bin/clang",
+        "bin/clang++",
+        "include/c++/v1/meta",
+        "lib/x86_64-unknown-linux-gnu/libc++.so.1",
+        "lib/x86_64-unknown-linux-gnu/libc++abi.so.1",
+        "lib/x86_64-unknown-linux-gnu/libunwind.so.1",
+        "move-artifact.json",
+        "move-qualification.json"
+      ],
+      "requirements": {
+        "architecture": "x86-64-baseline",
+        "minimumGlibc": "2.35"
       }
     },
     {
