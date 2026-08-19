@@ -80,6 +80,9 @@ Inspect the selected environment with:
 npm start -- status
 ```
 
+On Linux this status includes the libc family and runtime version used for
+artifact selection.
+
 ## 4. Check or install Xmake
 
 ```bash

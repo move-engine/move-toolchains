@@ -170,6 +170,10 @@ async function currentSettings() {
 async function showStatus(settings) {
     const configuration = await manifest();
     console.log(`host: ${settings.host}`);
+    if (settings.host === "linux-x64") {
+        const libc = detectLinuxLibc();
+        console.log(`libc: ${libc.family}${libc.version ? ` ${libc.version}` : " (unsupported)"}`);
+    }
     console.log(`workspace root: ${settings.localRoot}`);
     console.log(`clang-p2996 root: ${settings.clangRoot}`);
     console.log(`GCC root: ${settings.gccRoot}`);
