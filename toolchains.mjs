@@ -29,6 +29,12 @@ import {
     resolveSettings,
     saveHostSettings,
 } from "./tools/config.mjs";
+import {
+    detectLinuxLibc,
+    selectCompatibleArtifact,
+    sourceBuildAlternative,
+    unsupportedLinuxMessage,
+} from "./tools/host-compatibility.mjs";
 
 const bootstrapPath = path.join(
     repositoryRoot, "tools", "reflection", "bootstrap.mjs");
@@ -382,14 +388,6 @@ function parseChecksum(text, expectedFile) {
     return match[1].toLowerCase();
 }
 
-function artifactMatchesHost(artifact, host) {
-    if (host === "win32-x64") return artifact.host.startsWith("windows-x86_64");
-    if (host === "linux-x64") return artifact.host.startsWith("linux-x86_64");
-    if (host === "darwin-x64") return artifact.host.startsWith("macos-x86_64");
-    if (host === "darwin-arm64") return artifact.host.startsWith("macos-arm64");
-    return false;
-}
-
 function inspectArchive(file) {
     const listing = file.toLowerCase().endsWith(".zip") && process.platform !== "win32"
         ? run("unzip", ["-Z1", file])
@@ -416,6 +414,10 @@ function extractArchive(file, destination) {
 }
 
 async function downloadToolchain(settings, component, tag) {
+    const libc = settings.host === "linux-x64" ? detectLinuxLibc() : null;
+    if (settings.host === "linux-x64" && libc.family !== "glibc") {
+        fail(sourceBuildAlternative(unsupportedLinuxMessage(libc, component)));
+    }
     const release = await githubRelease(settings.releaseRepository, tag);
     const temporary = await mkdtemp(path.join(tmpdir(), "move-toolchain-download-"));
     try {
@@ -434,11 +436,15 @@ async function downloadToolchain(settings, component, tag) {
             fail("release manifest checksum mismatch");
         }
         const releaseManifest = JSON.parse(await readFile(downloadedManifest, "utf8"));
-        const prefix = component === "clangd" ? "clang-p2996-" : "gcc-";
-        const artifact = releaseManifest.artifacts?.find((candidate) =>
-            candidate.id.startsWith(prefix) && artifactMatchesHost(candidate, settings.host));
+        const artifact = selectCompatibleArtifact(
+            releaseManifest.artifacts, component, settings.host, libc);
         if (!artifact) {
-            fail(`release ${release.tag_name} has no ${component} artifact for ${settings.host}`);
+            const message = settings.host === "linux-x64"
+                ? unsupportedLinuxMessage(libc, component)
+                : `release ${release.tag_name} has no ${component} artifact for ${settings.host}`;
+            fail(component === "clangd"
+                ? sourceBuildAlternative(message)
+                : message);
         }
         const archiveAsset = releaseAsset(release, artifact.file);
         const checksumAsset = releaseAsset(release, artifact.checksumFile);
