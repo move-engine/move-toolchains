@@ -160,7 +160,9 @@ publishes it. If final publication fails, the uploaded draft is preserved for
 inspection.
 
 Enable immutable releases in the GitHub repository before the first public
-release. Never run release publication from untrusted pull-request code.
+release. The publisher verifies this repository setting and refuses a real
+publication when it is absent. Never run release publication from untrusted
+pull-request code.
 
 ## Consumer bootstrap boundary
 

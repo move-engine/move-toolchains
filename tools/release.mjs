@@ -269,6 +269,31 @@ function assertValidRepositoryName(repository) {
     }
 }
 
+export function immutableReleasesEnabled(response) {
+    try {
+        return JSON.parse(response).enabled === true;
+    } catch {
+        return false;
+    }
+}
+
+function assertImmutableReleases(repository) {
+    const status = spawnSync("gh", [
+        "api", "-H", "X-GitHub-Api-Version: 2026-03-10",
+        `repos/${repository}/immutable-releases`,
+    ], {
+        cwd: repositoryRoot,
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "pipe"],
+    });
+    if (status.error || status.status !== 0 ||
+        !immutableReleasesEnabled(status.stdout ?? "")) {
+        fail(
+            `immutable releases are not enabled for ${repository}; enable ` +
+            "release immutability before publishing");
+    }
+}
+
 async function publish(configuration, flags, values) {
     const repository = values.get("--repository");
     if (!repository) fail("publish requires --repository OWNER/REPO");
@@ -292,6 +317,7 @@ async function publish(configuration, flags, values) {
 
     if (!commandAvailable("gh", ["--version"])) fail("GitHub CLI is unavailable");
     run("gh", ["auth", "status"], {inherit: true});
+    assertImmutableReleases(repository);
     assertCleanRepository();
     const existing = spawnSync("gh", [
         "release", "view", release.tag, "--repo", repository,

@@ -5,7 +5,16 @@ import {mkdtemp, mkdir, readFile, rm, writeFile} from "node:fs/promises";
 import {tmpdir} from "node:os";
 import path from "node:path";
 import test from "node:test";
-import {verifyArtifacts} from "../tools/release.mjs";
+import {
+    immutableReleasesEnabled,
+    verifyArtifacts,
+} from "../tools/release.mjs";
+
+test("requires an explicit enabled immutable-release response", () => {
+    assert.equal(immutableReleasesEnabled('{"enabled":true}'), true);
+    assert.equal(immutableReleasesEnabled('{"enabled":false}'), false);
+    assert.equal(immutableReleasesEnabled("not json"), false);
+});
 
 async function fixture() {
     const root = await mkdtemp(path.join(tmpdir(), "move-toolchains-test-"));

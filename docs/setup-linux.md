@@ -122,7 +122,7 @@ npm start -- download clangd
 For a reproducible setup, select an exact release:
 
 ```bash
-npm start -- download clangd --tag toolchains-2026.08.1
+npm start -- download clangd --tag toolchains-2026.08.3
 ```
 
 The manager verifies the release manifest and archive checksums, rejects unsafe
