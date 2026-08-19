@@ -111,6 +111,7 @@ function parseOsRelease(text) {
 }
 
 async function makeRuntimeLibrariesRelocatable(install) {
+    const canonicalInstall = await realpath(install);
     const root = path.join(install, "lib");
     const candidates = [root];
     for (const entry of await readdir(root, {withFileTypes: true})) {
@@ -131,6 +132,11 @@ async function makeRuntimeLibrariesRelocatable(install) {
     const patched = new Set();
     for (const name of names) {
         const library = await realpath(path.join(runtimeDirectory, name));
+        const relative = path.relative(canonicalInstall, library);
+        if (relative === ".." || relative.startsWith(`..${path.sep}`) ||
+            path.isAbsolute(relative)) {
+            fail(`runtime symlink escaped the packaged installation: ${library}`);
+        }
         if (patched.has(library)) continue;
         run("patchelf", ["--set-rpath", "$ORIGIN", library]);
         if (run("patchelf", ["--print-rpath", library]) !== "$ORIGIN") {
@@ -218,7 +224,9 @@ async function main() {
             archiveTree, "clang-p2996", revision, "install");
         await mkdir(path.dirname(stagedInstall), {recursive: true});
         await cp(sourceInstall, stagedInstall, {
-            recursive: true, preserveTimestamps: true,
+            recursive: true,
+            preserveTimestamps: true,
+            verbatimSymlinks: true,
         });
         await makeRuntimeLibrariesRelocatable(stagedInstall);
         const audit = await auditElfTree(stagedInstall, maximumGlibc);
