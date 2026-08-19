@@ -8,6 +8,7 @@ import {fileURLToPath} from "node:url";
 import {compareVersions} from "./host-compatibility.mjs";
 
 const scriptPath = fileURLToPath(import.meta.url);
+export const elfToolMaxBuffer = 64 * 1024 * 1024;
 
 function fail(message) {
     throw new Error(message);
@@ -16,6 +17,7 @@ function fail(message) {
 function run(command, args) {
     const result = spawnSync(command, args, {
         encoding: "utf8", stdio: ["ignore", "pipe", "pipe"],
+        maxBuffer: elfToolMaxBuffer,
     });
     if (result.error) fail(`${command} could not start: ${result.error.message}`);
     if (result.status !== 0) {
