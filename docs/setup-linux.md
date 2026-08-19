@@ -11,6 +11,10 @@ minimum glibc. The manager reads the runtime glibc from Node's process report
 and selects the newest artifact whose floor is no greater than the host. It
 does not parse localized `ldd` output for selection.
 
+The packaged libc++, libc++abi, and libunwind shared libraries use a relative
+`$ORIGIN` runtime search path, so they resolve from the relocated installation
+rather than from similarly named host libraries.
+
 ## 1. Clone the repository
 
 Install Git, Node.js 20 or newer, and its native Linux npm, then clone the

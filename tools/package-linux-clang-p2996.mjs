@@ -8,7 +8,9 @@ import {
     cp,
     mkdir,
     mkdtemp,
+    readdir,
     readFile,
+    realpath,
     rm,
     stat,
     writeFile,
@@ -108,6 +110,36 @@ function parseOsRelease(text) {
     return values;
 }
 
+async function makeRuntimeLibrariesRelocatable(install) {
+    const root = path.join(install, "lib");
+    const candidates = [root];
+    for (const entry of await readdir(root, {withFileTypes: true})) {
+        if (entry.isDirectory()) candidates.push(path.join(root, entry.name));
+    }
+    const names = ["libc++.so.1", "libc++abi.so.1", "libunwind.so.1"];
+    let runtimeDirectory = null;
+    for (const candidate of candidates) {
+        if ((await Promise.all(names.map(
+            (name) => exists(path.join(candidate, name))))).every(Boolean)) {
+            runtimeDirectory = candidate;
+            break;
+        }
+    }
+    if (!runtimeDirectory) {
+        fail("installed libc++, libc++abi, and libunwind shared libraries were not found together");
+    }
+    const patched = new Set();
+    for (const name of names) {
+        const library = await realpath(path.join(runtimeDirectory, name));
+        if (patched.has(library)) continue;
+        run("patchelf", ["--set-rpath", "$ORIGIN", library]);
+        if (run("patchelf", ["--print-rpath", library]) !== "$ORIGIN") {
+            fail(`failed to set a relative runtime search path on ${library}`);
+        }
+        patched.add(library);
+    }
+}
+
 async function qualifyInstall(install, root, revision, maximumGlibc) {
     const binary = (name) => path.join(install, "bin", name);
     const versions = {
@@ -188,6 +220,7 @@ async function main() {
         await cp(sourceInstall, stagedInstall, {
             recursive: true, preserveTimestamps: true,
         });
+        await makeRuntimeLibrariesRelocatable(stagedInstall);
         const audit = await auditElfTree(stagedInstall, maximumGlibc);
         const metadata = {
             schemaVersion: 1,
