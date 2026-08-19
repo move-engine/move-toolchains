@@ -228,6 +228,11 @@ async function main() {
             preserveTimestamps: true,
             verbatimSymlinks: true,
         });
+        // Qualification regenerates this workspace after extraction. Its
+        // executable is host evidence, not part of the portable toolchain.
+        await rm(path.join(stagedInstall, "move-smoke"), {
+            recursive: true, force: true,
+        });
         await makeRuntimeLibrariesRelocatable(stagedInstall);
         const audit = await auditElfTree(stagedInstall, maximumGlibc);
         const metadata = {
