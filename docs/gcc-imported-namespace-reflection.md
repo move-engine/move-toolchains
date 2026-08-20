@@ -27,6 +27,9 @@ The GCC 16.2 source archive used for qualification had SHA-256
 `e6738e29597f733270731aa90600f37ffdc045079dfc27ec7e8192cc81085c3e`
 and a valid GNU release signature. The GCC master archive had SHA-256
 `7f8d525d2a51a16e893696cb73c249a1c64a6c6edbca4a60c98377a3b8433f78`.
+The candidate patch dry-runs cleanly against that exact GCC 16.2 source. A
+patched 16.2 binary has not yet been built and qualified; do not infer that
+result from source compatibility alone.
 
 The clean master compiler was configured as a non-bootstrap C/C++ frontend
 build using the installed GCC 16.1 toolchain as host. Probe qualification used
