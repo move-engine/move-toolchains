@@ -28,12 +28,12 @@ correction.
 The maintained branches have distinct roles:
 
 - `master` mirrors upstream GCC history and receives no Move patches;
-- `feature/<patch-name>` carries one reviewable downstream patch and its GCC
-  regression tests;
+- `feature/trunk-<patch-name>` carries one reviewable downstream patch and its
+  GCC regression tests on current upstream trunk;
 - `move` integrates the currently accepted Move patch stack and is the rolling
   source line used to prepare future toolchains; and
-- a pinned release qualification branch or tag identifies the exact source
-  commit used by a published compiler package.
+- `releases/move-gcc-<version>` carries the ordered, reviewed backports on the
+  exact official release commit used by that compiler package.
 
 The manifest always pins a full source commit, its upstream base, and the
 ordered Move patch commits. A branch name is provenance and maintenance
@@ -42,10 +42,16 @@ change an existing package derivation.
 
 The imported-namespace reflection correction described in
 [`gcc-imported-namespace-reflection.md`](gcc-imported-namespace-reflection.md)
-must first exist on its own feature branch. It is then integrated into `move`
-as an ordinary commit. The official GCC 16.2 release qualification line must
-contain the same source correction and bundled `reflect-4` regression without
-changing upstream `master`.
+exists on trunk feature commit
+`65fa3a2e1926e9ee9f795c3272a78132cc48cdeb` and is integrated in rolling
+`move` commit `f6dab223ec6724569a214a0f3c5d8f9c391bfbdf`. Its GCC 16.2 backport is
+commit `ced2ae7f6670c0371e0464e5aaa888c44ebd012a` on
+`releases/move-gcc-16.2.0`, based directly on official release commit
+`78d4ac73dd391005b895a6148cd9831e28e1208b`. All three GCC 16.2 profile
+artifacts must pin that one backport commit. Future updates merge a new
+upstream trunk checkpoint into `move`, resolve each feature independently,
+and cut a new exact release line when packages are promoted. None of these
+operations changes mirrored `master`.
 
 ## Manifest layers
 
@@ -81,7 +87,8 @@ receipt records:
 - the build-image identity;
 - `SOURCE_DATE_EPOCH` derived from the pinned component source commit;
 - qualification cases and their outcomes; and
-- a deterministic file manifest for the installed tree, including relative
+- a deterministic payload-tree manifest that explicitly excludes the receipt
+  itself and later package/release evidence, including relative
   path, kind, mode, size, and content or link-target hash.
 
 Absolute workstation paths and secrets are not portable receipt inputs. Build
@@ -97,7 +104,7 @@ tree digest. Release verification checks all three layers:
 manifest derivation inputs
         |
         v
-embedded receipt + installed-tree digest
+embedded receipt + receipt-excluded payload-tree digest
         |
         v
 archive bytes <- adjacent checksum and release manifest SHA-256
@@ -108,6 +115,14 @@ and timestamps derived from `SOURCE_DATE_EPOCH` where the platform archive
 format permits it. The first required property is reproducible derivation from
 fully pinned inputs; bit-for-bit comparison is recorded as evidence rather
 than assumed.
+
+The embedded receipt records qualification completed against the staged
+payload before packaging, including a staged-prefix-independence check that
+does not claim archive relocation. Extracted-archive relocation,
+path-with-spaces, clean-runtime, and archive-byte qualification necessarily
+occur after the archive exists; their results live in release-side evidence
+and the release manifest, which binds the embedded receipt hash, payload-tree
+digest, and final archive SHA-256.
 
 ## Shared command boundary
 
