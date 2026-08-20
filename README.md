@@ -148,6 +148,11 @@ The current GCC releases and upstream master crash when reflecting an imported
 namespace from a C++ module partition. See the
 [qualification report and candidate patch](docs/gcc-imported-namespace-reflection.md)
 before selecting a GCC checkpoint for Move's generated declaration pipeline.
+The planned source-branch, host-profile, receipt, packaging, qualification, and
+composed-toolchain-set boundaries are recorded in the
+[GCC and Clang tools matrix](docs/gcc-toolchain-matrix.md). No compiler build is
+an implicit setup fallback; large source builds always require an explicit
+cost acceptance.
 
 ## Verify the current release set
 
