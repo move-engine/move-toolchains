@@ -7,6 +7,7 @@ import path from "node:path";
 import test from "node:test";
 import {
     immutableReleasesEnabled,
+    releaseAssetErrors,
     verifyArtifacts,
 } from "../tools/release.mjs";
 
@@ -14,6 +15,24 @@ test("requires an explicit enabled immutable-release response", () => {
     assert.equal(immutableReleasesEnabled('{"enabled":true}'), true);
     assert.equal(immutableReleasesEnabled('{"enabled":false}'), false);
     assert.equal(immutableReleasesEnabled("not json"), false);
+});
+
+test("requires every remote release asset to be uploaded and digested", () => {
+    const expected = [{name: "toolchain.zip", size: 42, sha256: "abc"}];
+    assert.deepEqual(releaseAssetErrors(expected, [{
+        name: "toolchain.zip",
+        size: 42,
+        state: "uploaded",
+        digest: "sha256:abc",
+    }]), []);
+    const errors = releaseAssetErrors(expected, [{
+        name: "toolchain.zip",
+        size: 42,
+        state: "starter",
+        digest: null,
+    }]);
+    assert.match(errors.join("\n"), /expected uploaded state/u);
+    assert.match(errors.join("\n"), /found no digest/u);
 });
 
 async function fixture() {
