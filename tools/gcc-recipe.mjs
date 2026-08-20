@@ -6,6 +6,20 @@ import {loadBuilderLock} from "./msys2-builder-lock.mjs";
 import {canonicalProfileIdentity} from "./toolchain-set.mjs";
 
 export const gccRecipeSchemaVersion = 1;
+export const windowsGccOperationIds = Object.freeze([
+    "materialize-builder.initialize-logical-roots",
+    "materialize-builder.materialize-msys2-builder",
+    "materialize-sources.gcc",
+    "materialize-sources.msys2-gcc-recipes",
+    "populate-sysroot.extract-locked-packages",
+    "prepare-gcc.apply-exact-patch-set",
+    "prepare-gcc.autoreconf",
+    "configure-gcc.configure",
+    "build-gcc.profiledbootstrap",
+    "install-gcc.install",
+    "install-gcc.normalize-portable-prefix",
+    "install-gcc.verify-final-runtime-closure",
+]);
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const fullRevisionPattern = /^(?:[0-9a-f]{40}|[0-9a-f]{64})$/;
@@ -232,7 +246,7 @@ function validateRoots(roots) {
         dependencies: "@workspace@/dependencies", install: "@workspace@/install",
         source: "@workspace@/source/gcc", sysroot: "@install@",
         sysrootWindows: "@windows-path:@sysroot@",
-        workspace: "@build-root@/windows-x86_64-ucrt64/@recipe-digest@",
+        workspace: "@build-root@/windows-x86_64-ucrt64/@derivation-digest@",
     };
     if (canonicalJson(requireObject(roots, "Windows GCC logical roots")) !==
         canonicalJson(expected)) fail("Windows GCC logical roots are incomplete or changed");
@@ -283,14 +297,21 @@ function validatePhases(phases) {
                 `Windows GCC phase ${phase.id} operation ${operationIndex}`);
             requireString(operation.kind,
                 `Windows GCC phase ${phase.id} operation ${operationIndex} kind`);
+            requireString(operation.id,
+                `Windows GCC phase ${phase.id} operation ${operationIndex} id`);
         });
         if (canonicalJson(phase.operations.map((operation) => operation.kind)) !==
             canonicalJson(shape.kinds)) {
             fail(`Windows GCC phase ${phase.id} operations are incomplete or changed`);
         }
     }
+    if (canonicalJson(phases.flatMap((phase) =>
+        phase.operations.map((operation) => operation.id))) !==
+        canonicalJson(windowsGccOperationIds)) {
+        fail("Windows GCC operation identities are incomplete or changed");
+    }
     const initialize = phases[0].operations[0];
-    if (initialize.derivationIdentity !== "@recipe-digest@" ||
+    if (initialize.derivationIdentity !== "@derivation-digest@" ||
         canonicalJson(initialize.containers) !== canonicalJson([
             "@workspace@", "@dependencies@",
         ]) || canonicalJson(initialize.exactReuse) !== canonicalJson([
@@ -314,10 +335,12 @@ function validatePhases(phases) {
     const materializeSources = phases[1].operations;
     if (canonicalJson(materializeSources) !== canonicalJson([
         {checkoutEol: "lf", depth: 1, destination: "@source@",
+            id: "materialize-sources.gcc",
             identity: "recipe.source", kind: "materialize-git",
             reusePolicy: "verify-exact-or-fail", verifyTree: true},
         {destination: "@dependencies@/msys2-gcc-recipes",
             checkoutEol: "lf", depth: 1,
+            id: "materialize-sources.msys2-gcc-recipes",
             identity: "dependency.msys2-gcc-recipes", kind: "materialize-git",
             reusePolicy: "verify-exact-or-fail", verifyTree: true},
     ])) {

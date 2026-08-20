@@ -6,6 +6,7 @@ import {
     gccBuildPlan,
     loadGccRecipe,
     validateGccRecipe,
+    windowsGccOperationIds,
 } from "../tools/gcc-recipe.mjs";
 
 const repositoryRoot = path.resolve(
@@ -71,6 +72,9 @@ test("produces a complete read-only normalized derivation plan", async () => {
         "materialize-builder", "materialize-sources", "populate-sysroot",
         "prepare-gcc", "configure-gcc", "build-gcc", "install-gcc",
     ]);
+    assert.deepEqual(plan.phases.flatMap((phase) =>
+        phase.operations.map((operation) => operation.id)),
+    windowsGccOperationIds);
     assert.equal(plan.roots.source, "@workspace@/source/gcc");
     assert.equal(plan.environmentPolicy.mode, "allowlist-plus-recipe");
 });
@@ -128,6 +132,7 @@ test("rejects phase-order, bootstrap-command, and logical-root drift", async () 
     const {recipe} = await loadGccRecipe(recipePath);
     for (const mutate of [
         (value) => value.profile.phases.reverse(),
+        (value) => value.profile.phases[0].operations[0].id = "different",
         (value) => value.profile.phases[3].operations[0].expectedTree = "bad",
         (value) => value.profile.phases[0].operations[1].verifySignatures = false,
         (value) => value.profile.phases[0].operations[0].fresh = [],

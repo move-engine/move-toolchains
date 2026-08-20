@@ -149,13 +149,14 @@
               "@workspace@",
               "@dependencies@"
             ],
-            "derivationIdentity": "@recipe-digest@",
+            "derivationIdentity": "@derivation-digest@",
             "exactReuse": [
               "@build@/gcc"
             ],
             "fresh": [
               "@install@"
             ],
+            "id": "materialize-builder.initialize-logical-roots",
             "kind": "initialize-logical-roots",
             "materialized": [
               "@builder@",
@@ -164,6 +165,7 @@
           },
           {
             "destination": "@builder@",
+            "id": "materialize-builder.materialize-msys2-builder",
             "kind": "materialize-msys2-builder",
             "lock": "profile.builder.lock",
             "network": "locked-downloads-only",
@@ -181,6 +183,7 @@
             "checkoutEol": "lf",
             "depth": 1,
             "destination": "@source@",
+            "id": "materialize-sources.gcc",
             "identity": "recipe.source",
             "kind": "materialize-git",
             "reusePolicy": "verify-exact-or-fail",
@@ -190,6 +193,7 @@
             "checkoutEol": "lf",
             "depth": 1,
             "destination": "@dependencies@/msys2-gcc-recipes",
+            "id": "materialize-sources.msys2-gcc-recipes",
             "identity": "dependency.msys2-gcc-recipes",
             "kind": "materialize-git",
             "reusePolicy": "verify-exact-or-fail",
@@ -212,6 +216,7 @@
               ".PKGINFO"
             ],
             "generatedProvides": "profile.builder.generatedProvides",
+            "id": "populate-sysroot.extract-locked-packages",
             "kind": "extract-locked-packages",
             "packages": "profile.builder.payloadPackages",
             "source": "profile.builder.lock",
@@ -225,6 +230,7 @@
         "operations": [
           {
             "expectedTree": "01301fbf04e6bd96be2b6bb8b2cecc26a02b2595",
+            "id": "prepare-gcc.apply-exact-patch-set",
             "kind": "apply-exact-patch-set",
             "mode": "git-apply-three-way-index",
             "patches": "profile.patches",
@@ -235,6 +241,7 @@
               "-fiv"
             ],
             "environmentPolicy": "profile.environmentPolicy",
+            "id": "prepare-gcc.autoreconf",
             "interpreter": "@builder@/usr/bin/bash.exe",
             "kind": "autoreconf"
           }
@@ -296,6 +303,7 @@
               "--with-stage1-ldflags=-static-libstdc++"
             ],
             "environmentPolicy": "profile.environmentPolicy",
+            "id": "configure-gcc.configure",
             "interpreter": "@builder@/usr/bin/bash.exe",
             "kind": "configure",
             "program": "@source@/configure"
@@ -317,6 +325,7 @@
               "MSYS2_ARG_CONV_EXCL": "-D"
             },
             "environmentPolicy": "profile.environmentPolicy",
+            "id": "build-gcc.profiledbootstrap",
             "interpreter": "@builder@/usr/bin/bash.exe",
             "kind": "make"
           }
@@ -331,16 +340,19 @@
               "install"
             ],
             "environmentPolicy": "profile.environmentPolicy",
+            "id": "install-gcc.install",
             "interpreter": "@builder@/usr/bin/bash.exe",
             "kind": "make"
           },
           {
+            "id": "install-gcc.normalize-portable-prefix",
             "kind": "normalize-portable-prefix",
             "root": "@install@"
           },
           {
             "forbidResolutionFrom": "@builder@",
             "generatedProvides": "profile.builder.generatedProvides",
+            "id": "install-gcc.verify-final-runtime-closure",
             "kind": "verify-final-runtime-closure",
             "requireAllImportsResolved": true,
             "requireProducedBy": "install-gcc",
@@ -359,7 +371,7 @@
       "source": "@workspace@/source/gcc",
       "sysroot": "@install@",
       "sysrootWindows": "@windows-path:@sysroot@",
-      "workspace": "@build-root@/windows-x86_64-ucrt64/@recipe-digest@"
+      "workspace": "@build-root@/windows-x86_64-ucrt64/@derivation-digest@"
     },
     "runtime": {
       "family": "ucrt"

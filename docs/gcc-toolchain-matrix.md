@@ -153,11 +153,20 @@ The Windows artifact is built natively under MSYS2 UCRT64, but it is never
 installed into the bootstrap `C:\msys64\ucrt64` prefix. The recipe owns clean
 source, build, sysroot, staging, and qualification roots.
 
-Each workspace is keyed by the canonical recipe digest. Source and builder
-roots may be reused only after their exact materializers reverify identity;
-the object root may be reused only with the same derivation marker. The
-install/staging root must be fresh and empty for every install, so incremental
-compilation never permits stale packaged files to survive.
+Each workspace is keyed by a canonical derivation digest containing the recipe
+digest, executor-semantics version, and exact tool repository commit. Source
+and builder roots may be reused only after their exact materializers reverify
+identity; the object root may be reused only with the same derivation marker.
+The install/staging root must be fresh and empty for every install, so
+incremental compilation never permits stale packaged files to survive.
+
+The future executable build entry remains behind a literal `--accept-cost`
+gate. Argument and authorization validation occurs before filesystem access,
+network activity, or child-process creation. It accepts only a native Windows
+x64 host, an explicit local absolute build root, a bounded job count, adequate
+path-length headroom, and at least 80 GiB free. Per-derivation owner locks are
+fail-closed: an unreadable or pre-existing lock is preserved for explicit
+recovery rather than reclaimed heuristically.
 
 The bootstrap is not identified by mutable package names alone. The checked-in
 builder lock binds an exact MSYS2 base installer plus the complete resolved
