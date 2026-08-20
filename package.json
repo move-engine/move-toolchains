@@ -20,6 +20,7 @@
     "package:clang-p2996": "node tools/package-clang-p2996.mjs",
     "package:clang-p2996:linux": "node tools/package-linux-clang-p2996.mjs",
     "package:gcc:windows": "node tools/package-gcc-windows.mjs",
+    "qualify:gcc:linux": "node tools/qualify-gcc-linux.mjs",
     "ubuntu2204:clangd": "node tools/ubuntu2204.mjs",
     "test": "node --test",
     "release:verify": "node tools/release.mjs verify",
