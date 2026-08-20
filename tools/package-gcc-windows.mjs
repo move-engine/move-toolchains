@@ -291,7 +291,7 @@ async function main() {
 
         await rm(archive, {force: true});
         await rm(checksum, {force: true});
-        run("7z.exe", ["a", "-tzip", "-mx=7", "-mmt=on", "-mtc=off", "-mta=off", archive, archiveRoot], {
+        run("7z.exe", ["a", "-tzip", "-mx=7", "-mmt=on", archive, archiveRoot], {
             cwd: temporary,
             inherit: true,
         });
