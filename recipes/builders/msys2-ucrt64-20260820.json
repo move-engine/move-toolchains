@@ -1,0 +1,2936 @@
+{
+  "base": {
+    "bytes": 52898952,
+    "file": "msys2-base-x86_64-20260611.sfx.exe",
+    "sha256": "c105946e64e08f099ac0e4647461ce762b95333ad211777666476a9a41451d65",
+    "url": "https://github.com/msys2/msys2-installer/releases/download/2026-06-11/msys2-base-x86_64-20260611.sfx.exe"
+  },
+  "id": "msys2-ucrt64-20260820",
+  "packages": [
+    {
+      "architecture": "any",
+      "bytes": 5003,
+      "dependencies": [
+        "autoconf2.13",
+        "autoconf2.69",
+        "autoconf2.71",
+        "autoconf2.72",
+        "autoconf2.73",
+        "bash",
+        "sed"
+      ],
+      "file": "autoconf-wrapper-20260320-1-any.pkg.tar.zst",
+      "name": "autoconf-wrapper",
+      "provides": [
+        "autoconf"
+      ],
+      "repository": "msys",
+      "sha256": "84c1f93d4450b3bf1ef567110b51c15ffb3f13670d656cc48fea70a01371b20c",
+      "signature": {
+        "bytes": 566,
+        "file": "autoconf-wrapper-20260320-1-any.pkg.tar.zst.sig",
+        "sha256": "2c468ca05aeb570e9a127fb5bf0db31516d8ebb0bab2036b74fffb4fdede8eb0",
+        "url": "https://repo.msys2.org/msys/x86_64/autoconf-wrapper-20260320-1-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/autoconf-wrapper-20260320-1-any.pkg.tar.zst",
+      "version": "20260320-1"
+    },
+    {
+      "architecture": "any",
+      "bytes": 140650,
+      "dependencies": [
+        "awk",
+        "bash",
+        "diffutils",
+        "m4",
+        "perl"
+      ],
+      "file": "autoconf2.13-2.13-6-any.pkg.tar.zst",
+      "name": "autoconf2.13",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "38bd817375f053b6d939f80a30582d05bc6ed5cd07db135e7f3120a27f1b9512",
+      "signature": {
+        "bytes": 566,
+        "file": "autoconf2.13-2.13-6-any.pkg.tar.zst.sig",
+        "sha256": "0da9f5e3136b671dcaf1d40281f37e500998ab9b1f7a46fbbc60241d05863b67",
+        "url": "https://repo.msys2.org/msys/x86_64/autoconf2.13-2.13-6-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/autoconf2.13-2.13-6-any.pkg.tar.zst",
+      "version": "2.13-6"
+    },
+    {
+      "architecture": "any",
+      "bytes": 291433,
+      "dependencies": [
+        "awk",
+        "bash",
+        "diffutils",
+        "m4",
+        "perl"
+      ],
+      "file": "autoconf2.69-2.69-4-any.pkg.tar.zst",
+      "name": "autoconf2.69",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "56b2de8e53e46a88bb217a427c2f7b5671ac6400148681fb2089e9b7be817364",
+      "signature": {
+        "bytes": 566,
+        "file": "autoconf2.69-2.69-4-any.pkg.tar.zst.sig",
+        "sha256": "5cd385bd0d01ade7d357d1dc07a7079e4015dcf837c3bf84177e725bd223d894",
+        "url": "https://repo.msys2.org/msys/x86_64/autoconf2.69-2.69-4-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/autoconf2.69-2.69-4-any.pkg.tar.zst",
+      "version": "2.69-4"
+    },
+    {
+      "architecture": "any",
+      "bytes": 335194,
+      "dependencies": [
+        "awk",
+        "bash",
+        "diffutils",
+        "m4",
+        "perl",
+        "sed"
+      ],
+      "file": "autoconf2.71-2.71-4-any.pkg.tar.zst",
+      "name": "autoconf2.71",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "55be2b911beaa0424d60fdcf206f2411a0eb24cb53e66a82964497ef8a4faac0",
+      "signature": {
+        "bytes": 565,
+        "file": "autoconf2.71-2.71-4-any.pkg.tar.zst.sig",
+        "sha256": "5eb76a37edce9d18310998225a683d2a7a35863e618ce8d05721e2d8c45acfb7",
+        "url": "https://repo.msys2.org/msys/x86_64/autoconf2.71-2.71-4-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/autoconf2.71-2.71-4-any.pkg.tar.zst",
+      "version": "2.71-4"
+    },
+    {
+      "architecture": "any",
+      "bytes": 339599,
+      "dependencies": [
+        "awk",
+        "bash",
+        "diffutils",
+        "m4",
+        "perl",
+        "sed"
+      ],
+      "file": "autoconf2.72-2.72-4-any.pkg.tar.zst",
+      "name": "autoconf2.72",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "65b3a37edf8bb4221d38db910ce1acc1ed879c7bcba33faa058066d06d35e7b0",
+      "signature": {
+        "bytes": 566,
+        "file": "autoconf2.72-2.72-4-any.pkg.tar.zst.sig",
+        "sha256": "ef080640a2f4db8cdf96f764be38d170ce39c69ddfd5574612ff8eb07e7fae57",
+        "url": "https://repo.msys2.org/msys/x86_64/autoconf2.72-2.72-4-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/autoconf2.72-2.72-4-any.pkg.tar.zst",
+      "version": "2.72-4"
+    },
+    {
+      "architecture": "any",
+      "bytes": 747391,
+      "dependencies": [
+        "awk",
+        "bash",
+        "diffutils",
+        "m4",
+        "perl",
+        "sed"
+      ],
+      "file": "autoconf2.73-2.73-1-any.pkg.tar.zst",
+      "name": "autoconf2.73",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "716d0542dc12a481f1c2d5574f17f1470eb9d3226cf6e206d4e243c12fa95e1a",
+      "signature": {
+        "bytes": 566,
+        "file": "autoconf2.73-2.73-1-any.pkg.tar.zst.sig",
+        "sha256": "78ac95867dbf91725adfd15768b085a36c9dc575d93cdae980bc8d44357568dc",
+        "url": "https://repo.msys2.org/msys/x86_64/autoconf2.73-2.73-1-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/autoconf2.73-2.73-1-any.pkg.tar.zst",
+      "version": "2.73-1"
+    },
+    {
+      "architecture": "any",
+      "bytes": 4474,
+      "dependencies": [
+        "automake1.11",
+        "automake1.12",
+        "automake1.13",
+        "automake1.14",
+        "automake1.15",
+        "automake1.16",
+        "automake1.17",
+        "automake1.18",
+        "bash",
+        "gawk"
+      ],
+      "file": "automake-wrapper-20260320-1-any.pkg.tar.zst",
+      "name": "automake-wrapper",
+      "provides": [
+        "automake"
+      ],
+      "repository": "msys",
+      "sha256": "693817c288c81bb9f94ac92e5b6f914402735b80bb33e326ccddd7c89cc6a719",
+      "signature": {
+        "bytes": 566,
+        "file": "automake-wrapper-20260320-1-any.pkg.tar.zst.sig",
+        "sha256": "7925cca62a4809f3ab990b2c79bbf6b542319e7ddd40329d3627c8737eecade1",
+        "url": "https://repo.msys2.org/msys/x86_64/automake-wrapper-20260320-1-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/automake-wrapper-20260320-1-any.pkg.tar.zst",
+      "version": "20260320-1"
+    },
+    {
+      "architecture": "any",
+      "bytes": 501977,
+      "dependencies": [
+        "bash",
+        "perl"
+      ],
+      "file": "automake1.11-1.11.6-6-any.pkg.tar.zst",
+      "name": "automake1.11",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "25ecc6296e1416513153c290442cbca6dcb813c1c50e5beb3a708408ba5de3a5",
+      "signature": {
+        "bytes": 566,
+        "file": "automake1.11-1.11.6-6-any.pkg.tar.zst.sig",
+        "sha256": "99a5cad2d07ddea9df55c583f3b4ddad36497b0005877493160faafab05e38c0",
+        "url": "https://repo.msys2.org/msys/x86_64/automake1.11-1.11.6-6-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/automake1.11-1.11.6-6-any.pkg.tar.zst",
+      "version": "1.11.6-6"
+    },
+    {
+      "architecture": "any",
+      "bytes": 515182,
+      "dependencies": [
+        "bash",
+        "perl"
+      ],
+      "file": "automake1.12-1.12.6-6-any.pkg.tar.zst",
+      "name": "automake1.12",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "b6c91241999c6ff8d04c5ea8011b10544a373b01eacb7993c66db99e5f4fb373",
+      "signature": {
+        "bytes": 566,
+        "file": "automake1.12-1.12.6-6-any.pkg.tar.zst.sig",
+        "sha256": "fdb398d249cece07264a185177ff1e54573c0b9df184c094ead7a0105c598d99",
+        "url": "https://repo.msys2.org/msys/x86_64/automake1.12-1.12.6-6-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/automake1.12-1.12.6-6-any.pkg.tar.zst",
+      "version": "1.12.6-6"
+    },
+    {
+      "architecture": "any",
+      "bytes": 513498,
+      "dependencies": [
+        "bash",
+        "perl"
+      ],
+      "file": "automake1.13-1.13.4-7-any.pkg.tar.zst",
+      "name": "automake1.13",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "a0d3eb1b359a67c1c8a9161cf79ba681cccabf47c78cb40d3065b5eff02a82f0",
+      "signature": {
+        "bytes": 566,
+        "file": "automake1.13-1.13.4-7-any.pkg.tar.zst.sig",
+        "sha256": "58af6d9609e881ff51c42c78166823b6db7e0f19bd6b88952337dc941c1bf5a6",
+        "url": "https://repo.msys2.org/msys/x86_64/automake1.13-1.13.4-7-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/automake1.13-1.13.4-7-any.pkg.tar.zst",
+      "version": "1.13.4-7"
+    },
+    {
+      "architecture": "any",
+      "bytes": 515193,
+      "dependencies": [
+        "bash",
+        "perl"
+      ],
+      "file": "automake1.14-1.14.1-6-any.pkg.tar.zst",
+      "name": "automake1.14",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "0b097559c1fa79124552334b63d13417bcec8a08008ab65f77d27300a4ccc5b4",
+      "signature": {
+        "bytes": 566,
+        "file": "automake1.14-1.14.1-6-any.pkg.tar.zst.sig",
+        "sha256": "821f02f882a2b393e9bad3ff2a6e60a70fa12e4ff0faa8f1817360c2238fcd8e",
+        "url": "https://repo.msys2.org/msys/x86_64/automake1.14-1.14.1-6-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/automake1.14-1.14.1-6-any.pkg.tar.zst",
+      "version": "1.14.1-6"
+    },
+    {
+      "architecture": "any",
+      "bytes": 525733,
+      "dependencies": [
+        "bash",
+        "perl"
+      ],
+      "file": "automake1.15-1.15.1-4-any.pkg.tar.zst",
+      "name": "automake1.15",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "e3c73d0094eebbc2353b2ddd0b7c81020917c2ec09d3e4967d7abc9794fa7843",
+      "signature": {
+        "bytes": 566,
+        "file": "automake1.15-1.15.1-4-any.pkg.tar.zst.sig",
+        "sha256": "1138487e8b7e859929e7ed0da75b718dab4a48dfffa5564b5e7ff519b789e554",
+        "url": "https://repo.msys2.org/msys/x86_64/automake1.15-1.15.1-4-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/automake1.15-1.15.1-4-any.pkg.tar.zst",
+      "version": "1.15.1-4"
+    },
+    {
+      "architecture": "any",
+      "bytes": 538941,
+      "dependencies": [
+        "bash",
+        "perl"
+      ],
+      "file": "automake1.16-1.16.5-1-any.pkg.tar.zst",
+      "name": "automake1.16",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "1963b5fa0ab5eaf1bdc311501cd742c6bb19941e831dcc8ab1e51a8c7f1634fe",
+      "signature": {
+        "bytes": 566,
+        "file": "automake1.16-1.16.5-1-any.pkg.tar.zst.sig",
+        "sha256": "563b28d0e047afac9b83dbd905ab84056c23c11388e8444ed41f1d051b94b8c1",
+        "url": "https://repo.msys2.org/msys/x86_64/automake1.16-1.16.5-1-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/automake1.16-1.16.5-1-any.pkg.tar.zst",
+      "version": "1.16.5-1"
+    },
+    {
+      "architecture": "any",
+      "bytes": 547861,
+      "dependencies": [
+        "bash",
+        "perl"
+      ],
+      "file": "automake1.17-1.17-1-any.pkg.tar.zst",
+      "name": "automake1.17",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "bb069dbb6f580c2346d2f6d74268b5e12e625f7ba57299426f9cd6c0fa714191",
+      "signature": {
+        "bytes": 566,
+        "file": "automake1.17-1.17-1-any.pkg.tar.zst.sig",
+        "sha256": "6190c9e05b22a0a5409a77091ed3b5525e0c9cd5ab222a94d35cea3e71a298d7",
+        "url": "https://repo.msys2.org/msys/x86_64/automake1.17-1.17-1-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/automake1.17-1.17-1-any.pkg.tar.zst",
+      "version": "1.17-1"
+    },
+    {
+      "architecture": "any",
+      "bytes": 556123,
+      "dependencies": [
+        "bash",
+        "perl"
+      ],
+      "file": "automake1.18-1.18.1-1-any.pkg.tar.zst",
+      "name": "automake1.18",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "c045d9eddf900dbacae06d9e0e19e250cc32d849def7d06b833253f85e3fc941",
+      "signature": {
+        "bytes": 566,
+        "file": "automake1.18-1.18.1-1-any.pkg.tar.zst.sig",
+        "sha256": "97904aaceae899d0a5952e280fb6aa48106bc698531cdceeaa7303ea4aab0d93",
+        "url": "https://repo.msys2.org/msys/x86_64/automake1.18-1.18.1-1-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/automake1.18-1.18.1-1-any.pkg.tar.zst",
+      "version": "1.18.1-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 2582400,
+      "dependencies": [],
+      "file": "bash-5.3.015-1-x86_64.pkg.tar.zst",
+      "name": "bash",
+      "provides": [
+        "sh"
+      ],
+      "repository": "msys",
+      "sha256": "ecd097c0b85938b3167abd7e839a6113b25c8b581b14954aad02e1f8ce556c8e",
+      "signature": {
+        "bytes": 566,
+        "file": "bash-5.3.015-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "374843698dde21c358a227b99692824d4425a078ba7ad56c85d0087ba0ed7853",
+        "url": "https://repo.msys2.org/msys/x86_64/bash-5.3.015-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/bash-5.3.015-1-x86_64.pkg.tar.zst",
+      "version": "5.3.015-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 795844,
+      "dependencies": [
+        "libiconv",
+        "libintl",
+        "m4",
+        "sh"
+      ],
+      "file": "bison-3.8.2-5-x86_64.pkg.tar.zst",
+      "name": "bison",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "7439ca784a9909e0730a513d3aff15852c3b292ac85053fa2dd7a2a19c1ce04c",
+      "signature": {
+        "bytes": 566,
+        "file": "bison-3.8.2-5-x86_64.pkg.tar.zst.sig",
+        "sha256": "a3f6c7e07f59a2147e16872011135a3c95dd4882df34f44c3ac765b11b2d34f4",
+        "url": "https://repo.msys2.org/msys/x86_64/bison-3.8.2-5-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/bison-3.8.2-5-x86_64.pkg.tar.zst",
+      "version": "3.8.2-5"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 381349,
+      "dependencies": [
+        "gcc-libs"
+      ],
+      "file": "brotli-1.2.0-1-x86_64.pkg.tar.zst",
+      "name": "brotli",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "6642bd8fcb238119b167038614ad4eaf44a25b4978a34f74349e0359565ac671",
+      "signature": {
+        "bytes": 565,
+        "file": "brotli-1.2.0-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "22fb9bea320e78cf82d827ea82f2538d03bccc0c6cd6617a62039d3d12fa4daa",
+        "url": "https://repo.msys2.org/msys/x86_64/brotli-1.2.0-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/brotli-1.2.0-1-x86_64.pkg.tar.zst",
+      "version": "1.2.0-1"
+    },
+    {
+      "architecture": "any",
+      "bytes": 395521,
+      "dependencies": [
+        "bash",
+        "coreutils",
+        "findutils",
+        "openssl",
+        "p11-kit",
+        "sed"
+      ],
+      "file": "ca-certificates-20260816-1-any.pkg.tar.zst",
+      "name": "ca-certificates",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "b7b2344aa87022919d6c4fd2bd9410e6490835c9a2d43092c1284186bae8c5d0",
+      "signature": {
+        "bytes": 566,
+        "file": "ca-certificates-20260816-1-any.pkg.tar.zst.sig",
+        "sha256": "c573f00de50b080d3d308676d38aed14f557e9cde1c2d8f868781ea3bed0fbe0",
+        "url": "https://repo.msys2.org/msys/x86_64/ca-certificates-20260816-1-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/ca-certificates-20260816-1-any.pkg.tar.zst",
+      "version": "20260816-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 2755209,
+      "dependencies": [
+        "gmp",
+        "libiconv",
+        "libintl"
+      ],
+      "file": "coreutils-8.32-5-x86_64.pkg.tar.zst",
+      "name": "coreutils",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "62dfee1c39fd15f99c39802b35e82643bc14fffc16d6c76d4001caa385ec77e3",
+      "signature": {
+        "bytes": 566,
+        "file": "coreutils-8.32-5-x86_64.pkg.tar.zst.sig",
+        "sha256": "622861ad85807d070f3665d7f6c524c27a5e1d2050b0ee3f806247f185a07ad2",
+        "url": "https://repo.msys2.org/msys/x86_64/coreutils-8.32-5-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/coreutils-8.32-5-x86_64.pkg.tar.zst",
+      "version": "8.32-5"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 927514,
+      "dependencies": [
+        "ca-certificates",
+        "libcurl",
+        "libnghttp2",
+        "libnghttp3",
+        "libngtcp2",
+        "libpsl",
+        "libunistring",
+        "openssl",
+        "zlib"
+      ],
+      "file": "curl-8.21.0-1-x86_64.pkg.tar.zst",
+      "name": "curl",
+      "provides": [
+        "wcurl"
+      ],
+      "repository": "msys",
+      "sha256": "85df4cba7342fcc2a2c8763e603a28721d8095004adf7bc1eae5f85fc0e3a706",
+      "signature": {
+        "bytes": 566,
+        "file": "curl-8.21.0-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "d980ec2185030684f34fe71587c96add6c962335cf60fc0810a1a60c5467b940",
+        "url": "https://repo.msys2.org/msys/x86_64/curl-8.21.0-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/curl-8.21.0-1-x86_64.pkg.tar.zst",
+      "version": "8.21.0-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 49971,
+      "dependencies": [
+        "libdb=6.2.32"
+      ],
+      "file": "db-6.2.32-6-x86_64.pkg.tar.zst",
+      "name": "db",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "41bc94acad3b53eaa92227ec34412305f648848ffbc963bcad88274517e13e8d",
+      "signature": {
+        "bytes": 566,
+        "file": "db-6.2.32-6-x86_64.pkg.tar.zst.sig",
+        "sha256": "dfd5a37a7512575806074297354f8ee3a1e1d58a750e6d30dd1522f12a4ee085",
+        "url": "https://repo.msys2.org/msys/x86_64/db-6.2.32-6-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/db-6.2.32-6-x86_64.pkg.tar.zst",
+      "version": "6.2.32-6"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 394515,
+      "dependencies": [
+        "libiconv",
+        "libintl",
+        "sh"
+      ],
+      "file": "diffutils-3.12-1-x86_64.pkg.tar.zst",
+      "name": "diffutils",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "7902c8ce3d4dd69a0f5e98dc9d5c83c17b23314ba486169db57ef6e2835ce3b6",
+      "signature": {
+        "bytes": 566,
+        "file": "diffutils-3.12-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "f25457caac4b77e5341e8fd02a53e696a023024ed398992eec199a43fd26c811",
+        "url": "https://repo.msys2.org/msys/x86_64/diffutils-3.12-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/diffutils-3.12-1-x86_64.pkg.tar.zst",
+      "version": "3.12-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 468042,
+      "dependencies": [
+        "gcc-libs",
+        "libbz2",
+        "liblzma",
+        "libzstd",
+        "zlib"
+      ],
+      "file": "file-5.48-1-x86_64.pkg.tar.zst",
+      "name": "file",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "f55026638fe4ed4b31ee3cf316843ac190d9332816bff8dcb0a99fd8c6350608",
+      "signature": {
+        "bytes": 566,
+        "file": "file-5.48-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "9d76081160bd2870532132802589d0c7a5200c413c8157cc6b509d2f487c3e46",
+        "url": "https://repo.msys2.org/msys/x86_64/file-5.48-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/file-5.48-1-x86_64.pkg.tar.zst",
+      "version": "5.48-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 582781,
+      "dependencies": [
+        "libiconv",
+        "libintl"
+      ],
+      "file": "findutils-4.11.0-2-x86_64.pkg.tar.zst",
+      "name": "findutils",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "f19d3c6b1b073d4c5759ae83f5639d11a5f0227b772f7d86d600db573d9d5d32",
+      "signature": {
+        "bytes": 566,
+        "file": "findutils-4.11.0-2-x86_64.pkg.tar.zst.sig",
+        "sha256": "89e5c679db160d56a7b88b4c82a14187168272a51e8f919cc1e8be0b09254c9a",
+        "url": "https://repo.msys2.org/msys/x86_64/findutils-4.11.0-2-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/findutils-4.11.0-2-x86_64.pkg.tar.zst",
+      "version": "4.11.0-2"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 310795,
+      "dependencies": [
+        "libiconv",
+        "libintl",
+        "m4",
+        "sh"
+      ],
+      "file": "flex-2.6.4-4-x86_64.pkg.tar.zst",
+      "name": "flex",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "d70fbf25d0dea3cb8ae42670b79a8ba65a48daa140137367b5ebaf37eb48df26",
+      "signature": {
+        "bytes": 566,
+        "file": "flex-2.6.4-4-x86_64.pkg.tar.zst.sig",
+        "sha256": "b66bc6370619a0b6cbc6d9466271ce93962587197bbf4262956d75909db94c10",
+        "url": "https://repo.msys2.org/msys/x86_64/flex-2.6.4-4-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/flex-2.6.4-4-x86_64.pkg.tar.zst",
+      "version": "2.6.4-4"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 1519178,
+      "dependencies": [
+        "libintl",
+        "libreadline",
+        "mpfr",
+        "sh"
+      ],
+      "file": "gawk-5.4.1-1-x86_64.pkg.tar.zst",
+      "name": "gawk",
+      "provides": [
+        "awk"
+      ],
+      "repository": "msys",
+      "sha256": "4b1322cb6c83d61fde5100e229e3cabc5b7d01fc0d0d8bc311edc08df91916be",
+      "signature": {
+        "bytes": 566,
+        "file": "gawk-5.4.1-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "54e5b27f677207d401ef32bfc3cad66f502de332e3a676a1d0898a8abaeae19b",
+        "url": "https://repo.msys2.org/msys/x86_64/gawk-5.4.1-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/gawk-5.4.1-1-x86_64.pkg.tar.zst",
+      "version": "5.4.1-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 1082211,
+      "dependencies": [],
+      "file": "gcc-libs-15.3.0-1-x86_64.pkg.tar.zst",
+      "name": "gcc-libs",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "0d99a122c453c05ae21ba3dcea910f2e0d93d38ae067c677a112a315b0f3cec5",
+      "signature": {
+        "bytes": 566,
+        "file": "gcc-libs-15.3.0-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "994ccac224e5a7a3c5c11e9ea11193c956bc5d1288b1be42f9fa437286542599",
+        "url": "https://repo.msys2.org/msys/x86_64/gcc-libs-15.3.0-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/gcc-libs-15.3.0-1-x86_64.pkg.tar.zst",
+      "version": "15.3.0-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 212954,
+      "dependencies": [
+        "libgdbm=1.26"
+      ],
+      "file": "gdbm-1.26-1-x86_64.pkg.tar.zst",
+      "name": "gdbm",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "1f8e949be2bbe488c5644132db78ecda288c9945922e7ed2447384734e2adba2",
+      "signature": {
+        "bytes": 566,
+        "file": "gdbm-1.26-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "dde1cf8a37a12fd83a97a1c25d30774b789c2b1ed772ef0b540fbc3127d64e5f",
+        "url": "https://repo.msys2.org/msys/x86_64/gdbm-1.26-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/gdbm-1.26-1-x86_64.pkg.tar.zst",
+      "version": "1.26-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 7339265,
+      "dependencies": [
+        "curl",
+        "libexpat",
+        "libintl",
+        "libpcre2_8",
+        "nano",
+        "openssh",
+        "openssl",
+        "perl-Authen-SASL",
+        "perl-Error",
+        "perl-MIME-tools",
+        "perl-Net-SMTP-SSL",
+        "perl-TermReadKey",
+        "perl-libwww",
+        "perl>=5.14.0"
+      ],
+      "file": "git-2.55.0-1-x86_64.pkg.tar.zst",
+      "name": "git",
+      "provides": [
+        "git-core"
+      ],
+      "repository": "msys",
+      "sha256": "59e0ab1f8a66e507e14000b23f31f3e18cecece092704fd29bafe87edbcc2c56",
+      "signature": {
+        "bytes": 566,
+        "file": "git-2.55.0-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "87088f173c5dbadb75afeb1d50270c1bb521fae018e1585841de9bc5ecb6cf37",
+        "url": "https://repo.msys2.org/msys/x86_64/git-2.55.0-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/git-2.55.0-1-x86_64.pkg.tar.zst",
+      "version": "2.55.0-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 396914,
+      "dependencies": [],
+      "file": "gmp-6.3.0-2-x86_64.pkg.tar.zst",
+      "name": "gmp",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "f84536138e618d47a1df2da83916cfebbd449f159ffad52f994a71060a41cf34",
+      "signature": {
+        "bytes": 566,
+        "file": "gmp-6.3.0-2-x86_64.pkg.tar.zst.sig",
+        "sha256": "2fe4effbb7950beba40d46dfd83db242c79d8989ee712c125e89bc292e94f24d",
+        "url": "https://repo.msys2.org/msys/x86_64/gmp-6.3.0-2-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/gmp-6.3.0-2-x86_64.pkg.tar.zst",
+      "version": "6.3.0-2"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 106297,
+      "dependencies": [
+        "bash",
+        "less"
+      ],
+      "file": "gzip-1.14-2-x86_64.pkg.tar.zst",
+      "name": "gzip",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "d63e8d98ff030c88663cc64cf8ebd04203fba17365807477efa06f717d7daedc",
+      "signature": {
+        "bytes": 566,
+        "file": "gzip-1.14-2-x86_64.pkg.tar.zst.sig",
+        "sha256": "a7cc40f2a7b0fa29c204c0ac1366f595ba33fdd0d4013f91f38f459a105f1a41",
+        "url": "https://repo.msys2.org/msys/x86_64/gzip-1.14-2-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/gzip-1.14-2-x86_64.pkg.tar.zst",
+      "version": "1.14-2"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 557618,
+      "dependencies": [
+        "heimdal-libs"
+      ],
+      "file": "heimdal-7.8.0-5-x86_64.pkg.tar.zst",
+      "name": "heimdal",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "4b3906a2a677232d43db712b6fecab50da761c5b229c5018178a577c5c25ec64",
+      "signature": {
+        "bytes": 566,
+        "file": "heimdal-7.8.0-5-x86_64.pkg.tar.zst.sig",
+        "sha256": "113236a4daf2914fd119d541664aeb8398092ce55c05bcad630b440d4ee03a98",
+        "url": "https://repo.msys2.org/msys/x86_64/heimdal-7.8.0-5-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/heimdal-7.8.0-5-x86_64.pkg.tar.zst",
+      "version": "7.8.0-5"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 848031,
+      "dependencies": [
+        "libdb",
+        "libedit",
+        "libopenssl",
+        "libsqlite",
+        "libxcrypt"
+      ],
+      "file": "heimdal-libs-7.8.0-5-x86_64.pkg.tar.zst",
+      "name": "heimdal-libs",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "d5f139b6feebd75f0b5fefec952c7fbb4cdfa16235601c223dabc3b1bcead19f",
+      "signature": {
+        "bytes": 566,
+        "file": "heimdal-libs-7.8.0-5-x86_64.pkg.tar.zst.sig",
+        "sha256": "3ed7244898fe3cd66e9bf04cd57926640f47593d44073300afa0e45ef56d9552",
+        "url": "https://repo.msys2.org/msys/x86_64/heimdal-libs-7.8.0-5-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/heimdal-libs-7.8.0-5-x86_64.pkg.tar.zst",
+      "version": "7.8.0-5"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 189742,
+      "dependencies": [
+        "gzip",
+        "libintl",
+        "libxcrypt",
+        "ncurses"
+      ],
+      "file": "info-7.2-3-x86_64.pkg.tar.zst",
+      "name": "info",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "69242603357aa7011356f7d15a2017ad086e5682c8577f13520943c94bd2b03e",
+      "signature": {
+        "bytes": 566,
+        "file": "info-7.2-3-x86_64.pkg.tar.zst.sig",
+        "sha256": "3d009bb77efd7b553898f73b21f4325188111e0f1b66397a0a57c4b283513ffd",
+        "url": "https://repo.msys2.org/msys/x86_64/info-7.2-3-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/info-7.2-3-x86_64.pkg.tar.zst",
+      "version": "7.2-3"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 151338,
+      "dependencies": [
+        "libpcre2_8",
+        "ncurses"
+      ],
+      "file": "less-704-1-x86_64.pkg.tar.zst",
+      "name": "less",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "0fddcf47bb99487616a0044bd98cda8528952cf5097666436d34383ecffe7fd6",
+      "signature": {
+        "bytes": 566,
+        "file": "less-704-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "cd7147888cabacc0c9807c2d90aa97b79758be4f74170d665a08591405e65526",
+        "url": "https://repo.msys2.org/msys/x86_64/less-704-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/less-704-1-x86_64.pkg.tar.zst",
+      "version": "704-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 30786,
+      "dependencies": [
+        "gcc-libs"
+      ],
+      "file": "libbz2-1.0.8-4-x86_64.pkg.tar.zst",
+      "name": "libbz2",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "89fb0e1478b22b80effda55ab4ae7549388d01245d3841a096d8a2d63236c2a1",
+      "signature": {
+        "bytes": 566,
+        "file": "libbz2-1.0.8-4-x86_64.pkg.tar.zst.sig",
+        "sha256": "8d2642418c1db5f80efdb272196b201ef117292db0f0280dadedd4701763a4f3",
+        "url": "https://repo.msys2.org/msys/x86_64/libbz2-1.0.8-4-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/libbz2-1.0.8-4-x86_64.pkg.tar.zst",
+      "version": "1.0.8-4"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 23152,
+      "dependencies": [],
+      "file": "libcbor-0.14.0-2-x86_64.pkg.tar.zst",
+      "name": "libcbor",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "a661826edc2d452f8d74bae2cd5974dfbcd84e23bfbfa7ea3db38ee010d7b004",
+      "signature": {
+        "bytes": 566,
+        "file": "libcbor-0.14.0-2-x86_64.pkg.tar.zst.sig",
+        "sha256": "aa81966a4929ac9b1f4e34c0566090236e65bfbaee4c5a931e85b8e5e797bd4a",
+        "url": "https://repo.msys2.org/msys/x86_64/libcbor-0.14.0-2-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/libcbor-0.14.0-2-x86_64.pkg.tar.zst",
+      "version": "0.14.0-2"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 381323,
+      "dependencies": [
+        "brotli",
+        "ca-certificates",
+        "libidn2",
+        "libnghttp2",
+        "libnghttp3",
+        "libngtcp2",
+        "libpsl",
+        "libssh2",
+        "libunistring",
+        "libzstd",
+        "openssl",
+        "zlib"
+      ],
+      "file": "libcurl-8.21.0-1-x86_64.pkg.tar.zst",
+      "name": "libcurl",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "efba0e04ece477f119580171c7c795817eed9322fa9a3b00fea5a94e0ea7b622",
+      "signature": {
+        "bytes": 566,
+        "file": "libcurl-8.21.0-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "d66f4e5a72e50927cf61d9d5c409df04befec435368a1863d8e9c22ac19c2924",
+        "url": "https://repo.msys2.org/msys/x86_64/libcurl-8.21.0-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/libcurl-8.21.0-1-x86_64.pkg.tar.zst",
+      "version": "8.21.0-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 831918,
+      "dependencies": [
+        "gcc-libs"
+      ],
+      "file": "libdb-6.2.32-6-x86_64.pkg.tar.zst",
+      "name": "libdb",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "27a35786f3aab14e625c02df7bcd8a9dda0da782ce4f0549a427a21316b4d179",
+      "signature": {
+        "bytes": 566,
+        "file": "libdb-6.2.32-6-x86_64.pkg.tar.zst.sig",
+        "sha256": "1f0efaa8e2c0065af9e9fa8bdd8ae990ad414f121e67cb7b7e57fb8e46016294",
+        "url": "https://repo.msys2.org/msys/x86_64/libdb-6.2.32-6-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/libdb-6.2.32-6-x86_64.pkg.tar.zst",
+      "version": "6.2.32-6"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 94059,
+      "dependencies": [
+        "ncurses",
+        "sh"
+      ],
+      "file": "libedit-20240808_3.1-1-x86_64.pkg.tar.zst",
+      "name": "libedit",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "aada8ba7dfe41fdcac28d3706c0dc7c621b7667035a5e629cb5f3af7fb3f7de0",
+      "signature": {
+        "bytes": 566,
+        "file": "libedit-20240808_3.1-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "cea62afb5546b9dc5d95e134ab4ce9db868e541b8b2b9516d8cee99276882413",
+        "url": "https://repo.msys2.org/msys/x86_64/libedit-20240808_3.1-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/libedit-20240808_3.1-1-x86_64.pkg.tar.zst",
+      "version": "20240808_3.1-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 63072,
+      "dependencies": [
+        "gcc-libs"
+      ],
+      "file": "libexpat-2.8.3-1-x86_64.pkg.tar.zst",
+      "name": "libexpat",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "64c5ec4d2239a6b93784208e38209317e3738cc21afc30dff48d77d1a55ce631",
+      "signature": {
+        "bytes": 566,
+        "file": "libexpat-2.8.3-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "bb3fb01cbdb61fd174b41d2f26084a7255d694a3c893efa70311b5274368c93c",
+        "url": "https://repo.msys2.org/msys/x86_64/libexpat-2.8.3-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/libexpat-2.8.3-1-x86_64.pkg.tar.zst",
+      "version": "2.8.3-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 37793,
+      "dependencies": [],
+      "file": "libffi-3.8.0-1-x86_64.pkg.tar.zst",
+      "name": "libffi",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "e0a21ae5ee3f0ce1ff3f446ea2c95ad462803081014aecfa8fc1cd22bc4df187",
+      "signature": {
+        "bytes": 566,
+        "file": "libffi-3.8.0-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "dd707edd30ab2fcd7861d04d935f9c33e8b1e07e67f52b4b8022d16ceaac4340",
+        "url": "https://repo.msys2.org/msys/x86_64/libffi-3.8.0-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/libffi-3.8.0-1-x86_64.pkg.tar.zst",
+      "version": "3.8.0-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 84734,
+      "dependencies": [
+        "libcbor",
+        "openssl",
+        "zlib"
+      ],
+      "file": "libfido2-1.17.0-1-x86_64.pkg.tar.zst",
+      "name": "libfido2",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "30794db36fa21af67c7126a221e2cb95b177be08845bb38720a8c9f28c39cdbb",
+      "signature": {
+        "bytes": 566,
+        "file": "libfido2-1.17.0-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "a423daadd68eb7720a053bbc2f1df0b0e41d8277549a678ceeb08688d9191ed9",
+        "url": "https://repo.msys2.org/msys/x86_64/libfido2-1.17.0-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/libfido2-1.17.0-1-x86_64.pkg.tar.zst",
+      "version": "1.17.0-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 32345,
+      "dependencies": [
+        "gcc-libs",
+        "libiconv",
+        "libintl",
+        "libreadline",
+        "ncurses"
+      ],
+      "file": "libgdbm-1.26-1-x86_64.pkg.tar.zst",
+      "name": "libgdbm",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "bb4b08b720dd3194db010589812e9c63bec3d29b32545e7cbd07b6443e51c5ed",
+      "signature": {
+        "bytes": 566,
+        "file": "libgdbm-1.26-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "b5806f722fc62740275ab0ed60d6cd2fbecd4f062597250c785634201df333b9",
+        "url": "https://repo.msys2.org/msys/x86_64/libgdbm-1.26-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/libgdbm-1.26-1-x86_64.pkg.tar.zst",
+      "version": "1.26-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 718353,
+      "dependencies": [
+        "gcc-libs"
+      ],
+      "file": "libiconv-1.19-1-x86_64.pkg.tar.zst",
+      "name": "libiconv",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "0fa55ea2a6ccf97cf8c58b24b2615815e15e16e6e4e888091c263c2c83c5313d",
+      "signature": {
+        "bytes": 566,
+        "file": "libiconv-1.19-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "273339e4ff358e016840a7808f6cdebc119b820ada9467f49cc4396d1d406a97",
+        "url": "https://repo.msys2.org/msys/x86_64/libiconv-1.19-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/libiconv-1.19-1-x86_64.pkg.tar.zst",
+      "version": "1.19-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 150443,
+      "dependencies": [
+        "libintl",
+        "libunistring"
+      ],
+      "file": "libidn2-2.3.8-1-x86_64.pkg.tar.zst",
+      "name": "libidn2",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "55e0de96b893e9f67f14a4283d411fc2a45d7b59333bc16e2a9b16e5bfc9282f",
+      "signature": {
+        "bytes": 566,
+        "file": "libidn2-2.3.8-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "0a63ede3181976c7ffe97aec1aab6dc8c52e45e550eaf1edb93e3cd777901ffb",
+        "url": "https://repo.msys2.org/msys/x86_64/libidn2-2.3.8-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/libidn2-2.3.8-1-x86_64.pkg.tar.zst",
+      "version": "2.3.8-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 50537,
+      "dependencies": [
+        "gcc-libs",
+        "libiconv"
+      ],
+      "file": "libintl-0.22.5-1-x86_64.pkg.tar.zst",
+      "name": "libintl",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "336d66b9d95cf9c1804958f8e260762a3e83bf158ed5981f783bc772a31073cf",
+      "signature": {
+        "bytes": 566,
+        "file": "libintl-0.22.5-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "1adbb78dc17437af97cea7491aa1637917ec09e69d3d94a628624e2b32b4d937",
+        "url": "https://repo.msys2.org/msys/x86_64/libintl-0.22.5-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/libintl-0.22.5-1-x86_64.pkg.tar.zst",
+      "version": "0.22.5-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 41871,
+      "dependencies": [],
+      "file": "libltdl-2.6.2-1-x86_64.pkg.tar.zst",
+      "name": "libltdl",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "bc17673d87573f997c2aad6680edb57a54a7ab837fd58a95dcd6030aac1f63e4",
+      "signature": {
+        "bytes": 566,
+        "file": "libltdl-2.6.2-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "508b95da395c883113e366e036623339c0e4d6f12b6a0e31f036eec7c3ffe6af",
+        "url": "https://repo.msys2.org/msys/x86_64/libltdl-2.6.2-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/libltdl-2.6.2-1-x86_64.pkg.tar.zst",
+      "version": "2.6.2-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 90186,
+      "dependencies": [],
+      "file": "liblzma-5.8.3-1-x86_64.pkg.tar.zst",
+      "name": "liblzma",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "63e778c1724dfa165394ca0c021ee399cffb7be7a1c8ff43ec2a1341aaf5d8fa",
+      "signature": {
+        "bytes": 566,
+        "file": "liblzma-5.8.3-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "12fb9f2a3767974e638ea4854183d889a698ef9d328bd7ebfb15ee52a59cce6f",
+        "url": "https://repo.msys2.org/msys/x86_64/liblzma-5.8.3-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/liblzma-5.8.3-1-x86_64.pkg.tar.zst",
+      "version": "5.8.3-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 66251,
+      "dependencies": [
+        "gcc-libs"
+      ],
+      "file": "libnghttp2-1.70.0-1-x86_64.pkg.tar.zst",
+      "name": "libnghttp2",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "9b3443ff1b26a3ece9394409efca60f3ac8eee94309e5be1e6b05706f3386110",
+      "signature": {
+        "bytes": 566,
+        "file": "libnghttp2-1.70.0-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "6ee279c9edaeafc1a4dff549029afb3e33e84c0dae70584f60ced91fbfda7126",
+        "url": "https://repo.msys2.org/msys/x86_64/libnghttp2-1.70.0-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/libnghttp2-1.70.0-1-x86_64.pkg.tar.zst",
+      "version": "1.70.0-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 69613,
+      "dependencies": [
+        "gcc-libs"
+      ],
+      "file": "libnghttp3-1.18.0-1-x86_64.pkg.tar.zst",
+      "name": "libnghttp3",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "45fdd8613fa1da08f6c0504377194497fea540ed1fec438bc557736459040669",
+      "signature": {
+        "bytes": 566,
+        "file": "libnghttp3-1.18.0-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "73761453f9acbb9cbfd2951a4cf3dfe28673200dd444dea79264c864d610dd47",
+        "url": "https://repo.msys2.org/msys/x86_64/libnghttp3-1.18.0-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/libnghttp3-1.18.0-1-x86_64.pkg.tar.zst",
+      "version": "1.18.0-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 162594,
+      "dependencies": [
+        "gcc-libs",
+        "libopenssl"
+      ],
+      "file": "libngtcp2-1.25.0-1-x86_64.pkg.tar.zst",
+      "name": "libngtcp2",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "a4c389078632e64ac2b320473651e80d44c97f9fed7a746a232d95b400b14fe8",
+      "signature": {
+        "bytes": 566,
+        "file": "libngtcp2-1.25.0-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "2d6b01f0fb3f9bb1193bd639bb36b8fe7371cec8ef423a5b05796c6808ba610e",
+        "url": "https://repo.msys2.org/msys/x86_64/libngtcp2-1.25.0-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/libngtcp2-1.25.0-1-x86_64.pkg.tar.zst",
+      "version": "1.25.0-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 2091819,
+      "dependencies": [],
+      "file": "libopenssl-3.6.3-1-x86_64.pkg.tar.zst",
+      "name": "libopenssl",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "f85f28d46b09d02229bfe923c9cc323463810fc4dbea2e8275a2fdc40edb2c53",
+      "signature": {
+        "bytes": 566,
+        "file": "libopenssl-3.6.3-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "d58483fe2e0088503e163bb845a7cf2770cd2b0bc9caf1754d6f007f68aebfbb",
+        "url": "https://repo.msys2.org/msys/x86_64/libopenssl-3.6.3-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/libopenssl-3.6.3-1-x86_64.pkg.tar.zst",
+      "version": "3.6.3-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 254512,
+      "dependencies": [
+        "libffi",
+        "libintl",
+        "libtasn1"
+      ],
+      "file": "libp11-kit-0.26.5-1-x86_64.pkg.tar.zst",
+      "name": "libp11-kit",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "62707348cea67bf4ee009dbf25548c84e9f06a76b688590bd14e76321d58e125",
+      "signature": {
+        "bytes": 566,
+        "file": "libp11-kit-0.26.5-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "bd3cad79f7d5440d5cfee0caf720849312284054b6ff564cd58e78a907d456e8",
+        "url": "https://repo.msys2.org/msys/x86_64/libp11-kit-0.26.5-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/libp11-kit-0.26.5-1-x86_64.pkg.tar.zst",
+      "version": "0.26.5-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 151732,
+      "dependencies": [
+        "gcc-libs"
+      ],
+      "file": "libpcre2_8-10.47-1-x86_64.pkg.tar.zst",
+      "name": "libpcre2_8",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "550804c3fd7c802daf5edb54396ef164cb3c1b4329e250def440eb18a3285ec6",
+      "signature": {
+        "bytes": 566,
+        "file": "libpcre2_8-10.47-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "ca7aeb634157237c8fb78b7d182865a771ff0df02c06789411dd40d594095252",
+        "url": "https://repo.msys2.org/msys/x86_64/libpcre2_8-10.47-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/libpcre2_8-10.47-1-x86_64.pkg.tar.zst",
+      "version": "10.47-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 72764,
+      "dependencies": [
+        "libidn2",
+        "libunistring"
+      ],
+      "file": "libpsl-0.23.2-1-x86_64.pkg.tar.zst",
+      "name": "libpsl",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "749014f86a1ae5f5a5adccec518e0296a03a838db9874aa9803dffaa8d30abc8",
+      "signature": {
+        "bytes": 566,
+        "file": "libpsl-0.23.2-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "b9877ec2a6aed59c45742d3aafb342470feb0efe2f47963416326644c42135bd",
+        "url": "https://repo.msys2.org/msys/x86_64/libpsl-0.23.2-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/libpsl-0.23.2-1-x86_64.pkg.tar.zst",
+      "version": "0.23.2-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 388315,
+      "dependencies": [
+        "ncurses"
+      ],
+      "file": "libreadline-8.3.003-1-x86_64.pkg.tar.zst",
+      "name": "libreadline",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "f78e11a496010305fb80b6804518d5c1257794fc87bc8caaf8c4a65d7a983dec",
+      "signature": {
+        "bytes": 566,
+        "file": "libreadline-8.3.003-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "df5750167ac977dfeb76559f8d04b093a3f77215346e59ff2de4daa065ed8f36",
+        "url": "https://repo.msys2.org/msys/x86_64/libreadline-8.3.003-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/libreadline-8.3.003-1-x86_64.pkg.tar.zst",
+      "version": "8.3.003-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 759158,
+      "dependencies": [],
+      "file": "libsqlite-3.53.4-1-x86_64.pkg.tar.zst",
+      "name": "libsqlite",
+      "provides": [
+        "libsqlite=3.53.4"
+      ],
+      "repository": "msys",
+      "sha256": "3cd9364e0e3df848454bdbefad2bc84608178209fac9497636bdae11ab8972df",
+      "signature": {
+        "bytes": 566,
+        "file": "libsqlite-3.53.4-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "65bb533fb7b8fc0e243c81f2d8d97843d27c8c490a7f8ed22b33acf2be0e30ff",
+        "url": "https://repo.msys2.org/msys/x86_64/libsqlite-3.53.4-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/libsqlite-3.53.4-1-x86_64.pkg.tar.zst",
+      "version": "3.53.4-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 230653,
+      "dependencies": [
+        "ca-certificates",
+        "openssl",
+        "zlib"
+      ],
+      "file": "libssh2-1.11.1-1-x86_64.pkg.tar.zst",
+      "name": "libssh2",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "f79883af85a2bb4778e1352c0b7ea27737a05e4110ef14461f0a842a40ff893d",
+      "signature": {
+        "bytes": 566,
+        "file": "libssh2-1.11.1-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "8190b424b591b1ed71fba0c7e9853e71c023fd5c665071a3a315acb4bd1533c6",
+        "url": "https://repo.msys2.org/msys/x86_64/libssh2-1.11.1-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/libssh2-1.11.1-1-x86_64.pkg.tar.zst",
+      "version": "1.11.1-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 100727,
+      "dependencies": [
+        "info"
+      ],
+      "file": "libtasn1-4.21.0-1-x86_64.pkg.tar.zst",
+      "name": "libtasn1",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "14f15c4b2b6ebeb6bfcf060cab27a32cd8967f70b0e68cc14670062cce546f04",
+      "signature": {
+        "bytes": 566,
+        "file": "libtasn1-4.21.0-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "ae7d5d10f0d524153dfe8bdb106ba1e0b397bf9e1d22d16fcba806e67df41e15",
+        "url": "https://repo.msys2.org/msys/x86_64/libtasn1-4.21.0-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/libtasn1-4.21.0-1-x86_64.pkg.tar.zst",
+      "version": "4.21.0-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 425484,
+      "dependencies": [
+        "bash",
+        "libltdl=2.6.2"
+      ],
+      "file": "libtool-2.6.2-1-x86_64.pkg.tar.zst",
+      "name": "libtool",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "ed51a0790d6cd59d24f2f76c826ed0e8d85f81bc1ac2807736400ea5e178fc5a",
+      "signature": {
+        "bytes": 566,
+        "file": "libtool-2.6.2-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "2cb1b651c9c5e10eabdd4de44f6c0d3ad80f84dbb2141315bbf1ae11907e60c0",
+        "url": "https://repo.msys2.org/msys/x86_64/libtool-2.6.2-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/libtool-2.6.2-1-x86_64.pkg.tar.zst",
+      "version": "2.6.2-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 772641,
+      "dependencies": [
+        "libiconv"
+      ],
+      "file": "libunistring-1.4.2-1-x86_64.pkg.tar.zst",
+      "name": "libunistring",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "bcd04706d95b5e7127d39834565bceed6b400192f5fb51599745aba28d5da018",
+      "signature": {
+        "bytes": 566,
+        "file": "libunistring-1.4.2-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "e42366a37f23d640892962d99378c16544c3444e7ac76a4ab8011d6fdc78d6f0",
+        "url": "https://repo.msys2.org/msys/x86_64/libunistring-1.4.2-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/libunistring-1.4.2-1-x86_64.pkg.tar.zst",
+      "version": "1.4.2-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 87371,
+      "dependencies": [],
+      "file": "libxcrypt-4.5.2-1-x86_64.pkg.tar.zst",
+      "name": "libxcrypt",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "e63db0aa2b708359e25f61f506e2d2c92c315febf5f88cc9f386e4ec0bdf4fa5",
+      "signature": {
+        "bytes": 566,
+        "file": "libxcrypt-4.5.2-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "d2dda19a9fa14dc5c1cba7a41a9b47fedcdfd798fc52e3b530934146c96a6d91",
+        "url": "https://repo.msys2.org/msys/x86_64/libxcrypt-4.5.2-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/libxcrypt-4.5.2-1-x86_64.pkg.tar.zst",
+      "version": "4.5.2-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 399681,
+      "dependencies": [
+        "gcc-libs"
+      ],
+      "file": "libzstd-1.5.7-1-x86_64.pkg.tar.zst",
+      "name": "libzstd",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "5e370b2e725a0a7e5ff58d84653c9a0cd5a10b9cfe930f2d949a28ad2a11c1f2",
+      "signature": {
+        "bytes": 566,
+        "file": "libzstd-1.5.7-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "fa9200763ed912254353ea15b36342824881d6e8f91558f3793168b576192d6a",
+        "url": "https://repo.msys2.org/msys/x86_64/libzstd-1.5.7-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/libzstd-1.5.7-1-x86_64.pkg.tar.zst",
+      "version": "1.5.7-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 258635,
+      "dependencies": [
+        "bash",
+        "gcc-libs",
+        "libiconv"
+      ],
+      "file": "m4-1.4.21-1-x86_64.pkg.tar.zst",
+      "name": "m4",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "b561e8871c7599502d9fae7196ee965b3fed3d7af09154eb8d2f5e4d9e5e5106",
+      "signature": {
+        "bytes": 566,
+        "file": "m4-1.4.21-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "d38d5a7c83ef5a0ebe395bb9487e06d0067fc63f70921a23e25edfac7f34b972",
+        "url": "https://repo.msys2.org/msys/x86_64/m4-1.4.21-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/m4-1.4.21-1-x86_64.pkg.tar.zst",
+      "version": "1.4.21-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 514683,
+      "dependencies": [
+        "libintl",
+        "sh"
+      ],
+      "file": "make-4.4.1-3-x86_64.pkg.tar.zst",
+      "name": "make",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "af0bdba17f06fe037f0194069adaa31a8fe45f1a11381501896aea1fae37bd5d",
+      "signature": {
+        "bytes": 566,
+        "file": "make-4.4.1-3-x86_64.pkg.tar.zst.sig",
+        "sha256": "7f53c96aeb1a29d9917e2b00e9f709fbdc5b0458e6535e88b1fed69365191265",
+        "url": "https://repo.msys2.org/msys/x86_64/make-4.4.1-3-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/make-4.4.1-3-x86_64.pkg.tar.zst",
+      "version": "4.4.1-3"
+    },
+    {
+      "architecture": "any",
+      "bytes": 6639046,
+      "dependencies": [
+        "mingw-w64-ucrt-x86_64-gettext-runtime",
+        "mingw-w64-ucrt-x86_64-libwinpthread",
+        "mingw-w64-ucrt-x86_64-zlib",
+        "mingw-w64-ucrt-x86_64-zstd"
+      ],
+      "file": "mingw-w64-ucrt-x86_64-binutils-2.47-3-any.pkg.tar.zst",
+      "name": "mingw-w64-ucrt-x86_64-binutils",
+      "provides": [],
+      "repository": "ucrt64",
+      "sha256": "ba98af202fe71e0884bb51daf78ce10bd8a51c69528c700dcf5855e6ece06dd3",
+      "signature": {
+        "bytes": 566,
+        "file": "mingw-w64-ucrt-x86_64-binutils-2.47-3-any.pkg.tar.zst.sig",
+        "sha256": "cbf255869ea862b3a3de61a83916abf2a92a2c61520ea09f94eb3b13ae8e5bdf",
+        "url": "https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-binutils-2.47-3-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-binutils-2.47-3-any.pkg.tar.zst",
+      "version": "2.47-3"
+    },
+    {
+      "architecture": "any",
+      "bytes": 4886729,
+      "dependencies": [
+        "mingw-w64-ucrt-x86_64-headers"
+      ],
+      "file": "mingw-w64-ucrt-x86_64-crt-14.0.0.r283.ga7cb47123-1-any.pkg.tar.zst",
+      "name": "mingw-w64-ucrt-x86_64-crt",
+      "provides": [
+        "mingw-w64-ucrt-x86_64-crt-git=14.0.0.r283.ga7cb47123"
+      ],
+      "repository": "ucrt64",
+      "sha256": "e1fad53006da96a34fbe90a7123e04477b42ea5734448da66485a10a8f299af7",
+      "signature": {
+        "bytes": 566,
+        "file": "mingw-w64-ucrt-x86_64-crt-14.0.0.r283.ga7cb47123-1-any.pkg.tar.zst.sig",
+        "sha256": "66909acb3ee342468af60d1cb454aeeafa39f4a3148dc33ab4aa703effdd1fc2",
+        "url": "https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-crt-14.0.0.r283.ga7cb47123-1-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-crt-14.0.0.r283.ga7cb47123-1-any.pkg.tar.zst",
+      "version": "14.0.0.r283.ga7cb47123-1"
+    },
+    {
+      "architecture": "any",
+      "bytes": 48655779,
+      "dependencies": [
+        "mingw-w64-ucrt-x86_64-binutils",
+        "mingw-w64-ucrt-x86_64-crt",
+        "mingw-w64-ucrt-x86_64-gcc-libs=16.2.0-3",
+        "mingw-w64-ucrt-x86_64-gmp",
+        "mingw-w64-ucrt-x86_64-headers",
+        "mingw-w64-ucrt-x86_64-isl",
+        "mingw-w64-ucrt-x86_64-mpc",
+        "mingw-w64-ucrt-x86_64-mpfr",
+        "mingw-w64-ucrt-x86_64-windows-default-manifest",
+        "mingw-w64-ucrt-x86_64-winpthreads",
+        "mingw-w64-ucrt-x86_64-zlib",
+        "mingw-w64-ucrt-x86_64-zstd"
+      ],
+      "file": "mingw-w64-ucrt-x86_64-gcc-16.2.0-3-any.pkg.tar.zst",
+      "name": "mingw-w64-ucrt-x86_64-gcc",
+      "provides": [
+        "mingw-w64-ucrt-x86_64-cc",
+        "mingw-w64-ucrt-x86_64-gcc-base"
+      ],
+      "repository": "ucrt64",
+      "sha256": "1cd86e5817f6e0d7310d7cb2bb91f4a55e1256cb4ce580a0c5f2a74e013d144d",
+      "signature": {
+        "bytes": 566,
+        "file": "mingw-w64-ucrt-x86_64-gcc-16.2.0-3-any.pkg.tar.zst.sig",
+        "sha256": "3164f0b78bf142a11c62a95886ce37412ccdbb3c3fb3f5c6d97ecfb4f41c254a",
+        "url": "https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-gcc-16.2.0-3-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-gcc-16.2.0-3-any.pkg.tar.zst",
+      "version": "16.2.0-3"
+    },
+    {
+      "architecture": "any",
+      "bytes": 1147919,
+      "dependencies": [
+        "mingw-w64-ucrt-x86_64-libwinpthread",
+        "mingw-w64-ucrt-x86_64-tzdata"
+      ],
+      "file": "mingw-w64-ucrt-x86_64-gcc-libs-16.2.0-3-any.pkg.tar.zst",
+      "name": "mingw-w64-ucrt-x86_64-gcc-libs",
+      "provides": [
+        "mingw-w64-ucrt-x86_64-cc-libs",
+        "mingw-w64-ucrt-x86_64-omp"
+      ],
+      "repository": "ucrt64",
+      "sha256": "5763fabf86fa13a4449ee765006d3446384ed66af7bf827459710eb777e0b11c",
+      "signature": {
+        "bytes": 566,
+        "file": "mingw-w64-ucrt-x86_64-gcc-libs-16.2.0-3-any.pkg.tar.zst.sig",
+        "sha256": "1126ddc1848e2b6b878abd1902fcb6bb01e2b869d475e30ba0bb78c96be49392",
+        "url": "https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-gcc-libs-16.2.0-3-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-gcc-libs-16.2.0-3-any.pkg.tar.zst",
+      "version": "16.2.0-3"
+    },
+    {
+      "architecture": "any",
+      "bytes": 417977,
+      "dependencies": [
+        "mingw-w64-ucrt-x86_64-cc-libs",
+        "mingw-w64-ucrt-x86_64-libiconv"
+      ],
+      "file": "mingw-w64-ucrt-x86_64-gettext-runtime-1.0-1-any.pkg.tar.zst",
+      "name": "mingw-w64-ucrt-x86_64-gettext-runtime",
+      "provides": [],
+      "repository": "ucrt64",
+      "sha256": "ba693dda4ac375af76ce481ff3a6e7481286546cc7dc6d56c7021dae34084157",
+      "signature": {
+        "bytes": 566,
+        "file": "mingw-w64-ucrt-x86_64-gettext-runtime-1.0-1-any.pkg.tar.zst.sig",
+        "sha256": "4754e870d55cacb5e7e3707313b68edb29d2598cc7a1ee399c74715007f38c4d",
+        "url": "https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-gettext-runtime-1.0-1-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-gettext-runtime-1.0-1-any.pkg.tar.zst",
+      "version": "1.0-1"
+    },
+    {
+      "architecture": "any",
+      "bytes": 592359,
+      "dependencies": [],
+      "file": "mingw-w64-ucrt-x86_64-gmp-6.3.0-2-any.pkg.tar.zst",
+      "name": "mingw-w64-ucrt-x86_64-gmp",
+      "provides": [],
+      "repository": "ucrt64",
+      "sha256": "e82a75968a556484a50084578238a84eb60fb93e34986fd6695c537975bd39ea",
+      "signature": {
+        "bytes": 566,
+        "file": "mingw-w64-ucrt-x86_64-gmp-6.3.0-2-any.pkg.tar.zst.sig",
+        "sha256": "99d2b95269ef099bdc8f3dd0e3db8a9171346e4076bfe0c0c58855d7b97220ff",
+        "url": "https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-gmp-6.3.0-2-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-gmp-6.3.0-2-any.pkg.tar.zst",
+      "version": "6.3.0-2"
+    },
+    {
+      "architecture": "any",
+      "bytes": 6891081,
+      "dependencies": [],
+      "file": "mingw-w64-ucrt-x86_64-headers-14.0.0.r283.ga7cb47123-1-any.pkg.tar.zst",
+      "name": "mingw-w64-ucrt-x86_64-headers",
+      "provides": [
+        "mingw-w64-ucrt-x86_64-headers-git=14.0.0.r283.ga7cb47123"
+      ],
+      "repository": "ucrt64",
+      "sha256": "892b5aafcf2eaed339830ceb87f83f804e451744350bf8533fe87b206215ee2c",
+      "signature": {
+        "bytes": 566,
+        "file": "mingw-w64-ucrt-x86_64-headers-14.0.0.r283.ga7cb47123-1-any.pkg.tar.zst.sig",
+        "sha256": "83fade2ff3745a04b2a2f4775e31b64a281dd74bd738a2e68f12b17abd75ec25",
+        "url": "https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-headers-14.0.0.r283.ga7cb47123-1-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-headers-14.0.0.r283.ga7cb47123-1-any.pkg.tar.zst",
+      "version": "14.0.0.r283.ga7cb47123-1"
+    },
+    {
+      "architecture": "any",
+      "bytes": 1540719,
+      "dependencies": [
+        "mingw-w64-ucrt-x86_64-gmp"
+      ],
+      "file": "mingw-w64-ucrt-x86_64-isl-0.28-1-any.pkg.tar.zst",
+      "name": "mingw-w64-ucrt-x86_64-isl",
+      "provides": [],
+      "repository": "ucrt64",
+      "sha256": "8594e01a253d5a72646c586cf5a1626c1b1c2be7c30060fe67abd9bebe3fe223",
+      "signature": {
+        "bytes": 566,
+        "file": "mingw-w64-ucrt-x86_64-isl-0.28-1-any.pkg.tar.zst.sig",
+        "sha256": "7154a96c9936f5d00504ae012c74a82cd15f094d925e0cf1a17b7a2bf1be11a6",
+        "url": "https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-isl-0.28-1-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-isl-0.28-1-any.pkg.tar.zst",
+      "version": "0.28-1"
+    },
+    {
+      "architecture": "any",
+      "bytes": 744750,
+      "dependencies": [],
+      "file": "mingw-w64-ucrt-x86_64-libiconv-1.19-1-any.pkg.tar.zst",
+      "name": "mingw-w64-ucrt-x86_64-libiconv",
+      "provides": [],
+      "repository": "ucrt64",
+      "sha256": "9a500f38c2b91808741c62fae746b3e9110b33a1ecf5c30fa0c66dbedddf7e16",
+      "signature": {
+        "bytes": 566,
+        "file": "mingw-w64-ucrt-x86_64-libiconv-1.19-1-any.pkg.tar.zst.sig",
+        "sha256": "e18abd753c47dbed046cf619f0855c2bc05ae17a7f3eabba8a2e841478a4f6b2",
+        "url": "https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-libiconv-1.19-1-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-libiconv-1.19-1-any.pkg.tar.zst",
+      "version": "1.19-1"
+    },
+    {
+      "architecture": "any",
+      "bytes": 29791,
+      "dependencies": [],
+      "file": "mingw-w64-ucrt-x86_64-libwinpthread-14.0.0.r283.ga7cb47123-1-any.pkg.tar.zst",
+      "name": "mingw-w64-ucrt-x86_64-libwinpthread",
+      "provides": [
+        "mingw-w64-ucrt-x86_64-libwinpthread-git"
+      ],
+      "repository": "ucrt64",
+      "sha256": "58f7212d053a029f2f19672ebbd12f8c8142ae26ed47b57b1450a5128682188a",
+      "signature": {
+        "bytes": 566,
+        "file": "mingw-w64-ucrt-x86_64-libwinpthread-14.0.0.r283.ga7cb47123-1-any.pkg.tar.zst.sig",
+        "sha256": "02b8c9151b8e1e856f55b9b70c52910fa717b8bf1815ad853ac2e206d1f10f00",
+        "url": "https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-libwinpthread-14.0.0.r283.ga7cb47123-1-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-libwinpthread-14.0.0.r283.ga7cb47123-1-any.pkg.tar.zst",
+      "version": "14.0.0.r283.ga7cb47123-1"
+    },
+    {
+      "architecture": "any",
+      "bytes": 139585,
+      "dependencies": [
+        "mingw-w64-ucrt-x86_64-gmp",
+        "mingw-w64-ucrt-x86_64-mpfr"
+      ],
+      "file": "mingw-w64-ucrt-x86_64-mpc-1.4.1-1-any.pkg.tar.zst",
+      "name": "mingw-w64-ucrt-x86_64-mpc",
+      "provides": [],
+      "repository": "ucrt64",
+      "sha256": "f06556e811c711ce91609484e31d358e4f495811ba29813bf2284a3b236d82ce",
+      "signature": {
+        "bytes": 566,
+        "file": "mingw-w64-ucrt-x86_64-mpc-1.4.1-1-any.pkg.tar.zst.sig",
+        "sha256": "c6816cce004dfe57f976a60bdac037a52c7dbf29a4ee0f8085acca13b26cb5a0",
+        "url": "https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-mpc-1.4.1-1-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-mpc-1.4.1-1-any.pkg.tar.zst",
+      "version": "1.4.1-1"
+    },
+    {
+      "architecture": "any",
+      "bytes": 553765,
+      "dependencies": [
+        "mingw-w64-ucrt-x86_64-cc-libs",
+        "mingw-w64-ucrt-x86_64-gmp"
+      ],
+      "file": "mingw-w64-ucrt-x86_64-mpfr-4.2.2-3-any.pkg.tar.zst",
+      "name": "mingw-w64-ucrt-x86_64-mpfr",
+      "provides": [],
+      "repository": "ucrt64",
+      "sha256": "6b70a275d2ec75c70aa50a236c218e6b7ee9a5ab4c6d52cb0b580267b7d200fe",
+      "signature": {
+        "bytes": 566,
+        "file": "mingw-w64-ucrt-x86_64-mpfr-4.2.2-3-any.pkg.tar.zst.sig",
+        "sha256": "6eb04885039d85bbf17a932840fc54aca8b871545711347c04309dcc840e11cd",
+        "url": "https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-mpfr-4.2.2-3-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-mpfr-4.2.2-3-any.pkg.tar.zst",
+      "version": "4.2.2-3"
+    },
+    {
+      "architecture": "any",
+      "bytes": 224857,
+      "dependencies": [],
+      "file": "mingw-w64-ucrt-x86_64-tzdata-2026c-1-any.pkg.tar.zst",
+      "name": "mingw-w64-ucrt-x86_64-tzdata",
+      "provides": [],
+      "repository": "ucrt64",
+      "sha256": "b6af6fd6acb676b9bb0761b75b1d8330b89abd4c8d467fda35cee8925b170db9",
+      "signature": {
+        "bytes": 566,
+        "file": "mingw-w64-ucrt-x86_64-tzdata-2026c-1-any.pkg.tar.zst.sig",
+        "sha256": "a7818a4d64d6d073db6041019665d73346ebbad2f43a9acf149833e42c209504",
+        "url": "https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-tzdata-2026c-1-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-tzdata-2026c-1-any.pkg.tar.zst",
+      "version": "2026c-1"
+    },
+    {
+      "architecture": "any",
+      "bytes": 2652,
+      "dependencies": [],
+      "file": "mingw-w64-ucrt-x86_64-windows-default-manifest-20260815-1-any.pkg.tar.zst",
+      "name": "mingw-w64-ucrt-x86_64-windows-default-manifest",
+      "provides": [],
+      "repository": "ucrt64",
+      "sha256": "b39039f754a600cc0dec49df7d675a59a3cb2b63691d91b4ae60735ee7075eca",
+      "signature": {
+        "bytes": 566,
+        "file": "mingw-w64-ucrt-x86_64-windows-default-manifest-20260815-1-any.pkg.tar.zst.sig",
+        "sha256": "e3d5eeee4fc45230c973bb8f08bd1fb3e0cd97846ffbe0a34c4ca54cc09a84fb",
+        "url": "https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-windows-default-manifest-20260815-1-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-windows-default-manifest-20260815-1-any.pkg.tar.zst",
+      "version": "20260815-1"
+    },
+    {
+      "architecture": "any",
+      "bytes": 44027,
+      "dependencies": [
+        "mingw-w64-ucrt-x86_64-crt",
+        "mingw-w64-ucrt-x86_64-libwinpthread=14.0.0.r283.ga7cb47123"
+      ],
+      "file": "mingw-w64-ucrt-x86_64-winpthreads-14.0.0.r283.ga7cb47123-1-any.pkg.tar.zst",
+      "name": "mingw-w64-ucrt-x86_64-winpthreads",
+      "provides": [
+        "mingw-w64-ucrt-x86_64-winpthreads-git"
+      ],
+      "repository": "ucrt64",
+      "sha256": "10952a1e223f674b79bf9f4aaf774c13f5c0fba370a156597c73874d143ebb2a",
+      "signature": {
+        "bytes": 566,
+        "file": "mingw-w64-ucrt-x86_64-winpthreads-14.0.0.r283.ga7cb47123-1-any.pkg.tar.zst.sig",
+        "sha256": "e8557e3f8189f88a5f30f4ac2173a8dfcdb03f2b7caa867c8963d60e4587b905",
+        "url": "https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-winpthreads-14.0.0.r283.ga7cb47123-1-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-winpthreads-14.0.0.r283.ga7cb47123-1-any.pkg.tar.zst",
+      "version": "14.0.0.r283.ga7cb47123-1"
+    },
+    {
+      "architecture": "any",
+      "bytes": 111475,
+      "dependencies": [],
+      "file": "mingw-w64-ucrt-x86_64-zlib-1.3.2-2-any.pkg.tar.zst",
+      "name": "mingw-w64-ucrt-x86_64-zlib",
+      "provides": [],
+      "repository": "ucrt64",
+      "sha256": "841401182976d2f9e17e5c0ebaac51f2a8014140ea53d67625e91c8fb3c85ea0",
+      "signature": {
+        "bytes": 566,
+        "file": "mingw-w64-ucrt-x86_64-zlib-1.3.2-2-any.pkg.tar.zst.sig",
+        "sha256": "3c21e4ca62ae9544f37ad41b0910f64d60f4f0c4c4113bc5c9287ce2b6396acb",
+        "url": "https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-zlib-1.3.2-2-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-zlib-1.3.2-2-any.pkg.tar.zst",
+      "version": "1.3.2-2"
+    },
+    {
+      "architecture": "any",
+      "bytes": 668277,
+      "dependencies": [
+        "mingw-w64-ucrt-x86_64-cc-libs"
+      ],
+      "file": "mingw-w64-ucrt-x86_64-zstd-1.5.7-2-any.pkg.tar.zst",
+      "name": "mingw-w64-ucrt-x86_64-zstd",
+      "provides": [],
+      "repository": "ucrt64",
+      "sha256": "dbdb8427280046a2b41697780aa4c52983b708082b0da4755951dc3bea96ca89",
+      "signature": {
+        "bytes": 566,
+        "file": "mingw-w64-ucrt-x86_64-zstd-1.5.7-2-any.pkg.tar.zst.sig",
+        "sha256": "97b4fe48e37ed32bc8a952c01737b6263dceb5a9c2c6f6b3a2def8e22f4e8b35",
+        "url": "https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-zstd-1.5.7-2-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-zstd-1.5.7-2-any.pkg.tar.zst",
+      "version": "1.5.7-2"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 395839,
+      "dependencies": [
+        "gmp>=5.0"
+      ],
+      "file": "mpfr-4.2.2-1-x86_64.pkg.tar.zst",
+      "name": "mpfr",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "8f1b6c17c53e00494a488e03dfdf8fc742027ed03a5bd7b1b3a6a33f595a7498",
+      "signature": {
+        "bytes": 566,
+        "file": "mpfr-4.2.2-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "8c9a772a091365c88751e74ec280ab01435fade4dea7984676869a4d594cbeca",
+        "url": "https://repo.msys2.org/msys/x86_64/mpfr-4.2.2-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/mpfr-4.2.2-1-x86_64.pkg.tar.zst",
+      "version": "4.2.2-1"
+    },
+    {
+      "architecture": "any",
+      "bytes": 42159,
+      "dependencies": [],
+      "file": "msys2-keyring-1~20260214-1-any.pkg.tar.zst",
+      "name": "msys2-keyring",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "c93044188c49f6f75e6f75709017ffa9234c2bdd8fe7c6a4c47d62a9cd8bfb1f",
+      "signature": {
+        "bytes": 566,
+        "file": "msys2-keyring-1~20260214-1-any.pkg.tar.zst.sig",
+        "sha256": "3b1623461c8ffc9f2c127afbae1387ccc43dc740f1529854558504c98c12d950",
+        "url": "https://repo.msys2.org/msys/x86_64/msys2-keyring-1~20260214-1-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/msys2-keyring-1~20260214-1-any.pkg.tar.zst",
+      "version": "1~20260214-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 688103,
+      "dependencies": [
+        "file",
+        "libintl",
+        "ncurses",
+        "sh"
+      ],
+      "file": "nano-9.2-1-x86_64.pkg.tar.zst",
+      "name": "nano",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "0fd23077af18ab656e4a082ce0455ab16217c852f3968343e903843c204a12b2",
+      "signature": {
+        "bytes": 566,
+        "file": "nano-9.2-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "0e25eab46b9686803563142ca525b269fdf4305e5698d0419b0a4db2701d677c",
+        "url": "https://repo.msys2.org/msys/x86_64/nano-9.2-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/nano-9.2-1-x86_64.pkg.tar.zst",
+      "version": "9.2-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 1286284,
+      "dependencies": [
+        "gcc-libs"
+      ],
+      "file": "ncurses-6.6-2-x86_64.pkg.tar.zst",
+      "name": "ncurses",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "828c92f09b17f00d3b49362fcfa4affa58e5e50e238f290ea36eb7a690da3acb",
+      "signature": {
+        "bytes": 566,
+        "file": "ncurses-6.6-2-x86_64.pkg.tar.zst.sig",
+        "sha256": "96552e3391030cd6b26a94acfdd21880e4a2865608b94bf30759c93ca6b62e08",
+        "url": "https://repo.msys2.org/msys/x86_64/ncurses-6.6-2-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/ncurses-6.6-2-x86_64.pkg.tar.zst",
+      "version": "6.6-2"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 1212827,
+      "dependencies": [
+        "heimdal",
+        "libedit",
+        "libfido2",
+        "libxcrypt",
+        "openssl"
+      ],
+      "file": "openssh-10.5p1-1-x86_64.pkg.tar.zst",
+      "name": "openssh",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "48f16972010a505f0f54b71a38a52c21f8341bb50bf6760b1e1ee0a68148ec4f",
+      "signature": {
+        "bytes": 566,
+        "file": "openssh-10.5p1-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "02da86d3ceaf1848da9607d23ddb5b6ca362aa9d0e9f4d5b2ac707311b576893",
+        "url": "https://repo.msys2.org/msys/x86_64/openssh-10.5p1-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/openssh-10.5p1-1-x86_64.pkg.tar.zst",
+      "version": "10.5p1-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 685181,
+      "dependencies": [
+        "libopenssl"
+      ],
+      "file": "openssl-3.6.3-1-x86_64.pkg.tar.zst",
+      "name": "openssl",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "26b53a063e95bd9295b796053ac34d0a4ec77dc49fb11fc135454ea676e7e9c5",
+      "signature": {
+        "bytes": 566,
+        "file": "openssl-3.6.3-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "ee27897f2b167fe31258dd2bf7be8944202e111c37bba735a72e1bc643d577de",
+        "url": "https://repo.msys2.org/msys/x86_64/openssl-3.6.3-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/openssl-3.6.3-1-x86_64.pkg.tar.zst",
+      "version": "3.6.3-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 514293,
+      "dependencies": [
+        "libp11-kit"
+      ],
+      "file": "p11-kit-0.26.5-1-x86_64.pkg.tar.zst",
+      "name": "p11-kit",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "db341cc3e91c68f5de25d9a2eda3beb752ec8ac74a89f001f60453c817ce5f51",
+      "signature": {
+        "bytes": 566,
+        "file": "p11-kit-0.26.5-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "d8ea75713efa164627519549f908a667661063967c48f0fbb4e98733df53f20c",
+        "url": "https://repo.msys2.org/msys/x86_64/p11-kit-0.26.5-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/p11-kit-0.26.5-1-x86_64.pkg.tar.zst",
+      "version": "0.26.5-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 98395,
+      "dependencies": [],
+      "file": "patch-2.7.6-3-x86_64.pkg.tar.zst",
+      "name": "patch",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "dd75ca0f715dd9c71a43af6a0ff3d068faeee1d768e02282d319671201cd5d45",
+      "signature": {
+        "bytes": 566,
+        "file": "patch-2.7.6-3-x86_64.pkg.tar.zst.sig",
+        "sha256": "b05a72f972973df0b5aea64fa0531b12832f2a6c79af2bf93c481e00b7f2a674",
+        "url": "https://repo.msys2.org/msys/x86_64/patch-2.7.6-3-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/patch-2.7.6-3-x86_64.pkg.tar.zst",
+      "version": "2.7.6-3"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 7526327,
+      "dependencies": [
+        "coreutils",
+        "db",
+        "gdbm",
+        "libxcrypt",
+        "sh"
+      ],
+      "file": "perl-5.42.3-1-x86_64.pkg.tar.zst",
+      "name": "perl",
+      "provides": [
+        "perl-Archive-Tar=3.04",
+        "perl-Attribute-Handlers=1.03",
+        "perl-AutoLoader=5.74",
+        "perl-CPAN-Meta-Requirements=2.143",
+        "perl-CPAN-Meta-YAML=0.020",
+        "perl-CPAN-Meta=2.150010",
+        "perl-CPAN=2.38",
+        "perl-Carp=1.54",
+        "perl-Compress-Raw-Bzip2=2.213",
+        "perl-Compress-Raw-Zlib=2.213",
+        "perl-Config-Perl-V=0.38",
+        "perl-DB_File=1.859",
+        "perl-Data-Dumper=2.192",
+        "perl-Devel-PPPort=3.73",
+        "perl-Devel-SelfStubber=1.06",
+        "perl-Digest-MD5=2.59",
+        "perl-Digest-SHA=6.04",
+        "perl-Digest=1.20",
+        "perl-Dumpvalue=1.21",
+        "perl-Encode=3.21",
+        "perl-Env=1.06",
+        "perl-Exporter=5.79",
+        "perl-ExtUtils-CBuilder=0.280242",
+        "perl-ExtUtils-Constant=0.25",
+        "perl-ExtUtils-Install=2.22",
+        "perl-ExtUtils-MakeMaker=7.76",
+        "perl-ExtUtils-Manifest=1.75",
+        "perl-ExtUtils-PL2Bat=0.005",
+        "perl-ExtUtils-ParseXS=3.57",
+        "perl-File-Fetch=1.04",
+        "perl-File-Path=2.18",
+        "perl-File-Temp=0.2311",
+        "perl-Filter-Simple=0.96",
+        "perl-Filter-Util-Call=1.64",
+        "perl-FindBin=1.54",
+        "perl-Getopt-Long=2.58",
+        "perl-HTTP-Tiny=0.090",
+        "perl-I18N-Collate=1.02",
+        "perl-I18N-LangTags=0.45",
+        "perl-IO-Compress=2.213",
+        "perl-IO-Socket-IP=0.43",
+        "perl-IO-Zlib=1.15",
+        "perl-IO=1.55",
+        "perl-IPC-Cmd=1.04",
+        "perl-IPC-SysV=2.09",
+        "perl-JSON-PP=4.16",
+        "perl-Locale-Maketext-Simple=0.21_01",
+        "perl-Locale-Maketext=1.33",
+        "perl-MIME-Base64=3.16_01",
+        "perl-Math-BigInt-FastCalc=0.5020",
+        "perl-Math-BigInt=2.005002",
+        "perl-Math-Complex=1.63",
+        "perl-Memoize=1.17",
+        "perl-Module-CoreList=5.20260308",
+        "perl-Module-Load-Conditional=0.74",
+        "perl-Module-Load=0.36",
+        "perl-Module-Loaded=0.08",
+        "perl-Module-Metadata=1.000038",
+        "perl-NEXT=0.69",
+        "perl-Net-Ping=2.76",
+        "perl-Params-Check=0.38",
+        "perl-PathTools=3.94",
+        "perl-Perl-OSType=1.010",
+        "perl-PerlIO-via-QuotedPrint=0.10",
+        "perl-Pod-Checker=1.77",
+        "perl-Pod-Escapes=1.07",
+        "perl-Pod-Perldoc=3.2801",
+        "perl-Pod-Simple=3.45",
+        "perl-Pod-Usage=2.05",
+        "perl-Safe=2.47",
+        "perl-Scalar-List-Utils=1.68_01",
+        "perl-Search-Dict=1.08",
+        "perl-SelfLoader=1.28",
+        "perl-Socket=2.038",
+        "perl-Storable=3.37",
+        "perl-Sys-Syslog=0.36",
+        "perl-Term-ANSIColor=5.01",
+        "perl-Term-Cap=1.18",
+        "perl-Term-Complete=1.403",
+        "perl-Term-ReadLine=1.17",
+        "perl-Term-Table=0.024",
+        "perl-Test-Harness=3.50",
+        "perl-Test-Simple=1.302210",
+        "perl-Test=1.31",
+        "perl-Text-Abbrev=1.02",
+        "perl-Text-Balanced=2.06",
+        "perl-Text-ParseWords=3.31",
+        "perl-Text-Tabs=2024.001",
+        "perl-Thread-Queue=3.14",
+        "perl-Thread-Semaphore=2.13",
+        "perl-Tie-File=1.10",
+        "perl-Tie-RefHash=1.41",
+        "perl-Time-HiRes=1.9778",
+        "perl-Time-Local=1.35",
+        "perl-Time-Piece=1.36",
+        "perl-Unicode-Collate=1.31",
+        "perl-Unicode-Normalize=1.32",
+        "perl-Win32=0.59_01",
+        "perl-Win32API-File=0.1203_01",
+        "perl-XSLoader=0.32",
+        "perl-autodie=2.37",
+        "perl-autouse=1.11",
+        "perl-base=2.27",
+        "perl-bignum=0.67",
+        "perl-constant=1.33",
+        "perl-encoding-warnings=0.14",
+        "perl-experimental=0.035",
+        "perl-if=0.0610",
+        "perl-lib=0.65",
+        "perl-libnet=3.15",
+        "perl-parent=0.244",
+        "perl-perlfaq=5.20250619",
+        "perl-podlators=6.0.2",
+        "perl-threads-shared=1.70",
+        "perl-threads=2.43",
+        "perl-version=0.9933"
+      ],
+      "repository": "msys",
+      "sha256": "d9692a5add7b0544a78e3e8d4efda7866d3630159a9144553791d302f8f865c2",
+      "signature": {
+        "bytes": 566,
+        "file": "perl-5.42.3-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "ce765a38cab49068899305c3c1118b5fecbbf983d5893be9f72d08f359ff965e",
+        "url": "https://repo.msys2.org/msys/x86_64/perl-5.42.3-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/perl-5.42.3-1-x86_64.pkg.tar.zst",
+      "version": "5.42.3-1"
+    },
+    {
+      "architecture": "any",
+      "bytes": 41720,
+      "dependencies": [
+        "perl"
+      ],
+      "file": "perl-Authen-SASL-2.2000-1-any.pkg.tar.zst",
+      "name": "perl-Authen-SASL",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "26ecc94fba9bf2969648e657d07f715141d2df7efeb8563f92d70f1c93450c0f",
+      "signature": {
+        "bytes": 566,
+        "file": "perl-Authen-SASL-2.2000-1-any.pkg.tar.zst.sig",
+        "sha256": "e385c616d5c5e1169460ad95d86c50f88591c30321bb6c2930c22f1be3825f47",
+        "url": "https://repo.msys2.org/msys/x86_64/perl-Authen-SASL-2.2000-1-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/perl-Authen-SASL-2.2000-1-any.pkg.tar.zst",
+      "version": "2.2000-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 15814,
+      "dependencies": [
+        "perl"
+      ],
+      "file": "perl-Clone-0.50-2-x86_64.pkg.tar.zst",
+      "name": "perl-Clone",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "fd131c4b6c12d29525a3f14382f001ba1bdb2e65be3f55afe9c82d7fb29e2224",
+      "signature": {
+        "bytes": 566,
+        "file": "perl-Clone-0.50-2-x86_64.pkg.tar.zst.sig",
+        "sha256": "8949a9cc900bcefb15e7a89205dcc214e78dddf093c88fbc6adde9be27fee95c",
+        "url": "https://repo.msys2.org/msys/x86_64/perl-Clone-0.50-2-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/perl-Clone-0.50-2-x86_64.pkg.tar.zst",
+      "version": "0.50-2"
+    },
+    {
+      "architecture": "any",
+      "bytes": 30508,
+      "dependencies": [
+        "perl"
+      ],
+      "file": "perl-Convert-BinHex-1.125-2-any.pkg.tar.zst",
+      "name": "perl-Convert-BinHex",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "164e802322370041dbb78d07ad3b59e017de1d281794734889bc905c273b4923",
+      "signature": {
+        "bytes": 566,
+        "file": "perl-Convert-BinHex-1.125-2-any.pkg.tar.zst.sig",
+        "sha256": "82e16d0f1c7eee7c4bc909d8506d71e96df4cd442fd9ac1f0d79084c01f0ace2",
+        "url": "https://repo.msys2.org/msys/x86_64/perl-Convert-BinHex-1.125-2-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/perl-Convert-BinHex-1.125-2-any.pkg.tar.zst",
+      "version": "1.125-2"
+    },
+    {
+      "architecture": "any",
+      "bytes": 10976,
+      "dependencies": [
+        "perl>=5.008"
+      ],
+      "file": "perl-Encode-Locale-1.05-2-any.pkg.tar.zst",
+      "name": "perl-Encode-Locale",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "b6d0a57ca9e090073ba5a082cc0493dfbc1a85e6d9feaae70cceabadd28fd018",
+      "signature": {
+        "bytes": 566,
+        "file": "perl-Encode-Locale-1.05-2-any.pkg.tar.zst.sig",
+        "sha256": "43e22af7497587b9c516de00d4aa39fd9af2d40306e239d66ffbe1e043ccf237",
+        "url": "https://repo.msys2.org/msys/x86_64/perl-Encode-Locale-1.05-2-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/perl-Encode-Locale-1.05-2-any.pkg.tar.zst",
+      "version": "1.05-2"
+    },
+    {
+      "architecture": "any",
+      "bytes": 21240,
+      "dependencies": [
+        "perl"
+      ],
+      "file": "perl-Error-0.17030-1-any.pkg.tar.zst",
+      "name": "perl-Error",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "25565c40d39442f96c71a3c837b996ea5dd5e39fae44655d04479e4381873467",
+      "signature": {
+        "bytes": 566,
+        "file": "perl-Error-0.17030-1-any.pkg.tar.zst.sig",
+        "sha256": "3e23045c3693fb1a10587bdaa77bea67c15ecb1c1c68caeb8869d803bd886b92",
+        "url": "https://repo.msys2.org/msys/x86_64/perl-Error-0.17030-1-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/perl-Error-0.17030-1-any.pkg.tar.zst",
+      "version": "0.17030-1"
+    },
+    {
+      "architecture": "any",
+      "bytes": 10591,
+      "dependencies": [
+        "perl-HTTP-Date>=6",
+        "perl>=5.8.8"
+      ],
+      "file": "perl-File-Listing-6.16-1-any.pkg.tar.zst",
+      "name": "perl-File-Listing",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "d6c5083d5ecd859acf08dccdc4f98f4eed9170b7e7af86e7fcae1ce5789a2a00",
+      "signature": {
+        "bytes": 566,
+        "file": "perl-File-Listing-6.16-1-any.pkg.tar.zst.sig",
+        "sha256": "51ceccc07161f820b9d6bb5261cd1149bac6817da560c7c3a764b9344326163e",
+        "url": "https://repo.msys2.org/msys/x86_64/perl-File-Listing-6.16-1-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/perl-File-Listing-6.16-1-any.pkg.tar.zst",
+      "version": "6.16-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 80228,
+      "dependencies": [
+        "perl",
+        "perl-HTML-Tagset",
+        "perl-HTTP-Message",
+        "perl-URI"
+      ],
+      "file": "perl-HTML-Parser-3.85-1-x86_64.pkg.tar.zst",
+      "name": "perl-HTML-Parser",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "23eaa504e860619e78915cbd5249b28ca497538a8ea1291c2d352036128530a0",
+      "signature": {
+        "bytes": 566,
+        "file": "perl-HTML-Parser-3.85-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "e39022a4646e6dddac229b5cbb54b50f20ca428dd40e0a4f218d7e9a634f28df",
+        "url": "https://repo.msys2.org/msys/x86_64/perl-HTML-Parser-3.85-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/perl-HTML-Parser-3.85-1-x86_64.pkg.tar.zst",
+      "version": "3.85-1"
+    },
+    {
+      "architecture": "any",
+      "bytes": 10743,
+      "dependencies": [
+        "perl>=5.10.0"
+      ],
+      "file": "perl-HTML-Tagset-3.24-1-any.pkg.tar.zst",
+      "name": "perl-HTML-Tagset",
+      "provides": [
+        "HTML-Tagset"
+      ],
+      "repository": "msys",
+      "sha256": "36a89439a14a73d725a40aaab1911434b346c998bb4ead1e15146028cdd6451a",
+      "signature": {
+        "bytes": 566,
+        "file": "perl-HTML-Tagset-3.24-1-any.pkg.tar.zst.sig",
+        "sha256": "13c851c40f3c2c4c9e1d84b56586050553ba3d63ff6e5534aa5331986d3fc040",
+        "url": "https://repo.msys2.org/msys/x86_64/perl-HTML-Tagset-3.24-1-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/perl-HTML-Tagset-3.24-1-any.pkg.tar.zst",
+      "version": "3.24-1"
+    },
+    {
+      "architecture": "any",
+      "bytes": 22258,
+      "dependencies": [
+        "perl-HTTP-Date>=6",
+        "perl-HTTP-Message",
+        "perl>=5.8.8"
+      ],
+      "file": "perl-HTTP-Cookies-6.12-1-any.pkg.tar.zst",
+      "name": "perl-HTTP-Cookies",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "34268ada050731878e8a0931036eaa8e00451b562ed4f534d9cba4cd34581fcc",
+      "signature": {
+        "bytes": 566,
+        "file": "perl-HTTP-Cookies-6.12-1-any.pkg.tar.zst.sig",
+        "sha256": "a5ffec537185ef7f10ffc8c14e25afd3c02ebd27c75a5ad0d62af5f4ace845ae",
+        "url": "https://repo.msys2.org/msys/x86_64/perl-HTTP-Cookies-6.12-1-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/perl-HTTP-Cookies-6.12-1-any.pkg.tar.zst",
+      "version": "6.12-1"
+    },
+    {
+      "architecture": "any",
+      "bytes": 20163,
+      "dependencies": [
+        "perl",
+        "perl-HTTP-Date",
+        "perl-HTTP-Message",
+        "perl-IO-Socket-IP",
+        "perl-LWP-MediaTypes"
+      ],
+      "file": "perl-HTTP-Daemon-6.17-1-any.pkg.tar.zst",
+      "name": "perl-HTTP-Daemon",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "2187d398b354ae2036d6631b860308aa5ad34ea9be82e384d18c041278ad9161",
+      "signature": {
+        "bytes": 566,
+        "file": "perl-HTTP-Daemon-6.17-1-any.pkg.tar.zst.sig",
+        "sha256": "0a4ea1c6f54212ea32d297523398b48177f273f04f0f367fda9c471d4f8dc874",
+        "url": "https://repo.msys2.org/msys/x86_64/perl-HTTP-Daemon-6.17-1-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/perl-HTTP-Daemon-6.17-1-any.pkg.tar.zst",
+      "version": "6.17-1"
+    },
+    {
+      "architecture": "any",
+      "bytes": 10241,
+      "dependencies": [
+        "perl>=5.8.8"
+      ],
+      "file": "perl-HTTP-Date-6.08-1-any.pkg.tar.zst",
+      "name": "perl-HTTP-Date",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "0a07b0deb43474c71284e6df996b2e24bf55e2d20800eb11dcf93727a5046062",
+      "signature": {
+        "bytes": 566,
+        "file": "perl-HTTP-Date-6.08-1-any.pkg.tar.zst.sig",
+        "sha256": "fe2f94a7ce41e6680229af56fb2854376072872ee0b274ca6eb452d1b06785f6",
+        "url": "https://repo.msys2.org/msys/x86_64/perl-HTTP-Date-6.08-1-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/perl-HTTP-Date-6.08-1-any.pkg.tar.zst",
+      "version": "6.08-1"
+    },
+    {
+      "architecture": "any",
+      "bytes": 75598,
+      "dependencies": [
+        "perl-Clone",
+        "perl-Encode-Locale>=1",
+        "perl-HTTP-Date>=6",
+        "perl-IO-HTML",
+        "perl-LWP-MediaTypes>=6",
+        "perl-URI>=1.10",
+        "perl>=5.8.8"
+      ],
+      "file": "perl-HTTP-Message-7.04-1-any.pkg.tar.zst",
+      "name": "perl-HTTP-Message",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "a4ea42448c479c4b88606784aeaaac3586a3098708e3d55985e4f71e8e98f076",
+      "signature": {
+        "bytes": 566,
+        "file": "perl-HTTP-Message-7.04-1-any.pkg.tar.zst.sig",
+        "sha256": "d9cd47675c36f0ba1f10f8a39d7636b17100d500b397d18c57c47f91ca737e71",
+        "url": "https://repo.msys2.org/msys/x86_64/perl-HTTP-Message-7.04-1-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/perl-HTTP-Message-7.04-1-any.pkg.tar.zst",
+      "version": "7.04-1"
+    },
+    {
+      "architecture": "any",
+      "bytes": 12411,
+      "dependencies": [
+        "perl-HTTP-Message",
+        "perl>=5.8.8"
+      ],
+      "file": "perl-HTTP-Negotiate-6.01-3-any.pkg.tar.zst",
+      "name": "perl-HTTP-Negotiate",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "7d436cce8fa8438b718e45abf4e9f529995c302c81893e1cbe8660bf2a15d400",
+      "signature": {
+        "bytes": 566,
+        "file": "perl-HTTP-Negotiate-6.01-3-any.pkg.tar.zst.sig",
+        "sha256": "db890714a21d5983245e3c58864b80217e4fd6a9da4593d871eba5b45944e66e",
+        "url": "https://repo.msys2.org/msys/x86_64/perl-HTTP-Negotiate-6.01-3-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/perl-HTTP-Negotiate-6.01-3-any.pkg.tar.zst",
+      "version": "6.01-3"
+    },
+    {
+      "architecture": "any",
+      "bytes": 14776,
+      "dependencies": [
+        "perl"
+      ],
+      "file": "perl-IO-HTML-1.004-2-any.pkg.tar.zst",
+      "name": "perl-IO-HTML",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "d84e9eb722f7e256cfbc8d84894e7413b68498fbda08df83f75a08807bafa3e1",
+      "signature": {
+        "bytes": 566,
+        "file": "perl-IO-HTML-1.004-2-any.pkg.tar.zst.sig",
+        "sha256": "dbc8337f5e00ec1a55d2be358547da5fd58983de95727255e11f199cc4a44408",
+        "url": "https://repo.msys2.org/msys/x86_64/perl-IO-HTML-1.004-2-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/perl-IO-HTML-1.004-2-any.pkg.tar.zst",
+      "version": "1.004-2"
+    },
+    {
+      "architecture": "any",
+      "bytes": 170010,
+      "dependencies": [
+        "perl",
+        "perl-Net-SSLeay",
+        "perl-URI"
+      ],
+      "file": "perl-IO-Socket-SSL-2.099-1-any.pkg.tar.zst",
+      "name": "perl-IO-Socket-SSL",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "88308bbe0f4ae92b3fa7207a4fdc3b4ab7512ea4c427de28d38e10a4191865ac",
+      "signature": {
+        "bytes": 566,
+        "file": "perl-IO-Socket-SSL-2.099-1-any.pkg.tar.zst.sig",
+        "sha256": "2b9a93025b6630b7187c5f5d924a6cce34be96b6a4c02775874f8f6e70047210",
+        "url": "https://repo.msys2.org/msys/x86_64/perl-IO-Socket-SSL-2.099-1-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/perl-IO-Socket-SSL-2.099-1-any.pkg.tar.zst",
+      "version": "2.099-1"
+    },
+    {
+      "architecture": "any",
+      "bytes": 44205,
+      "dependencies": [
+        "perl"
+      ],
+      "file": "perl-IO-Stringy-2.113-3-any.pkg.tar.zst",
+      "name": "perl-IO-Stringy",
+      "provides": [
+        "perl-IO-stringy"
+      ],
+      "repository": "msys",
+      "sha256": "eda6107fa2f077f899e92cf84822751439f9152ea98bea2f25bd657a90ee21eb",
+      "signature": {
+        "bytes": 566,
+        "file": "perl-IO-Stringy-2.113-3-any.pkg.tar.zst.sig",
+        "sha256": "58c7659780d807451a44fa973345d8a135f6b75ac7b19d817b1c32c073efe844",
+        "url": "https://repo.msys2.org/msys/x86_64/perl-IO-Stringy-2.113-3-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/perl-IO-Stringy-2.113-3-any.pkg.tar.zst",
+      "version": "2.113-3"
+    },
+    {
+      "architecture": "any",
+      "bytes": 19579,
+      "dependencies": [
+        "perl"
+      ],
+      "file": "perl-LWP-MediaTypes-6.04-2-any.pkg.tar.zst",
+      "name": "perl-LWP-MediaTypes",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "12fd35ab7d0605971c6830e9222365a442d7cc110162d88fe570a913bb64dd2d",
+      "signature": {
+        "bytes": 566,
+        "file": "perl-LWP-MediaTypes-6.04-2-any.pkg.tar.zst.sig",
+        "sha256": "14cacbb5fbb69e7b48220de2b167565c4a51e7f4b94b580fbe90b31efa4c948a",
+        "url": "https://repo.msys2.org/msys/x86_64/perl-LWP-MediaTypes-6.04-2-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/perl-LWP-MediaTypes-6.04-2-any.pkg.tar.zst",
+      "version": "6.04-2"
+    },
+    {
+      "architecture": "any",
+      "bytes": 181379,
+      "dependencies": [
+        "perl-Convert-BinHex",
+        "perl-IO-Stringy",
+        "perl-MailTools"
+      ],
+      "file": "perl-MIME-tools-5.517-1-any.pkg.tar.zst",
+      "name": "perl-MIME-tools",
+      "provides": [
+        "perl-MIME-Body=5.428.0",
+        "perl-MIME-Decoder",
+        "perl-MIME-Decoder-Base64",
+        "perl-MIME-Decoder-Binary",
+        "perl-MIME-Decoder-Binhex",
+        "perl-MIME-Decoder-Quotedprint",
+        "perl-MIME-Decoder-gzip64",
+        "perl-MIME-Decoder-nbit",
+        "perl-MIME-Entity",
+        "perl-MIME-Field-Contdisp=5.428.0",
+        "perl-MIME-Field-Contraenc=5.428.0",
+        "perl-MIME-Field-Conttype=5.428.0",
+        "perl-MIME-Field-Paramval=5.428.0",
+        "perl-MIME-Head=5.428.0",
+        "perl-MIME-Parser",
+        "perl-MIME-Parser-Filer",
+        "perl-MIME-Parser-Reader",
+        "perl-MIME-Parser-Results",
+        "perl-MIME-WordDecoder",
+        "perl-MIME-Words=5.428.0",
+        "perl-MIME-decoder-uu"
+      ],
+      "repository": "msys",
+      "sha256": "cae0a59f9135bfef045eed6461ce97df2a5a9aa74695376cc6da77ba83d49ea2",
+      "signature": {
+        "bytes": 566,
+        "file": "perl-MIME-tools-5.517-1-any.pkg.tar.zst.sig",
+        "sha256": "a62a21a4a6b5543db4ac68dfe8c62c0a948645ad0fbdec829e090cb802fa863a",
+        "url": "https://repo.msys2.org/msys/x86_64/perl-MIME-tools-5.517-1-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/perl-MIME-tools-5.517-1-any.pkg.tar.zst",
+      "version": "5.517-1"
+    },
+    {
+      "architecture": "any",
+      "bytes": 59313,
+      "dependencies": [
+        "perl-TimeDate"
+      ],
+      "file": "perl-MailTools-2.22-1-any.pkg.tar.zst",
+      "name": "perl-MailTools",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "2a39fdc73fd364715de5038feb535a5401607d657a0badf27548f981224a852e",
+      "signature": {
+        "bytes": 566,
+        "file": "perl-MailTools-2.22-1-any.pkg.tar.zst.sig",
+        "sha256": "b086744da958b5d6ff839a407f43e7dce1a6fc16b6decfe9067d56de2d224b1c",
+        "url": "https://repo.msys2.org/msys/x86_64/perl-MailTools-2.22-1-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/perl-MailTools-2.22-1-any.pkg.tar.zst",
+      "version": "2.22-1"
+    },
+    {
+      "architecture": "any",
+      "bytes": 22056,
+      "dependencies": [
+        "perl>=5.6.2"
+      ],
+      "file": "perl-Net-HTTP-6.24-1-any.pkg.tar.zst",
+      "name": "perl-Net-HTTP",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "2bdd43d95f1f7be7d9301bd82a40e149893c272c3df6cee7a197d658a046d931",
+      "signature": {
+        "bytes": 566,
+        "file": "perl-Net-HTTP-6.24-1-any.pkg.tar.zst.sig",
+        "sha256": "8b14c956851dc1fa45258ff6c7aa77f1c7a0a7c852ea8cf0a34a5ef6ed194412",
+        "url": "https://repo.msys2.org/msys/x86_64/perl-Net-HTTP-6.24-1-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/perl-Net-HTTP-6.24-1-any.pkg.tar.zst",
+      "version": "6.24-1"
+    },
+    {
+      "architecture": "any",
+      "bytes": 5026,
+      "dependencies": [
+        "perl-IO-Socket-SSL"
+      ],
+      "file": "perl-Net-SMTP-SSL-1.04-2-any.pkg.tar.zst",
+      "name": "perl-Net-SMTP-SSL",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "31f4d27a07dd5091856e35fe7c4c5b10665744fd6a0f340f0e8f41da4935b655",
+      "signature": {
+        "bytes": 566,
+        "file": "perl-Net-SMTP-SSL-1.04-2-any.pkg.tar.zst.sig",
+        "sha256": "b19cd59fdab4af1757bfa31bf6a83103547847f1f44ddee736af1f20afae7230",
+        "url": "https://repo.msys2.org/msys/x86_64/perl-Net-SMTP-SSL-1.04-2-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/perl-Net-SMTP-SSL-1.04-2-any.pkg.tar.zst",
+      "version": "1.04-2"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 225928,
+      "dependencies": [
+        "openssl"
+      ],
+      "file": "perl-Net-SSLeay-1.96-1-x86_64.pkg.tar.zst",
+      "name": "perl-Net-SSLeay",
+      "provides": [
+        "net-ssleay"
+      ],
+      "repository": "msys",
+      "sha256": "1e975b175e21e6195b967b51a4dbd8970eb96319a670e8dff2081e11554fbaff",
+      "signature": {
+        "bytes": 566,
+        "file": "perl-Net-SSLeay-1.96-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "7fd8bfb5963fff6b208c64c84c1b4da73e478783d84a8e3c7d897b180edc3c7a",
+        "url": "https://repo.msys2.org/msys/x86_64/perl-Net-SSLeay-1.96-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/perl-Net-SSLeay-1.96-1-x86_64.pkg.tar.zst",
+      "version": "1.96-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 20542,
+      "dependencies": [
+        "perl"
+      ],
+      "file": "perl-TermReadKey-2.38-8-x86_64.pkg.tar.zst",
+      "name": "perl-TermReadKey",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "f776ce0f6e4b0244a535efbfc6fe541365d7eb4c98509c119cd330a20d01ddf1",
+      "signature": {
+        "bytes": 566,
+        "file": "perl-TermReadKey-2.38-8-x86_64.pkg.tar.zst.sig",
+        "sha256": "592d4709e8b3b0325498cc6aaebd5904536a879def56fed1c9787cbbf9563397",
+        "url": "https://repo.msys2.org/msys/x86_64/perl-TermReadKey-2.38-8-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/perl-TermReadKey-2.38-8-x86_64.pkg.tar.zst",
+      "version": "2.38-8"
+    },
+    {
+      "architecture": "any",
+      "bytes": 62197,
+      "dependencies": [
+        "perl"
+      ],
+      "file": "perl-TimeDate-2.35-1-any.pkg.tar.zst",
+      "name": "perl-TimeDate",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "f58e0eb26b2d72fc7f863079ab1d45fac32b4bac0d9589a3560bf41a31ccb042",
+      "signature": {
+        "bytes": 566,
+        "file": "perl-TimeDate-2.35-1-any.pkg.tar.zst.sig",
+        "sha256": "6fdecebf1e8d8a96a4a7cfba03b29f951f928ce1decbd5d509b63903c92b0902",
+        "url": "https://repo.msys2.org/msys/x86_64/perl-TimeDate-2.35-1-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/perl-TimeDate-2.35-1-any.pkg.tar.zst",
+      "version": "2.35-1"
+    },
+    {
+      "architecture": "any",
+      "bytes": 19069,
+      "dependencies": [
+        "perl"
+      ],
+      "file": "perl-Try-Tiny-0.32-1-any.pkg.tar.zst",
+      "name": "perl-Try-Tiny",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "bea318e67b5eac1c41f0c71a4265b321f8944248a55a7691a0201a8784e48a43",
+      "signature": {
+        "bytes": 566,
+        "file": "perl-Try-Tiny-0.32-1-any.pkg.tar.zst.sig",
+        "sha256": "e8d60a66ae2d817399f5a13563359cecc1cf02485358f7160a35a7e3ff77f1af",
+        "url": "https://repo.msys2.org/msys/x86_64/perl-Try-Tiny-0.32-1-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/perl-Try-Tiny-0.32-1-any.pkg.tar.zst",
+      "version": "0.32-1"
+    },
+    {
+      "architecture": "any",
+      "bytes": 100332,
+      "dependencies": [
+        "perl>=5.10.0"
+      ],
+      "file": "perl-URI-5.35-1-any.pkg.tar.zst",
+      "name": "perl-URI",
+      "provides": [
+        "perl-URI-Escape=3.30"
+      ],
+      "repository": "msys",
+      "sha256": "696fbf9cd57f68e88f8647fd80963194b1bfc65b1c31a741c55826c27095747f",
+      "signature": {
+        "bytes": 566,
+        "file": "perl-URI-5.35-1-any.pkg.tar.zst.sig",
+        "sha256": "90c4ba7fd79f777c85f7b58a8718375ca85575abe71ec9148ffe6e254a6c9e5a",
+        "url": "https://repo.msys2.org/msys/x86_64/perl-URI-5.35-1-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/perl-URI-5.35-1-any.pkg.tar.zst",
+      "version": "5.35-1"
+    },
+    {
+      "architecture": "any",
+      "bytes": 14472,
+      "dependencies": [
+        "perl",
+        "perl-URI"
+      ],
+      "file": "perl-WWW-RobotRules-6.03-1-any.pkg.tar.zst",
+      "name": "perl-WWW-RobotRules",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "30c51fe709f126f47c6d309256c248c8b7072aef45eb5c8704eb7da3525406d2",
+      "signature": {
+        "bytes": 566,
+        "file": "perl-WWW-RobotRules-6.03-1-any.pkg.tar.zst.sig",
+        "sha256": "45ff071f5a1d061ad1746e26a4e6b0857d4b03194960b44b610e1afc9092e2a9",
+        "url": "https://repo.msys2.org/msys/x86_64/perl-WWW-RobotRules-6.03-1-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/perl-WWW-RobotRules-6.03-1-any.pkg.tar.zst",
+      "version": "6.03-1"
+    },
+    {
+      "architecture": "any",
+      "bytes": 14278,
+      "dependencies": [
+        "perl-HTTP-Date"
+      ],
+      "file": "perl-http-cookiejar-0.014-1-any.pkg.tar.zst",
+      "name": "perl-http-cookiejar",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "aceee3419ec000a08fc2707c2972302f7e2b6cd2160dd06c632f280f30f7838a",
+      "signature": {
+        "bytes": 566,
+        "file": "perl-http-cookiejar-0.014-1-any.pkg.tar.zst.sig",
+        "sha256": "7dba9903b6ac80eef19f54e8f9966ab620f323fbae272adbfa1915cb3e6ff16f",
+        "url": "https://repo.msys2.org/msys/x86_64/perl-http-cookiejar-0.014-1-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/perl-http-cookiejar-0.014-1-any.pkg.tar.zst",
+      "version": "0.014-1"
+    },
+    {
+      "architecture": "any",
+      "bytes": 130223,
+      "dependencies": [
+        "perl",
+        "perl-Encode-Locale",
+        "perl-File-Listing",
+        "perl-HTML-Parser",
+        "perl-HTTP-Cookies",
+        "perl-HTTP-Daemon",
+        "perl-HTTP-Date",
+        "perl-HTTP-Message",
+        "perl-HTTP-Negotiate",
+        "perl-LWP-MediaTypes",
+        "perl-Net-HTTP",
+        "perl-Try-Tiny",
+        "perl-URI",
+        "perl-WWW-RobotRules",
+        "perl-http-cookiejar"
+      ],
+      "file": "perl-libwww-6.83-2-any.pkg.tar.zst",
+      "name": "perl-libwww",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "aea6a7ee7c5ebabf2a2bc8050e2b7e7cee37c5ffe075a0f7e055aa822e5f9d82",
+      "signature": {
+        "bytes": 566,
+        "file": "perl-libwww-6.83-2-any.pkg.tar.zst.sig",
+        "sha256": "bff3cfefb4e328c17547d5bdb023af633dc8bede3a6be89e2cf99e51b7f3d352",
+        "url": "https://repo.msys2.org/msys/x86_64/perl-libwww-6.83-2-any.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/perl-libwww-6.83-2-any.pkg.tar.zst",
+      "version": "6.83-2"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 249918,
+      "dependencies": [
+        "libintl",
+        "sh"
+      ],
+      "file": "sed-4.9-1-x86_64.pkg.tar.zst",
+      "name": "sed",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "3748af28f69e946ec5a42e6670c9bbf6da7352dc93baaa537f69e99c5483b9fc",
+      "signature": {
+        "bytes": 566,
+        "file": "sed-4.9-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "f581e034fe9b375764c64880278604e0b42cb544f40c1ce01eb1492d0af1e056",
+        "url": "https://repo.msys2.org/msys/x86_64/sed-4.9-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/sed-4.9-1-x86_64.pkg.tar.zst",
+      "version": "4.9-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 815230,
+      "dependencies": [
+        "libiconv",
+        "libintl",
+        "sh"
+      ],
+      "file": "tar-1.35-3-x86_64.pkg.tar.zst",
+      "name": "tar",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "71983bed200c4026cdec157837d989728d3de65e8cf644e03876df41a0f1b7c4",
+      "signature": {
+        "bytes": 566,
+        "file": "tar-1.35-3-x86_64.pkg.tar.zst.sig",
+        "sha256": "db89bbaa5b227cb35b36a1a1f3b90925b94dbfd4031c4722b6fc66b27375ea5c",
+        "url": "https://repo.msys2.org/msys/x86_64/tar-1.35-3-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/tar-1.35-3-x86_64.pkg.tar.zst",
+      "version": "1.35-3"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 1510331,
+      "dependencies": [
+        "info",
+        "perl",
+        "sh"
+      ],
+      "file": "texinfo-7.2-3-x86_64.pkg.tar.zst",
+      "name": "texinfo",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "a7043da600b5ec187a8fb03d01869746542974e27ce1b14af0acf6d127cf7151",
+      "signature": {
+        "bytes": 566,
+        "file": "texinfo-7.2-3-x86_64.pkg.tar.zst.sig",
+        "sha256": "e7f1b60950bb68ed981db0ab8fe9140bb54a40799e4d58845b92675aaffbafc6",
+        "url": "https://repo.msys2.org/msys/x86_64/texinfo-7.2-3-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/texinfo-7.2-3-x86_64.pkg.tar.zst",
+      "version": "7.2-3"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 778752,
+      "dependencies": [
+        "libiconv",
+        "libintl",
+        "liblzma"
+      ],
+      "file": "xz-5.8.3-1-x86_64.pkg.tar.zst",
+      "name": "xz",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "05a0cba55b1d302861e8152c7aa08fb35819af625d79c75bd8502b5e105cd657",
+      "signature": {
+        "bytes": 566,
+        "file": "xz-5.8.3-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "1c5f76e2e5f5dafb4d2301201b1297df94a53c88f45aa594e7fd161d13b786ef",
+        "url": "https://repo.msys2.org/msys/x86_64/xz-5.8.3-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/xz-5.8.3-1-x86_64.pkg.tar.zst",
+      "version": "5.8.3-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 52245,
+      "dependencies": [
+        "gcc-libs"
+      ],
+      "file": "zlib-1.3.2-1-x86_64.pkg.tar.zst",
+      "name": "zlib",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "a04aa79996c57f0db936be66cf94326d7e67e9cd8dbffe4cf6e97693d0a1d9ef",
+      "signature": {
+        "bytes": 566,
+        "file": "zlib-1.3.2-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "97d2a513a19b53edd250476da081803124c985e1fc726b52602fb82908d2d62e",
+        "url": "https://repo.msys2.org/msys/x86_64/zlib-1.3.2-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/zlib-1.3.2-1-x86_64.pkg.tar.zst",
+      "version": "1.3.2-1"
+    },
+    {
+      "architecture": "x86_64",
+      "bytes": 91266,
+      "dependencies": [
+        "gcc-libs",
+        "libzstd"
+      ],
+      "file": "zstd-1.5.7-1-x86_64.pkg.tar.zst",
+      "name": "zstd",
+      "provides": [],
+      "repository": "msys",
+      "sha256": "7b8ab77828c5a1efe53ebc53e3ea9d719bfbd609bf4c810eaa88d626188ed407",
+      "signature": {
+        "bytes": 566,
+        "file": "zstd-1.5.7-1-x86_64.pkg.tar.zst.sig",
+        "sha256": "8bc891c344c33fe3f4d7b4c2742387f7c0b35c3acaaffc3d3dd4e38ee7373c4c",
+        "url": "https://repo.msys2.org/msys/x86_64/zstd-1.5.7-1-x86_64.pkg.tar.zst.sig"
+      },
+      "url": "https://repo.msys2.org/msys/x86_64/zstd-1.5.7-1-x86_64.pkg.tar.zst",
+      "version": "1.5.7-1"
+    }
+  ],
+  "requestedPackages": [
+    "autoconf-wrapper",
+    "automake-wrapper",
+    "bison",
+    "flex",
+    "git",
+    "libtool",
+    "make",
+    "mingw-w64-ucrt-x86_64-gcc",
+    "msys2-keyring",
+    "patch",
+    "tar",
+    "texinfo",
+    "xz",
+    "zstd"
+  ],
+  "roots": {
+    "shell": "usr/bin/bash.exe",
+    "ucrt64": "ucrt64"
+  },
+  "schemaVersion": 1,
+  "signaturePolicy": {
+    "keyring": "base-plus-locked-msys2-keyring",
+    "requireEveryPackage": true
+  }
+}

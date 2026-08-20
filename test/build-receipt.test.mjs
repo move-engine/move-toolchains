@@ -24,6 +24,16 @@ const gccQualificationCases = [
     "staged-prefix-independence",
     "runtime-closure",
 ];
+const clangQualificationCases = [
+    "clang-version",
+    "clangxx-version",
+    "clangd-version",
+    "reflection-feature",
+    "nez-compilation-database",
+    "resource-headers",
+    "staged-prefix-independence",
+    "runtime-closure",
+];
 
 async function fixture(context) {
     const root = await mkdtemp(path.join(tmpdir(), "move-receipt-test-"));
@@ -51,10 +61,11 @@ function input() {
         sourceDateEpoch: 1786088827,
         dependencies: [{
             id: "binutils",
+            kind: "archive",
+            file: "binutils-fixture.tar.xz",
             source: "https://sourceware.org/git/binutils-gdb.git",
             version: "fixture",
-            revision: "d".repeat(40),
-            sha256: "e".repeat(64),
+            checksum: {algorithm: "sha256", digest: "e".repeat(64)},
         }],
         build: {
             triples: {build: "x86_64-pc-linux-gnu", host: "x86_64-pc-linux-gnu",
@@ -139,6 +150,54 @@ test("requires complete reproducibility and qualification identity", async (cont
     }
 });
 
+test("accepts exact archive and Git dependency identities", async (context) => {
+    const root = await fixture(context);
+    const candidate = input();
+    candidate.dependencies.push({
+        id: "mingw-w64",
+        kind: "git",
+        source: "https://github.com/mingw-w64/mingw-w64.git",
+        version: "14.0.0",
+        revision: "a".repeat(40),
+        tree: "b".repeat(40),
+    });
+    await writeBuildReceipt(root, candidate);
+});
+
+test("rejects mutable or malformed dependency identities", async (context) => {
+    const root = await fixture(context);
+    const written = await writeBuildReceipt(root, input());
+    for (const mutate of [
+        (receipt) => delete receipt.dependencies[0].checksum,
+        (receipt) => delete receipt.dependencies[0].file,
+        (receipt) => receipt.dependencies[0].file = "../escape.tar.xz",
+        (receipt) => receipt.dependencies[0].checksum.algorithm = "md5",
+        (receipt) => receipt.dependencies[0].kind = "directory",
+    ]) {
+        const receipt = structuredClone(written.receipt);
+        mutate(receipt);
+        assert.throws(() => validateBuildReceipt(receipt));
+    }
+});
+
+test("validates optional archive signature identity", async (context) => {
+    const root = await fixture(context);
+    const candidate = input();
+    candidate.dependencies[0].signature = {
+        file: "binutils-fixture.tar.xz.sig",
+        checksum: {algorithm: "sha256", digest: "f".repeat(64)},
+    };
+    const written = await writeBuildReceipt(root, candidate);
+    for (const mutate of [
+        (receipt) => receipt.dependencies[0].signature.file = "../escape.sig",
+        (receipt) => receipt.dependencies[0].signature.checksum.algorithm = "md5",
+    ]) {
+        const receipt = structuredClone(written.receipt);
+        mutate(receipt);
+        assert.throws(() => validateBuildReceipt(receipt));
+    }
+});
+
 test("binds runtime, triples, and CPU baseline to the exact profile", async (context) => {
     const root = await fixture(context);
     const written = await writeBuildReceipt(root, input());
@@ -151,6 +210,36 @@ test("binds runtime, triples, and CPU baseline to the exact profile", async (con
         mutate(receipt);
         assert.throws(() => validateBuildReceipt(receipt), /disagrees with profile/);
     }
+});
+
+test("requires the Win64 AVX stack-alignment regression for Windows GCC", async (context) => {
+    const root = await fixture(context);
+    const candidate = input();
+    candidate.profile = "windows-x86_64-ucrt64";
+    candidate.build.triples = {
+        build: "x86_64-w64-mingw32",
+        host: "x86_64-w64-mingw32",
+        target: "x86_64-w64-mingw32",
+    };
+    candidate.environment.runtimeIdentity = {family: "ucrt"};
+    candidate.qualification.cases.push({
+        id: "win64-avx-stack-alignment",
+        status: "passed",
+    });
+    const written = await writeBuildReceipt(root, candidate);
+    const missing = structuredClone(written.receipt);
+    missing.qualification.cases = missing.qualification.cases.filter(
+        (entry) => entry.id !== "win64-avx-stack-alignment");
+    assert.throws(() => validateBuildReceipt(missing),
+        /win64-avx-stack-alignment/);
+
+    const clangRoot = await fixture(context);
+    const clangCandidate = structuredClone(candidate);
+    clangCandidate.component = "clangTools";
+    clangCandidate.componentVersion = "p2996-7220baff";
+    clangCandidate.qualification.cases = clangQualificationCases.map(
+        (id) => ({id, status: "passed"}));
+    await writeBuildReceipt(clangRoot, clangCandidate);
 });
 
 test("rejects nonstandard full Git object-id lengths", async (context) => {

@@ -153,12 +153,46 @@ The Windows artifact is built natively under MSYS2 UCRT64, but it is never
 installed into the bootstrap `C:\msys64\ucrt64` prefix. The recipe owns clean
 source, build, sysroot, staging, and qualification roots.
 
+Each workspace is keyed by the canonical recipe digest. Source and builder
+roots may be reused only after their exact materializers reverify identity;
+the object root may be reused only with the same derivation marker. The
+install/staging root must be fresh and empty for every install, so incremental
+compilation never permits stale packaged files to survive.
+
+The bootstrap is not identified by mutable package names alone. The checked-in
+builder lock binds an exact MSYS2 base installer plus the complete resolved
+package closure: archive and detached-signature filenames, repository URLs,
+byte sizes, and SHA-256 digests. The builder is reconstructed from that lock;
+it is not updated from the rolling repositories during a build.
+
+The staged sysroot begins as the normalized union of an explicit subset of
+those locked UCRT64 packages (headers, CRT, winpthreads, binutils, dependency
+libraries, zone data, and the default manifest). Package metadata is excluded
+and the `ucrt64/` package prefix is stripped. The locked bootstrap GCC and its
+runtime package are deliberately not copied. The recipe names that runtime as
+a bootstrap-only provider for the `cc-libs` capability needed while building,
+and records that the custom GCC install must replace that capability. The
+Move GCC profiled bootstrap installs over the staged dependency/sysroot
+prefix; the final phase then inventories every PE import, requires the custom
+runtime closure to be complete, and rejects any dependency that resolves only
+from the builder root. The normalized plan also carries the lock's signature
+policy, logical shell root, and an explicit interpreter for each shell command.
+
+Windows-only GCC corrections are separate from the ordered Move semantic
+patch commits. Each selected MSYS2 recipe patch is bound to the exact recipe
+repository commit, blob, path, target, apply root, and strip level. The
+pre-build patch gate uses indexed three-way application against the exact Move
+source tree and requires the resulting Git tree to equal the recipe's recorded
+prepared-tree identity. That makes stale context, an altered patch blob, a
+different application result, or accidental inclusion of Ada/Fortran/Rust-
+only recipe patches fail before the expensive build.
+
 The manifest must settle and record:
 
 - `x86_64-w64-mingw32` build, host, and target triples;
 - UCRT, SEH, and the chosen POSIX/winpthreads or Win32 thread model;
-- exact binutils and mingw-w64 sources;
-- exact GMP, MPFR, MPC, ISL, and other build dependencies;
+- exact signed binutils, mingw-w64, GMP, MPFR, MPC, ISL, and other staged
+  package inputs from the immutable builder lock;
 - C and C++ languages, LTO policy, and x86-64 baseline flags; and
 - whether host executables are independent of an interactive MSYS2 shell.
 
@@ -202,6 +236,13 @@ Every packaged GCC artifact must pass from a clean module cache:
 8. relocation and a path containing spaces;
 9. absence of build-tree paths and undeclared host runtime dependencies; and
 10. clean qualification on the profile's declared runtime floor.
+
+The Windows profile additionally requires a Win64 AVX stack-slot alignment
+regression for GCC PR54412. The older MSYS2 `-mno-align-vector-insn` patch is
+not silently inherited: GCC upstream has objected to its global pessimization,
+and it does not apply cleanly to the pinned 16.2 source. If the exact source
+fails the regression, the Windows build remains unqualified until a separate
+reviewed correction is added to the platform recipe or Move GCC patch stack.
 
 The minimized case is demonstrated once against the exact unpatched upstream
 base and once against the corrected source. All three artifacts independently

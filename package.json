@@ -9,6 +9,7 @@
   "scripts": {
     "start": "node toolchains.mjs",
     "toolchains": "node toolchains.mjs",
+    "gcc": "node tools/gcc.mjs",
     "doctor": "node tools/release.mjs doctor",
     "doctor:clangd": "node tools/reflection/bootstrap.mjs doctor",
     "status:clangd": "node tools/reflection/bootstrap.mjs status",

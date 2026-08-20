@@ -42,6 +42,11 @@ const requiredQualificationCases = Object.freeze({
         "runtime-closure",
     ]),
 });
+const profileQualificationCases = Object.freeze({
+    "gcc:windows-x86_64-ucrt64": Object.freeze([
+        "win64-avx-stack-alignment",
+    ]),
+});
 
 function fail(message) {
     throw new Error(message);
@@ -250,9 +255,43 @@ function validateDependencies(dependencies) {
         ids.add(id);
         requireString(dependency.source, `receipt dependency ${id} source`);
         requireString(dependency.version, `receipt dependency ${id} version`);
-        if (!fullRevisionPattern.test(dependency.revision ?? "") ||
-            !sha256Pattern.test(dependency.sha256 ?? "")) {
-            fail(`receipt dependency ${id} lacks immutable source identity`);
+        if (dependency.kind === "git") {
+            if (!fullRevisionPattern.test(dependency.revision ?? "") ||
+                !fullRevisionPattern.test(dependency.tree ?? "")) {
+                fail(`receipt dependency ${id} lacks immutable Git identity`);
+            }
+        } else if (dependency.kind === "archive") {
+            validateRelativePath(
+                dependency.file, `receipt dependency ${id} file`);
+            const checksum = requireObject(
+                dependency.checksum, `receipt dependency ${id} checksum`);
+            const digestPattern = checksum.algorithm === "sha256"
+                ? sha256Pattern
+                : checksum.algorithm === "sha512" ? /^[0-9a-f]{128}$/ : null;
+            if (!digestPattern?.test(checksum.digest ?? "")) {
+                fail(`receipt dependency ${id} lacks immutable archive identity`);
+            }
+            if (dependency.signature !== undefined) {
+                const signature = requireObject(
+                    dependency.signature,
+                    `receipt dependency ${id} signature`);
+                validateRelativePath(
+                    signature.file,
+                    `receipt dependency ${id} signature file`);
+                const signatureChecksum = requireObject(
+                    signature.checksum,
+                    `receipt dependency ${id} signature checksum`);
+                const signaturePattern = signatureChecksum.algorithm === "sha256"
+                    ? sha256Pattern
+                    : signatureChecksum.algorithm === "sha512"
+                        ? /^[0-9a-f]{128}$/
+                        : null;
+                if (!signaturePattern?.test(signatureChecksum.digest ?? "")) {
+                    fail(`receipt dependency ${id} lacks immutable signature identity`);
+                }
+            }
+        } else {
+            fail(`receipt dependency ${id} has unsupported kind`);
         }
     }
 }
@@ -355,7 +394,10 @@ export function validateBuildReceipt(receipt) {
             fail(`required qualification did not pass: ${id}`);
         }
     }
-    for (const id of requiredQualificationCases[component]) {
+    for (const id of [
+        ...requiredQualificationCases[component],
+        ...(profileQualificationCases[`${component}:${receipt.profile}`] ?? []),
+    ]) {
         if (results.get(id)?.status !== "passed") {
             fail(`required qualification is absent or did not pass: ${id}`);
         }

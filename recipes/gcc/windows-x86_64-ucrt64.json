@@ -1,0 +1,387 @@
+{
+  "component": "gcc",
+  "dependencies": [
+    {
+      "id": "msys2-gcc-recipes",
+      "kind": "git",
+      "revision": "fc4afbaccc4fc855b2c96a881cc1a5bc81ab41d2",
+      "source": "https://github.com/msys2/MINGW-packages.git",
+      "tree": "219371b490c4cc0fb3ad8e556f83af8a3131f186",
+      "version": "gcc-16.2.0-3"
+    }
+  ],
+  "packageRevision": "move.1",
+  "profile": {
+    "builder": {
+      "bootstrapRuntimePackages": [
+        "mingw-w64-ucrt-x86_64-gcc-libs"
+      ],
+      "generatedProvides": [
+        "mingw-w64-ucrt-x86_64-cc-libs"
+      ],
+      "generatedRuntimeFiles": [
+        "bin/libatomic-1.dll",
+        "bin/libgcc_s_seh-1.dll",
+        "bin/libgomp-1.dll",
+        "bin/libstdc++-6.dll"
+      ],
+      "kind": "msys2-ucrt64",
+      "lock": {
+        "file": "recipes/builders/msys2-ucrt64-20260820.json",
+        "id": "msys2-ucrt64-20260820",
+        "sha256": "5fc7598db13a922377d2662d1918fc7e32d3234ec00f577cd091fca3ca05656e"
+      },
+      "payloadPackages": [
+        "mingw-w64-ucrt-x86_64-binutils",
+        "mingw-w64-ucrt-x86_64-crt",
+        "mingw-w64-ucrt-x86_64-gettext-runtime",
+        "mingw-w64-ucrt-x86_64-gmp",
+        "mingw-w64-ucrt-x86_64-headers",
+        "mingw-w64-ucrt-x86_64-isl",
+        "mingw-w64-ucrt-x86_64-libiconv",
+        "mingw-w64-ucrt-x86_64-libwinpthread",
+        "mingw-w64-ucrt-x86_64-mpc",
+        "mingw-w64-ucrt-x86_64-mpfr",
+        "mingw-w64-ucrt-x86_64-tzdata",
+        "mingw-w64-ucrt-x86_64-windows-default-manifest",
+        "mingw-w64-ucrt-x86_64-winpthreads",
+        "mingw-w64-ucrt-x86_64-zlib",
+        "mingw-w64-ucrt-x86_64-zstd"
+      ],
+      "shell": "@builder@/usr/bin/bash.exe"
+    },
+    "environment": {
+      "CC": "@builder@/ucrt64/bin/gcc.exe",
+      "CPPFLAGS": "-DCOM_NO_WINDOWS_H",
+      "CXX": "@builder@/ucrt64/bin/g++.exe",
+      "LANG": "C.UTF-8",
+      "LC_ALL": "C.UTF-8",
+      "PATH": "@install@/bin:@builder@/ucrt64/bin:@builder@/usr/bin",
+      "SOURCE_DATE_EPOCH": "@source-date-epoch@",
+      "gcc_cv_have_tls": "yes",
+      "glibcxx_cv_atomic_word": "yes",
+      "lt_cv_deplibs_check_method": "pass_all"
+    },
+    "environmentPolicy": {
+      "inherit": [
+        "SystemRoot",
+        "TEMP",
+        "TMP"
+      ],
+      "mode": "allowlist-plus-recipe",
+      "values": "profile.environment"
+    },
+    "exceptionModel": "seh",
+    "id": "windows-x86_64-ucrt64",
+    "patches": [
+      {
+        "applyRoot": "@source@",
+        "blob": "96f2c21236c3e85200bcb9a3bcde1962928ea8db",
+        "path": "mingw-w64-gcc/0002-i386-Keep-SEH-enabled-for-Win64-sysv_abi-functions.patch",
+        "sourceDependency": "msys2-gcc-recipes",
+        "strip": 1,
+        "target": "gcc"
+      },
+      {
+        "applyRoot": "@source@",
+        "blob": "8d5c2dd735e0afa063d0b914db231f70b6ae17f3",
+        "path": "mingw-w64-gcc/0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch",
+        "sourceDependency": "msys2-gcc-recipes",
+        "strip": 1,
+        "target": "gcc"
+      },
+      {
+        "applyRoot": "@source@",
+        "blob": "adc926b3503811c72949adbe21251a6d5896be00",
+        "path": "mingw-w64-gcc/0012-Handle-spaces-in-path-for-default-manifest.patch",
+        "sourceDependency": "msys2-gcc-recipes",
+        "strip": 1,
+        "target": "gcc"
+      },
+      {
+        "applyRoot": "@source@",
+        "blob": "cbb82d017a2c5439d4391880be69768c16cf2207",
+        "path": "mingw-w64-gcc/0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch",
+        "sourceDependency": "msys2-gcc-recipes",
+        "strip": 1,
+        "target": "gcc"
+      },
+      {
+        "applyRoot": "@source@",
+        "blob": "08034b2f16b917ddc9699750285d85eaa45dd4ff",
+        "path": "mingw-w64-gcc/0020-libgomp-Don-t-hard-code-MS-printf-attributes.patch",
+        "sourceDependency": "msys2-gcc-recipes",
+        "strip": 1,
+        "target": "gcc"
+      },
+      {
+        "applyRoot": "@source@",
+        "blob": "29ebf6784505777d9cc91f3bb49f9b46973f9236",
+        "path": "mingw-w64-gcc/0022-mingw-Remove-outdated-mingw-stuff.patch",
+        "sourceDependency": "msys2-gcc-recipes",
+        "strip": 1,
+        "target": "gcc"
+      },
+      {
+        "applyRoot": "@source@",
+        "blob": "ad9b3a1467a584cd0eab15463153901b373477d4",
+        "path": "mingw-w64-gcc/0140-gcc-diagnostic-color.patch",
+        "sourceDependency": "msys2-gcc-recipes",
+        "strip": 1,
+        "target": "gcc"
+      },
+      {
+        "applyRoot": "@source@",
+        "blob": "6ac89abd6831a8c0894692f30dd764c319587c9c",
+        "path": "mingw-w64-gcc/3001-fix-codeview-crashes.patch",
+        "sourceDependency": "msys2-gcc-recipes",
+        "strip": 1,
+        "target": "gcc"
+      }
+    ],
+    "phases": [
+      {
+        "cwd": "@build-root@",
+        "id": "materialize-builder",
+        "operations": [
+          {
+            "containers": [
+              "@workspace@",
+              "@dependencies@"
+            ],
+            "derivationIdentity": "@recipe-digest@",
+            "exactReuse": [
+              "@build@/gcc"
+            ],
+            "fresh": [
+              "@install@"
+            ],
+            "kind": "initialize-logical-roots",
+            "materialized": [
+              "@builder@",
+              "@source@"
+            ]
+          },
+          {
+            "destination": "@builder@",
+            "kind": "materialize-msys2-builder",
+            "lock": "profile.builder.lock",
+            "network": "locked-downloads-only",
+            "reusePolicy": "verify-exact-or-fail",
+            "verifySha256": true,
+            "verifySignatures": true
+          }
+        ]
+      },
+      {
+        "cwd": "@workspace@",
+        "id": "materialize-sources",
+        "operations": [
+          {
+            "checkoutEol": "lf",
+            "depth": 1,
+            "destination": "@source@",
+            "identity": "recipe.source",
+            "kind": "materialize-git",
+            "reusePolicy": "verify-exact-or-fail",
+            "verifyTree": true
+          },
+          {
+            "checkoutEol": "lf",
+            "depth": 1,
+            "destination": "@dependencies@/msys2-gcc-recipes",
+            "identity": "dependency.msys2-gcc-recipes",
+            "kind": "materialize-git",
+            "reusePolicy": "verify-exact-or-fail",
+            "verifyTree": true
+          }
+        ]
+      },
+      {
+        "cwd": "@workspace@",
+        "id": "populate-sysroot",
+        "operations": [
+          {
+            "bootstrapRuntimePackages": "profile.builder.bootstrapRuntimePackages",
+            "collisionPolicy": "identical-or-fail",
+            "destination": "@install@",
+            "exclude": [
+              ".BUILDINFO",
+              ".INSTALL",
+              ".MTREE",
+              ".PKGINFO"
+            ],
+            "generatedProvides": "profile.builder.generatedProvides",
+            "kind": "extract-locked-packages",
+            "packages": "profile.builder.payloadPackages",
+            "source": "profile.builder.lock",
+            "stripPrefix": "ucrt64"
+          }
+        ]
+      },
+      {
+        "cwd": "@source@",
+        "id": "prepare-gcc",
+        "operations": [
+          {
+            "expectedTree": "01301fbf04e6bd96be2b6bb8b2cecc26a02b2595",
+            "kind": "apply-exact-patch-set",
+            "mode": "git-apply-three-way-index",
+            "patches": "profile.patches",
+            "target": "@source@"
+          },
+          {
+            "arguments": [
+              "-fiv"
+            ],
+            "environmentPolicy": "profile.environmentPolicy",
+            "interpreter": "@builder@/usr/bin/bash.exe",
+            "kind": "autoreconf"
+          }
+        ]
+      },
+      {
+        "cwd": "@build@/gcc",
+        "id": "configure-gcc",
+        "operations": [
+          {
+            "arguments": [
+              "--prefix=@install@",
+              "--build=x86_64-w64-mingw32",
+              "--host=x86_64-w64-mingw32",
+              "--target=x86_64-w64-mingw32",
+              "--with-sysroot=@sysroot@",
+              "--with-build-sysroot=@sysroot-windows@",
+              "--with-local-prefix=/local",
+              "--with-native-system-header-dir=/include",
+              "--libexecdir=@install@/lib",
+              "--enable-bootstrap",
+              "--enable-checking=release",
+              "--with-arch=x86-64",
+              "--with-tune=generic",
+              "--enable-mingw-wildcard",
+              "--enable-languages=c,c++,lto",
+              "--enable-lto",
+              "--enable-shared",
+              "--enable-static",
+              "--enable-libatomic",
+              "--enable-threads=posix",
+              "--enable-tls",
+              "--enable-graphite",
+              "--enable-fully-dynamic-string",
+              "--enable-libstdcxx-backtrace=yes",
+              "--enable-libstdcxx-filesystem-ts",
+              "--enable-libstdcxx-time",
+              "--disable-libstdcxx-pch",
+              "--enable-libgomp",
+              "--disable-libssp",
+              "--disable-multilib",
+              "--disable-rpath",
+              "--disable-win32-registry",
+              "--disable-nls",
+              "--disable-werror",
+              "--disable-symvers",
+              "--with-libiconv=@install@",
+              "--with-system-zlib",
+              "--with-gmp=@install@",
+              "--with-mpfr=@install@",
+              "--with-mpc=@install@",
+              "--with-isl=@install@",
+              "--with-pkgversion=Move GCC 16.2.0 move.1",
+              "--with-bugurl=https://github.com/move-engine/gcc/issues",
+              "--with-gnu-as",
+              "--with-gnu-ld",
+              "--with-libstdcxx-zoneinfo=yes",
+              "--with-boot-ldflags=-static-libstdc++",
+              "--with-stage1-ldflags=-static-libstdc++"
+            ],
+            "environmentPolicy": "profile.environmentPolicy",
+            "interpreter": "@builder@/usr/bin/bash.exe",
+            "kind": "configure",
+            "program": "@source@/configure"
+          }
+        ]
+      },
+      {
+        "cwd": "@build@/gcc",
+        "id": "build-gcc",
+        "operations": [
+          {
+            "arguments": [
+              "-O",
+              "-j@jobs@",
+              "STAGE1_CFLAGS=-O2",
+              "profiledbootstrap"
+            ],
+            "environment": {
+              "MSYS2_ARG_CONV_EXCL": "-D"
+            },
+            "environmentPolicy": "profile.environmentPolicy",
+            "interpreter": "@builder@/usr/bin/bash.exe",
+            "kind": "make"
+          }
+        ]
+      },
+      {
+        "cwd": "@build@/gcc",
+        "id": "install-gcc",
+        "operations": [
+          {
+            "arguments": [
+              "install"
+            ],
+            "environmentPolicy": "profile.environmentPolicy",
+            "interpreter": "@builder@/usr/bin/bash.exe",
+            "kind": "make"
+          },
+          {
+            "kind": "normalize-portable-prefix",
+            "root": "@install@"
+          },
+          {
+            "forbidResolutionFrom": "@builder@",
+            "generatedProvides": "profile.builder.generatedProvides",
+            "kind": "verify-final-runtime-closure",
+            "requireAllImportsResolved": true,
+            "requireProducedBy": "install-gcc",
+            "requiredGeneratedFiles": "profile.builder.generatedRuntimeFiles",
+            "root": "@install@",
+            "runtime": "pe-ucrt64"
+          }
+        ]
+      }
+    ],
+    "roots": {
+      "build": "@workspace@/build",
+      "builder": "@workspace@/builder",
+      "dependencies": "@workspace@/dependencies",
+      "install": "@workspace@/install",
+      "source": "@workspace@/source/gcc",
+      "sysroot": "@install@",
+      "sysrootWindows": "@windows-path:@sysroot@",
+      "workspace": "@build-root@/windows-x86_64-ucrt64/@recipe-digest@"
+    },
+    "runtime": {
+      "family": "ucrt"
+    },
+    "targetCpuBaseline": "x86-64",
+    "threadModel": "posix",
+    "triples": {
+      "build": "x86_64-w64-mingw32",
+      "host": "x86_64-w64-mingw32",
+      "target": "x86_64-w64-mingw32"
+    }
+  },
+  "schemaVersion": 1,
+  "source": {
+    "patchRevisions": [
+      "ced2ae7f6670c0371e0464e5aaa888c44ebd012a"
+    ],
+    "repository": "https://github.com/move-engine/gcc.git",
+    "revision": "ced2ae7f6670c0371e0464e5aaa888c44ebd012a",
+    "tree": "57f5cc6c172e3e3e08a66c4f1efcf032c84c0b65",
+    "upstreamBaseRevision": "78d4ac73dd391005b895a6148cd9831e28e1208b"
+  },
+  "sourceDateEpoch": 1787208838,
+  "version": "16.2.0"
+}
