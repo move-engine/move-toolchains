@@ -196,6 +196,16 @@ prepared-tree identity. That makes stale context, an altered patch blob, a
 different application result, or accidental inclusion of Ada/Fortran/Rust-
 only recipe patches fail before the expensive build.
 
+If an otherwise accepted MSYS2 patch requires GNU patch fuzz or an offset
+against the pinned GCC source, Move carries an exact rebased copy under
+`patches/gcc/` and records that local blob instead. The GCC 16.2 Windows
+directory-existence correction follows this rule; its original MSYS2 patch is
+retained as provenance, but is not the executable build input. Native Windows
+builds also disable Info generation with `MAKEINFO=true`: GCC's native-path
+source spelling is required by compiler generators, while MSYS Makeinfo cannot
+consume those paths reliably. Info documentation is not part of the runtime
+toolchain payload.
+
 The manifest must settle and record:
 
 - `x86_64-w64-mingw32` build, host, and target triples;

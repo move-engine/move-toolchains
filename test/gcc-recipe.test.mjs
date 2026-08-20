@@ -32,9 +32,14 @@ test("keeps Move compiler patches separate from selected Windows host patches", 
     const {recipe} = await loadGccRecipe(recipePath);
     assert.equal(recipe.source.patchRevisions.length, 1);
     assert.equal(recipe.profile.patches.length, 8);
-    assert.ok(recipe.profile.patches.every((entry) =>
+    assert.equal(recipe.profile.patches.filter((entry) =>
         entry.sourceDependency === "msys2-gcc-recipes" &&
-        entry.path.startsWith("mingw-w64-gcc/") && entry.target === "gcc"));
+        entry.path.startsWith("mingw-w64-gcc/") &&
+        entry.target === "gcc").length, 7);
+    assert.deepEqual(recipe.profile.patches.filter((entry) =>
+        entry.sourceDependency === "move-toolchains").map((entry) => entry.path), [
+        "patches/gcc/0002-windows-posix-dir-exists-gcc-16.2.patch",
+    ]);
     assert.equal(recipe.profile.phases[3].operations[0].expectedTree,
         "01301fbf04e6bd96be2b6bb8b2cecc26a02b2595");
 });
@@ -88,6 +93,7 @@ test("rejects profile, dependency, patch, builder, and payload drift", async () 
         (value) => value.dependencies[0].revision = "bad",
         (value) => value.profile.patches[0].path = "../escape.patch",
         (value) => value.profile.patches[0].blob = "bad",
+        (value) => value.profile.patches[1].sourceDependency = "unknown",
         (value) => value.profile.builder.lock.sha256 = "bad",
         (value) => value.profile.builder.payloadPackages =
             value.profile.builder.payloadPackages.filter(
@@ -145,7 +151,11 @@ test("rejects phase-order, bootstrap-command, and logical-root drift", async () 
         (value) => delete value.profile.phases[5].operations[0].interpreter,
         (value) => delete value.profile.phases[5].operations[0].environmentPolicy,
         (value) => delete value.profile.phases[5].operations[0].environment,
+        (value) => value.profile.phases[5].operations[0].arguments.splice(
+            value.profile.phases[5].operations[0].arguments.indexOf("MAKEINFO=true"),
+            1),
         (value) => value.profile.phases[6].operations[0].arguments = ["install-strip"],
+        (value) => value.profile.phases[6].operations[0].arguments = ["install"],
         (value) => value.profile.phases[6].operations[2].forbidResolutionFrom = "",
         (value) => value.profile.roots.install = "@workspace@/different",
         (value) => value.profile.environment.gcc_cv_have_tls = "no",

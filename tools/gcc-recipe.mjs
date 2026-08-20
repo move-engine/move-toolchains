@@ -229,14 +229,18 @@ function validateBuilder(builder) {
 }
 function validatePatch(value, index, dependencies) {
     const patch = requireObject(value, `Windows GCC patch ${index}`);
-    if (patch.target !== "gcc" || patch.sourceDependency !== "msys2-gcc-recipes" ||
-        patch.applyRoot !== "@source@" || patch.strip !== 1 ||
-        !fullRevisionPattern.test(patch.blob ?? "") ||
-        !dependencies.has(patch.sourceDependency)) {
+    if (patch.target !== "gcc" || patch.applyRoot !== "@source@" ||
+        patch.strip !== 1 || !fullRevisionPattern.test(patch.blob ?? "")) {
         fail(`Windows GCC patch ${index} has invalid provenance or application identity`);
     }
-    if (!/^mingw-w64-gcc\/[A-Za-z0-9._-]+\.patch$/.test(
-        safeRelativePath(patch.path, `Windows GCC patch ${index} path`))) {
+    const patchPath = safeRelativePath(
+        patch.path, `Windows GCC patch ${index} path`);
+    const external = patch.sourceDependency === "msys2-gcc-recipes" &&
+        dependencies.has(patch.sourceDependency) &&
+        /^mingw-w64-gcc\/[A-Za-z0-9._-]+\.patch$/.test(patchPath);
+    const local = patch.sourceDependency === "move-toolchains" &&
+        /^patches\/gcc\/[A-Za-z0-9._-]+\.patch$/.test(patchPath);
+    if (!external && !local) {
         fail(`Windows GCC patch ${index} is outside the pinned GCC recipe`);
     }
 }
@@ -387,7 +391,8 @@ function validatePhases(phases) {
     }
     const make = phases[5].operations.find((operation) => operation.kind === "make");
     if (canonicalJson(make?.arguments) !== canonicalJson([
-        "-O", "-j@jobs@", "STAGE1_CFLAGS=-O2", "profiledbootstrap",
+        "-O", "-j@jobs@", "STAGE1_CFLAGS=-O2", "MAKEINFO=true",
+        "profiledbootstrap",
     ]) || make.interpreter !== "@builder@/usr/bin/bash.exe" ||
         make.environmentPolicy !== "profile.environmentPolicy" ||
         make.environment?.MSYS2_ARG_CONV_EXCL !== "-D") {
@@ -396,7 +401,8 @@ function validatePhases(phases) {
     const install = phases[6].operations.find((operation) => operation.kind === "make");
     if (install?.interpreter !== "@builder@/usr/bin/bash.exe" ||
         install?.environmentPolicy !== "profile.environmentPolicy" ||
-        canonicalJson(install?.arguments) !== canonicalJson(["install"])) {
+        canonicalJson(install?.arguments) !==
+            canonicalJson(["MAKEINFO=true", "install"])) {
         fail("Windows GCC install command is incomplete or changed");
     }
     if (phases[6].operations[1].root !== "@install@") {

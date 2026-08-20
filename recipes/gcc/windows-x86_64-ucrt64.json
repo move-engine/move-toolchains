@@ -84,9 +84,9 @@
       },
       {
         "applyRoot": "@source@",
-        "blob": "8d5c2dd735e0afa063d0b914db231f70b6ae17f3",
-        "path": "mingw-w64-gcc/0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch",
-        "sourceDependency": "msys2-gcc-recipes",
+        "blob": "78e78d0ec45d6c80af83f0eacf1a01109b897d4c",
+        "path": "patches/gcc/0002-windows-posix-dir-exists-gcc-16.2.patch",
+        "sourceDependency": "move-toolchains",
         "strip": 1,
         "target": "gcc"
       },
@@ -319,6 +319,7 @@
               "-O",
               "-j@jobs@",
               "STAGE1_CFLAGS=-O2",
+              "MAKEINFO=true",
               "profiledbootstrap"
             ],
             "environment": {
@@ -337,6 +338,7 @@
         "operations": [
           {
             "arguments": [
+              "MAKEINFO=true",
               "install"
             ],
             "environmentPolicy": "profile.environmentPolicy",
