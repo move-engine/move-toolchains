@@ -134,8 +134,7 @@ function validateCompiler(install) {
     return {version: version.split(/\r?\n/)[0], target, fullVersion};
 }
 
-async function stripBinaries(install) {
-    const strip = path.join(install, "bin", "strip.exe");
+async function stripBinaries(install, strip) {
     const binaries = (await recursiveFiles(install)).filter((file) =>
         [".dll", ".exe"].includes(path.extname(file).toLowerCase()) &&
         path.resolve(file) !== path.resolve(strip));
@@ -235,11 +234,15 @@ async function main() {
     try {
         const stage = path.join(temporary, archiveRoot);
         await mkdir(stage);
-        run("robocopy.exe", [install, stage, "/E", "/COPY:DAT", "/DCOPY:T", "/R:2", "/W:1", "/XJ"], {
+        run("robocopy.exe", [
+            install, stage, "/E", "/COPY:DAT", "/DCOPY:T", "/R:2", "/W:1",
+            "/XJ", "/NFL", "/NDL", "/NJH", "/NJS", "/NP",
+        ], {
             inherit: true,
             acceptedStatuses: new Set([0, 1, 2, 3, 4, 5, 6, 7]),
         });
-        const strippedFiles = await stripBinaries(stage);
+        const strippedFiles = await stripBinaries(
+            stage, path.join(install, "bin", "strip.exe"));
         const peImports = await auditPeClosure(stage);
         const artifact = {
             schemaVersion: 1,
