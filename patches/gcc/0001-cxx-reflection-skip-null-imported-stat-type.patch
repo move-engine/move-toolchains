@@ -1,0 +1,5 @@
+--- a/gcc/cp/name-lookup.cc
++++ b/gcc/cp/name-lookup.cc
+@@ -4445 +4445 @@
+-		  if (STAT_TYPE_VISIBLE_P (bind))
++		  if (STAT_TYPE_VISIBLE_P (bind) && STAT_TYPE (bind))

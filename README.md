@@ -130,6 +130,11 @@ The archive lane must install into a staging prefix, qualify relocation, and
 close non-baseline runtime dependencies before a GCC asset is added to
 `toolchains.json`.
 
+The current GCC releases and upstream master crash when reflecting an imported
+namespace from a C++ module partition. See the
+[qualification report and candidate patch](docs/gcc-imported-namespace-reflection.md)
+before selecting a GCC checkpoint for Move's generated declaration pipeline.
+
 ## Verify the current release set
 
 The first manifest describes the already-qualified clang-p2996 archives. Point
