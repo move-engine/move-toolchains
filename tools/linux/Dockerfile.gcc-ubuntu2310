@@ -1,0 +1,34 @@
+FROM ubuntu@sha256:fd7fe639db24c4e005643921beea92bc449aac4f4d40d60cd9ad9ab6456aec01
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+# Ubuntu 23.10 is intentionally retained as the exact glibc 2.38 build floor.
+# Its immutable end-of-life package repository lives at old-releases.
+RUN sed -i \
+        -e 's|http://archive.ubuntu.com/ubuntu/|http://old-releases.ubuntu.com/ubuntu/|g' \
+        -e 's|http://security.ubuntu.com/ubuntu/|http://old-releases.ubuntu.com/ubuntu/|g' \
+        /etc/apt/sources.list \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+        binutils \
+        bison \
+        build-essential \
+        ca-certificates \
+        file \
+        flex \
+        git \
+        libgmp-dev \
+        libisl-dev \
+        libmpc-dev \
+        libmpfr-dev \
+        patchelf \
+        python3 \
+        rsync \
+        texinfo \
+        tmux \
+        xz-utils \
+        zlib1g-dev \
+    && rm -rf /var/lib/apt/lists/* \
+    && test "$(getconf GNU_LIBC_VERSION)" = "glibc 2.38"
+
+WORKDIR /opt/move-toolchains
