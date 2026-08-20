@@ -135,11 +135,12 @@ function validateCompiler(install) {
 }
 
 async function stripBinaries(install, strip) {
+    const stagedStrip = path.join(install, "bin", "strip.exe");
     const binaries = (await recursiveFiles(install)).filter((file) =>
         [".dll", ".exe"].includes(path.extname(file).toLowerCase()) &&
-        path.resolve(file) !== path.resolve(strip));
+        path.resolve(file) !== path.resolve(stagedStrip));
     for (const file of binaries) run(strip, ["--strip-unneeded", file]);
-    run(strip, ["--strip-unneeded", strip]);
+    run(strip, ["--strip-unneeded", stagedStrip]);
     return binaries.length + 1;
 }
 
