@@ -104,6 +104,8 @@
         "bin/libgomp-1.dll",
         "bin/libstdc++-6.dll",
         "include/c++/16.2.0/meta",
+        "licenses/gcc/COPYING3",
+        "licenses/gcc/COPYING.RUNTIME",
         "move-artifact.json",
         "move-qualification.json"
       ],

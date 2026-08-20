@@ -4,6 +4,7 @@ import {createHash} from "node:crypto";
 import {spawnSync} from "node:child_process";
 import {
     access,
+    copyFile,
     mkdir,
     mkdtemp,
     readFile,
@@ -42,8 +43,8 @@ function usage() {
     console.log(`Package the qualified native Windows Move GCC build
 
 Usage:
-  npm run package:gcc:windows -- --install-root PATH [--output-dir PATH]
-      [--staging-root PATH] [--force]
+  npm run package:gcc:windows -- --install-root PATH --source-root PATH
+      [--output-dir PATH] [--staging-root PATH] [--force]
 
 The source installation is preserved. A staged copy is stripped, given exact
 artifact metadata, audited, archived, extracted beneath a path containing
@@ -61,7 +62,9 @@ export function parseArguments(argv) {
             flags.add(name);
             continue;
         }
-        if (!["--install-root", "--output-dir", "--staging-root"].includes(name)) {
+        if (![
+            "--install-root", "--source-root", "--output-dir", "--staging-root",
+        ].includes(name)) {
             fail(`unknown argument: ${name}`);
         }
         if (values.has(name)) fail(`duplicate argument: ${name}`);
@@ -70,6 +73,7 @@ export function parseArguments(argv) {
         values.set(name, value);
     }
     if (!values.has("--install-root")) fail("--install-root is required");
+    if (!values.has("--source-root")) fail("--source-root is required");
     return {help: false, flags, values};
 }
 
@@ -207,6 +211,7 @@ async function main() {
     const parsed = parseArguments(process.argv.slice(2));
     if (parsed.help) return usage();
     const install = path.resolve(parsed.values.get("--install-root"));
+    const sourceRoot = path.resolve(parsed.values.get("--source-root"));
     const outputDirectory = path.resolve(parsed.values.get("--output-dir") ??
         path.join(repositoryRoot, ".local", "prebuilt"));
     const stagingBase = path.resolve(parsed.values.get("--staging-root") ??
@@ -219,6 +224,19 @@ async function main() {
     }
     const compilerIdentity = validateCompiler(install);
     const loaded = await loadGccRecipe(recipePath);
+    const sourceRevision = run("git", ["-C", sourceRoot, "rev-parse", "HEAD"]);
+    const preparedTree = run("git", ["-C", sourceRoot, "write-tree"]);
+    const expectedPreparedTree = loaded.recipe.profile.phases[3].operations[0]
+        .expectedTree;
+    if (sourceRevision !== loaded.recipe.source.revision ||
+        preparedTree !== expectedPreparedTree) {
+        fail("GCC source revision or prepared tree disagrees with the recipe");
+    }
+    for (const license of ["COPYING3", "COPYING.RUNTIME"]) {
+        if (!(await exists(path.join(sourceRoot, license)))) {
+            fail(`GCC source license is absent: ${license}`);
+        }
+    }
     const configuration = JSON.parse(await readFile(configurationPath, "utf8"));
     const packageRevision = loaded.recipe.packageRevision;
     const archiveContainer = `gcc-${loaded.recipe.version}-${packageRevision}`;
@@ -246,6 +264,12 @@ async function main() {
         const strippedFiles = await stripBinaries(
             stage, path.join(install, "bin", "strip.exe"));
         const peImports = await auditPeClosure(stage);
+        const licenseDirectory = path.join(stage, "licenses", "gcc");
+        await mkdir(licenseDirectory, {recursive: true});
+        for (const license of ["COPYING3", "COPYING.RUNTIME"]) {
+            await copyFile(
+                path.join(sourceRoot, license), path.join(licenseDirectory, license));
+        }
         const artifact = {
             schemaVersion: 1,
             component: "gcc",
@@ -257,6 +281,7 @@ async function main() {
                 revision: loaded.recipe.source.revision,
                 upstreamBaseRevision: loaded.recipe.source.upstreamBaseRevision,
                 patchRevisions: loaded.recipe.source.patchRevisions,
+                preparedTree,
             },
             recipeSha256: loaded.digest,
             builderLockSha256: loaded.recipe.profile.builder.lock.sha256,

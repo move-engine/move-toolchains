@@ -507,8 +507,16 @@ async function downloadToolchain(settings, component, tag) {
                 const target = await exists(path.join(nestedInstall, "bin", "g++.exe"))
                     ? nestedInstall
                     : container;
-                await validateGccRoot(target);
-                await saveHostSettings({gccRoot: target});
+                try {
+                    await validateGccRoot(target);
+                    await saveHostSettings({gccRoot: target});
+                } catch (error) {
+                    const quarantine = `${container}.failed-${Date.now()}`;
+                    await renameWithRetry(container, quarantine);
+                    fail(
+                        `downloaded GCC failed qualification and was preserved at ` +
+                        `${quarantine}: ${error.message}`);
+                }
             }
         } finally {
             await rm(staging, {recursive: true, force: true});
