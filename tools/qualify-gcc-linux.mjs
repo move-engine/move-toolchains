@@ -7,7 +7,7 @@ import path from "node:path";
 import process from "node:process";
 import {fileURLToPath} from "node:url";
 import {auditElfTree} from "./elf-compatibility.mjs";
-import {detectLinuxLibc} from "./host-compatibility.mjs";
+import {compareVersions, detectLinuxLibc} from "./host-compatibility.mjs";
 
 const scriptPath = fileURLToPath(import.meta.url);
 const expectedRevision = "ced2ae7f6670c0371e0464e5aaa888c44ebd012a";
@@ -57,6 +57,14 @@ export function parseArguments(argv) {
         if (!values.has(required)) fail(`${required} is required`);
     }
     return {help: false, flags, values};
+}
+
+export function validateQualificationRuntime(libc, minimumGlibc) {
+    if (libc.family !== "glibc" ||
+        compareVersions(libc.version ?? "", minimumGlibc) < 0) {
+        fail(`qualification requires glibc ${minimumGlibc} or newer; found ` +
+            `${libc.family} ${libc.version}`);
+    }
 }
 
 function run(command, argumentsValue, options = {}) {
@@ -207,9 +215,7 @@ export async function qualifyLinuxGcc(options) {
     const probeRoot = path.resolve(options.probeRoot);
     const xmake = path.resolve(options.xmake);
     const libc = detectLinuxLibc();
-    if (libc.family !== "glibc" || libc.version !== options.minimumGlibc) {
-        fail(`qualification requires glibc ${options.minimumGlibc}; found ${libc.family} ${libc.version}`);
-    }
+    validateQualificationRuntime(libc, options.minimumGlibc);
     const sourceRevision = run("git", ["rev-parse", "HEAD"], {cwd: source});
     const sourceTree = run("git", ["write-tree"], {cwd: source});
     if (sourceRevision !== expectedRevision || sourceTree !== expectedTree) {
@@ -235,6 +241,7 @@ export async function qualifyLinuxGcc(options) {
         const audit = await auditElfTree(install, options.minimumGlibc);
         return {
             identity,
+            hostRuntime: libc,
             elfAudit: audit,
             qualification: {
                 schemaVersion: 1,
