@@ -8,8 +8,18 @@ import test from "node:test";
 import {
     immutableReleasesEnabled,
     releaseAssetErrors,
+    resolveReleaseTag,
     verifyArtifacts,
 } from "../tools/release.mjs";
+
+test("requires the requested tag to match the source manifest", () => {
+    const configuration = {release: {tag: "toolchains-2026.08.7"}};
+    assert.equal(resolveReleaseTag(configuration), "toolchains-2026.08.7");
+    assert.equal(resolveReleaseTag(
+        configuration, "toolchains-2026.08.7"), "toolchains-2026.08.7");
+    assert.throws(() => resolveReleaseTag(
+        configuration, "toolchains-2026.08.6"), /does not match/u);
+});
 
 test("requires an explicit enabled immutable-release response", () => {
     assert.equal(immutableReleasesEnabled('{"enabled":true}'), true);

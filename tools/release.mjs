@@ -241,8 +241,18 @@ async function writeReleaseMetadata(configuration, verified, outputDirectory, ta
     return {manifestPath, manifestChecksumPath, notesPath};
 }
 
+export function resolveReleaseTag(configuration, requestedTag = null) {
+    const tag = requestedTag ?? configuration.release.tag;
+    if (tag !== configuration.release.tag) {
+        fail(
+            `requested release tag ${tag} does not match toolchains.json ` +
+            `${configuration.release.tag}`);
+    }
+    return tag;
+}
+
 async function verify(configuration, values) {
-    const tag = values.get("--tag") ?? configuration.release.tag;
+    const tag = resolveReleaseTag(configuration, values.get("--tag"));
     const {artifactDirectory, outputDirectory} = resolveDirectories(values, tag);
     const verified = await verifyArtifacts(configuration, artifactDirectory);
     const metadata = await writeReleaseMetadata(
