@@ -10,7 +10,6 @@ import {
     mkdtemp,
     readFile,
     readdir,
-    rename,
     rm,
     writeFile,
 } from "node:fs/promises";
@@ -35,6 +34,7 @@ import {
     sourceBuildAlternative,
     unsupportedLinuxMessage,
 } from "./tools/host-compatibility.mjs";
+import {renameWithRetry} from "./tools/filesystem.mjs";
 
 const bootstrapPath = path.join(
     repositoryRoot, "tools", "reflection", "bootstrap.mjs");
@@ -377,7 +377,7 @@ async function downloadAsset(asset, destination) {
         }
     }
     await rm(destination, {force: true});
-    await rename(temporary, destination);
+    await renameWithRetry(temporary, destination);
 }
 
 async function sha256(file) {
@@ -481,7 +481,7 @@ async function downloadToolchain(settings, component, tag) {
                     fail(`clang-p2996 revision exists and was preserved: ${target}`);
                 }
                 await mkdir(container, {recursive: true});
-                await rename(source, target);
+                await renameWithRetry(source, target);
                 const args = [
                     bootstrapPath, "adopt", "--accept-prebuilt", "--root", root,
                 ];
@@ -492,7 +492,7 @@ async function downloadToolchain(settings, component, tag) {
                     run(process.execPath, args, {inherit: true});
                 } catch (error) {
                     const quarantine = `${target}.failed-${Date.now()}`;
-                    await rename(target, quarantine);
+                    await renameWithRetry(target, quarantine);
                     fail(`downloaded clang-p2996 failed qualification and was preserved at ${quarantine}: ${error.message}`);
                 }
             } else {
@@ -500,7 +500,7 @@ async function downloadToolchain(settings, component, tag) {
                 if (entries.length !== 1) fail("GCC archive must contain one root directory");
                 const target = path.join(root, entries[0]);
                 if (await exists(target)) fail(`GCC target exists and was preserved: ${target}`);
-                await rename(path.join(staging, entries[0]), target);
+                await renameWithRetry(path.join(staging, entries[0]), target);
                 await validateGccRoot(target);
                 await saveHostSettings({gccRoot: target});
             }
