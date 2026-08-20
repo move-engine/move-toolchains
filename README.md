@@ -70,7 +70,7 @@ npm run doctor
 
 ## clang-p2996 source build
 
-The migrated bootstrap uses an exact shallow fetch of the Bloomberg fork,
+The migrated bootstrap uses an exact shallow fetch of the Move Engine fork,
 qualifies the result, and preserves resumable build state:
 
 ```text
@@ -83,6 +83,18 @@ bootstrap builds clang, clangd, libc++, libc++abi, and libunwind as one isolated
 toolchain. Linux release artifacts are built with explicit x86-64-baseline
 flags and are audited file-by-file for their maximum required GLIBC symbol
 version.
+
+To qualify an already-built exact Release tree without recompiling it, use:
+
+```powershell
+npm run import-build:clangd -- --source M:\path\to\source --build M:\path\to\build --root M:\path\to\toolchains --jobs 20
+```
+
+The importer fails closed unless the checkout is clean at the pinned revision,
+the origin identifies the configured repository, the CMake cache matches the
+host Release profile, and `clang`, `clang++`, and `clangd` identify the pinned
+commit. It reruns CMake generation/install and the same full qualification used
+for a clean source build; it does not relabel arbitrary binaries.
 
 Package and relocation-test the qualified Windows installation with:
 

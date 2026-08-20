@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "release": {
-    "tag": "toolchains-2026.08.3",
-    "title": "Move toolchains 2026.08.3",
-    "notes": "Adds an Ubuntu 22.04-built clang-p2996 artifact for glibc 2.35 hosts while retaining the existing glibc 2.38 and Windows artifacts. Linux downloads select the newest compatible glibc floor before transferring an archive. GCC packages will join this release set after their relocation boundary is qualified."
+    "tag": "toolchains-2026.08.4",
+    "title": "Move toolchains 2026.08.4",
+    "notes": "Moves clang-p2996 to the Move Engine fork at the exact ExplDependentCallExpr serialization fix. Provides distinct Release artifacts for Windows, Ubuntu 22.04/glibc 2.35, and Debian 13/glibc 2.38; Linux downloads select the newest compatible glibc floor before transferring an archive. GCC packages will join this release set after their relocation boundary is qualified."
   },
   "components": {
     "gcc": {
@@ -13,8 +13,8 @@
       "releaseBaseUrl": "https://ftp.gnu.org/gnu/gcc"
     },
     "clang-p2996": {
-      "repository": "https://github.com/bloomberg/clang-p2996.git",
-      "revision": "7220baffd57ea5b0f8cf59bee494dd5b7cc2b748",
+      "repository": "https://github.com/move-engine/clang-p2996.git",
+      "revision": "0ac75f2f9a8648feaa404e6b68513ce7d4121ece",
       "qualificationSchemaVersion": 3,
       "minimumFreeGiB": 80,
       "hosts": {
@@ -70,9 +70,9 @@
     {
       "id": "clang-p2996-windows-x64",
       "host": "windows-x86_64",
-      "file": "clangd-p2996-7220baff-windows-x86_64.zip",
-      "checksumFile": "clangd-p2996-7220baff-windows-x86_64.zip.sha256",
-      "archiveRoot": "clang-p2996/7220baffd57ea5b0f8cf59bee494dd5b7cc2b748/install",
+      "file": "clangd-p2996-0ac75f2f-windows-x86_64.zip",
+      "checksumFile": "clangd-p2996-0ac75f2f-windows-x86_64.zip.sha256",
+      "archiveRoot": "clang-p2996/0ac75f2f9a8648feaa404e6b68513ce7d4121ece/install",
       "requiredEntries": [
         "bin/clangd.exe",
         "bin/clang.exe",
@@ -87,9 +87,9 @@
     {
       "id": "clang-p2996-linux-x64-glibc235",
       "host": "linux-x86_64-glibc2.35",
-      "file": "clangd-p2996-7220baff-linux-x86_64-glibc2.35.tar.gz",
-      "checksumFile": "clangd-p2996-7220baff-linux-x86_64-glibc2.35.tar.gz.sha256",
-      "archiveRoot": "clang-p2996/7220baffd57ea5b0f8cf59bee494dd5b7cc2b748/install",
+      "file": "clangd-p2996-0ac75f2f-linux-x86_64-glibc2.35.tar.gz",
+      "checksumFile": "clangd-p2996-0ac75f2f-linux-x86_64-glibc2.35.tar.gz.sha256",
+      "archiveRoot": "clang-p2996/0ac75f2f9a8648feaa404e6b68513ce7d4121ece/install",
       "requiredEntries": [
         "bin/clangd",
         "bin/clang",
@@ -109,9 +109,9 @@
     {
       "id": "clang-p2996-linux-x64",
       "host": "linux-x86_64-glibc2.38",
-      "file": "clangd-p2996-7220baff-linux-x86_64-glibc2.38.tar.gz",
-      "checksumFile": "clangd-p2996-7220baff-linux-x86_64-glibc2.38.tar.gz.sha256",
-      "archiveRoot": "clang-p2996/7220baffd57ea5b0f8cf59bee494dd5b7cc2b748/install",
+      "file": "clangd-p2996-0ac75f2f-linux-x86_64-glibc2.38.tar.gz",
+      "checksumFile": "clangd-p2996-0ac75f2f-linux-x86_64-glibc2.38.tar.gz.sha256",
+      "archiveRoot": "clang-p2996/0ac75f2f9a8648feaa404e6b68513ce7d4121ece/install",
       "requiredEntries": [
         "bin/clangd",
         "bin/clang",
