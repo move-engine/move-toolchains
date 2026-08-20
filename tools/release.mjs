@@ -2,7 +2,6 @@
 
 import {createHash} from "node:crypto";
 import {spawnSync} from "node:child_process";
-import {createReadStream} from "node:fs";
 import {
     access,
     mkdir,
@@ -336,28 +335,13 @@ async function describeAssets(assetPaths) {
     })));
 }
 
-async function uploadAsset(release, token, asset) {
-    const uploadUrl = release.upload_url.replace("{?name,label}", "") +
-        `?name=${encodeURIComponent(asset.name)}`;
-    const response = await fetch(uploadUrl, {
-        method: "POST",
-        headers: {
-            Accept: "application/vnd.github+json",
-            Authorization: `Bearer ${token}`,
-            "Content-Length": String(asset.size),
-            "Content-Type": "application/octet-stream",
-            "X-GitHub-Api-Version": "2026-03-10",
-        },
-        body: createReadStream(asset.file),
-        duplex: "half",
+function uploadAsset(repository, tag, token, asset) {
+    run("gh", [
+        "release", "upload", tag, asset.file, "--repo", repository,
+    ], {
+        inherit: true,
+        env: {...process.env, GH_TOKEN: token},
     });
-    if (!response.ok) {
-        const detail = (await response.text()).slice(0, 1000);
-        fail(
-            `upload failed for ${asset.name}: HTTP ${response.status}` +
-            `${detail ? `: ${detail}` : ""}`);
-    }
-    return await response.json();
 }
 
 async function remoteAssets(repository, releaseId) {
@@ -409,17 +393,20 @@ async function publish(configuration, flags, values) {
     run("gh", ["auth", "status"], {inherit: true});
     assertImmutableReleases(repository);
     assertCleanRepository();
+    const targetCommit = run("git", ["rev-parse", "HEAD"]);
     const existing = JSON.parse(run("gh", [
         "api", `repos/${repository}/releases?per_page=100`,
     ])).find((candidate) => candidate.tag_name === release.tag);
-    if (existing) {
+    if (existing && (existing.draft !== true ||
+        existing.immutable === true ||
+        existing.target_commitish !== targetCommit)) {
         fail(`release already exists: ${repository} ${release.tag}`);
     }
 
-    const releaseRecord = JSON.parse(run("gh", [
+    const releaseRecord = existing ?? JSON.parse(run("gh", [
         "api", "--method", "POST", `repos/${repository}/releases`,
         "-f", `tag_name=${release.tag}`,
-        "-f", `target_commitish=${run("git", ["rev-parse", "HEAD"])}`,
+        "-f", `target_commitish=${targetCommit}`,
         "-f", `name=${configuration.release.title}`,
         "-f", `body=${await readFile(release.metadata.notesPath, "utf8")}`,
         "-F", "draft=true",
@@ -427,9 +414,26 @@ async function publish(configuration, flags, values) {
     try {
         const token = run("gh", ["auth", "token"]);
         const expectedAssets = await describeAssets(assetPaths);
+        const presentAssets = await remoteAssets(repository, releaseRecord.id);
+        const expectedByName = new Map(
+            expectedAssets.map((asset) => [asset.name, asset]));
+        for (const present of presentAssets) {
+            const expected = expectedByName.get(present.name);
+            if (!expected) {
+                fail(`recoverable draft has unexpected asset: ${present.name}`);
+            }
+            const errors = releaseAssetErrors([expected], [present]);
+            if (errors.length !== 0) {
+                fail(
+                    `recoverable draft has an invalid existing asset:\n` +
+                    errors.join("\n"));
+            }
+        }
+        const presentNames = new Set(presentAssets.map((asset) => asset.name));
         for (const asset of expectedAssets) {
+            if (presentNames.has(asset.name)) continue;
             console.log(`uploading ${asset.name} (${asset.size} bytes)`);
-            await uploadAsset(releaseRecord, token, asset);
+            uploadAsset(repository, release.tag, token, asset);
         }
         await waitForVerifiedAssets(
             repository, releaseRecord.id, expectedAssets);
