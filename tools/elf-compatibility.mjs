@@ -99,7 +99,7 @@ export async function auditElfTree(install, maximumGlibc) {
                 fail(`${file} has an unresolved shared-library dependency:\n${linked.trim()}`);
             }
             for (const row of parseLdd(linked)) {
-                const isolated = /^(?:libstdc\+\+|libgcc_s|libc\+\+|libc\+\+abi|libunwind)\.so(?:\.|$)/
+                const isolated = /^(?:libstdc\+\+|libgcc_s|libc\+\+|libc\+\+abi|libunwind|libgmp|libisl|libmpc|libmpfr|libz)\.so(?:\.|$)/
                     .test(row.name);
                 if (isolated) {
                     if (row.resolved === "not" || !path.isAbsolute(row.resolved)) {

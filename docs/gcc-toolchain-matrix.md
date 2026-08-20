@@ -246,6 +246,20 @@ build tools from `PATH`, runs C and C++ smoke programs, and exercises the
 reflection/modules probes. The 2.35 artifact is additionally run on a newer
 glibc host to prove forward compatibility.
 
+The current profile-specific packaging checkpoint is invoked through npm:
+
+```text
+npm run package:gcc:linux -- --install-root <install> --source-root <source> \
+  --minimum-glibc <floor> --probe-root <exact-nez-probe> --xmake <xmake>
+```
+
+It preserves the build installation, stages the GCC and distribution runtime
+closure with corresponding license records, assigns relative ELF search paths,
+qualifies the staged tree, creates the archive, and requalifies an extraction
+under a path containing spaces. This command produces a component-artifact
+checkpoint; the complete receipt, release evidence, and paired toolchain-set
+gates below still apply before publication.
+
 ## GCC qualification boundary
 
 Every packaged GCC artifact must pass from a clean module cache:
