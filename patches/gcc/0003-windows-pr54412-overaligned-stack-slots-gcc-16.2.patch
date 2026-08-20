@@ -1,0 +1,443 @@
+diff --git a/gcc/config/i386/i386.cc b/gcc/config/i386/i386.cc
+index 4dfb90acf..3db88d56b 100644
+--- a/gcc/config/i386/i386.cc
++++ b/gcc/config/i386/i386.cc
+@@ -430,6 +430,8 @@ static rtx ix86_function_value (const_tree, const_tree, bool);
+ static bool ix86_function_value_regno_p (const unsigned int);
+ static unsigned int ix86_function_arg_boundary (machine_mode,
+ 						const_tree);
++static bool ix86_overaligned_stack_slot_required (void);
++static bool ix86_preserve_overaligned_stack_slot (tree);
+ static rtx ix86_static_chain (const_tree, bool);
+ static int ix86_function_regparm (const_tree, const_tree);
+ static void ix86_compute_frame_layout (void);
+@@ -1631,6 +1633,56 @@ ix86_must_pass_in_stack (const function_arg_info &arg)
+ 	  && arg.type && TREE_CODE (arg.type) != VECTOR_TYPE);
+ }
+ 
++/* Return true for fixed-size AVX and AVX512 payload types whose natural
++   alignment cannot be represented by a normal SEH stack frame.  */
++
++static bool
++ix86_overaligned_fixed_size_type_p (tree type)
++{
++  if (!type || !COMPLETE_TYPE_P (type)
++      || TREE_CODE (TYPE_SIZE_UNIT (type)) != INTEGER_CST
++      || TYPE_ALIGN (type) <= MAX_SUPPORTED_STACK_ALIGNMENT)
++    return false;
++
++  switch (TREE_CODE (type))
++    {
++    case VECTOR_TYPE:
++      return (tree_to_uhwi (TYPE_SIZE_UNIT (type)) == 32
++	      || tree_to_uhwi (TYPE_SIZE_UNIT (type)) == 64);
++
++    case ARRAY_TYPE:
++      return ix86_overaligned_fixed_size_type_p (TREE_TYPE (type));
++
++    case RECORD_TYPE:
++    case UNION_TYPE:
++    case QUAL_UNION_TYPE:
++      for (tree field = TYPE_FIELDS (type); field; field = DECL_CHAIN (field))
++	if (TREE_CODE (field) == FIELD_DECL
++	    && ix86_overaligned_fixed_size_type_p (TREE_TYPE (field)))
++	  return true;
++      return false;
++
++    default:
++      return false;
++    }
++}
++
++/* Implement TARGET_OVERALIGNED_STACK_SLOT_REQUIRED.  */
++
++static bool
++ix86_overaligned_stack_slot_required (void)
++{
++  return TARGET_SEH;
++}
++
++/* Implement TARGET_PRESERVE_OVERALIGNED_STACK_SLOT.  */
++
++static bool
++ix86_preserve_overaligned_stack_slot (tree type)
++{
++  return ix86_overaligned_fixed_size_type_p (type);
++}
++
+ /* It returns the size, in bytes, of the area reserved for arguments passed
+    in registers for the function represented by fndecl dependent to the used
+    abi format.  */
+@@ -28470,6 +28522,10 @@ static const scoped_attribute_specs *const ix86_attribute_table[] =
+ #define TARGET_SETUP_INCOMING_VARARGS ix86_setup_incoming_varargs
+ #undef TARGET_MUST_PASS_IN_STACK
+ #define TARGET_MUST_PASS_IN_STACK ix86_must_pass_in_stack
++#undef TARGET_OVERALIGNED_STACK_SLOT_REQUIRED
++#define TARGET_OVERALIGNED_STACK_SLOT_REQUIRED ix86_overaligned_stack_slot_required
++#undef TARGET_PRESERVE_OVERALIGNED_STACK_SLOT
++#define TARGET_PRESERVE_OVERALIGNED_STACK_SLOT ix86_preserve_overaligned_stack_slot
+ #undef TARGET_ALLOCATE_STACK_SLOTS_FOR_ARGS
+ #define TARGET_ALLOCATE_STACK_SLOTS_FOR_ARGS ix86_allocate_stack_slots_for_args
+ #undef TARGET_FUNCTION_ARG_ADVANCE
+diff --git a/gcc/doc/tm.texi b/gcc/doc/tm.texi
+index 2832a447e..255b0db4d 100644
+--- a/gcc/doc/tm.texi
++++ b/gcc/doc/tm.texi
+@@ -4300,6 +4300,21 @@ definition that is usually appropriate, refer to @file{expr.h} for additional
+ documentation.
+ @end deftypefn
+ 
++@deftypefn {Target Hook} bool TARGET_OVERALIGNED_STACK_SLOT_REQUIRED (void)
++This hook should return @code{true} when stack slots whose requested
++alignment exceeds @code{MAX_SUPPORTED_STACK_ALIGNMENT} need special handling
++on the target.  This covers slots created by call expansion, temporary stack
++slots, and incoming argument setup.  When @code{true}, GCC may avoid normal
++fixed stack slots and use over-allocation plus dynamic address alignment.
++@end deftypefn
++
++@deftypefn {Target Hook} bool TARGET_PRESERVE_OVERALIGNED_STACK_SLOT (tree @var{type})
++This hook should return @code{true} when a stack slot for @var{type} whose
++requested alignment exceeds @code{MAX_SUPPORTED_STACK_ALIGNMENT} should
++preserve that requested alignment instead of using the normal fixed stack
++slot handling.
++@end deftypefn
++
+ @deftypefn {Target Hook} rtx TARGET_FUNCTION_INCOMING_ARG (cumulative_args_t @var{ca}, const function_arg_info @var{&arg})
+ Define this hook if the caller and callee on the target have different
+ views of where arguments are passed.  Also define this hook if there are
+diff --git a/gcc/doc/tm.texi.in b/gcc/doc/tm.texi.in
+index 274bb899d..3cdd22f7a 100644
+--- a/gcc/doc/tm.texi.in
++++ b/gcc/doc/tm.texi.in
+@@ -3358,6 +3358,10 @@ the stack.
+ 
+ @hook TARGET_MUST_PASS_IN_STACK
+ 
++@hook TARGET_OVERALIGNED_STACK_SLOT_REQUIRED
++
++@hook TARGET_PRESERVE_OVERALIGNED_STACK_SLOT
++
+ @hook TARGET_FUNCTION_INCOMING_ARG
+ 
+ @hook TARGET_USE_PSEUDO_PIC_REG
+diff --git a/gcc/function.cc b/gcc/function.cc
+index 109821c16..78c22063d 100644
+--- a/gcc/function.cc
++++ b/gcc/function.cc
+@@ -550,6 +550,32 @@ assign_stack_local (machine_mode mode, poly_int64 size, int align)
+ {
+   return assign_stack_local_1 (mode, size, align, ASLK_RECORD_PAD);
+ }
++
++/* Like assign_stack_local, but preserve requested over-alignment by
++   overallocating a BLKmode slot and aligning an address within it.  */
++
++static rtx
++assign_stack_local_aligned (machine_mode mode, poly_int64 size,
++			    unsigned int align)
++{
++  if (align > MAX_SUPPORTED_STACK_ALIGNMENT)
++    {
++      gcc_assert (size.is_constant ());
++
++      rtx allocsize = gen_int_mode (size, Pmode);
++      get_dynamic_stack_size (&allocsize, 0, align, NULL);
++      gcc_assert (CONST_INT_P (allocsize));
++
++      rtx slot = assign_stack_local (BLKmode, UINTVAL (allocsize),
++				     MAX_SUPPORTED_STACK_ALIGNMENT);
++      rtx addr = align_dynamic_address (XEXP (slot, 0), align);
++      mark_reg_pointer (addr, align);
++      slot = gen_rtx_MEM (mode, addr);
++      MEM_NOTRAP_P (slot) = 1;
++      return slot;
++    }
++  return assign_stack_local (mode, size, align);
++}
+ 
+ /* In order to evaluate some expressions, such as function calls returning
+    structures in memory, we need to temporarily allocate stack locations.
+@@ -594,6 +620,18 @@ public:
+   poly_int64 full_size;
+ };
+ 
++/* Return true when SLOT uses an overallocated backing region and a derived
++   aligned address.  Such a slot must not participate in ordinary fixed-slot
++   reuse or coalescing.  */
++
++static bool
++temp_slot_preserves_overalignment_p (const temp_slot *slot)
++{
++  return (targetm.calls.overaligned_stack_slot_required ()
++	  && slot->align > MAX_SUPPORTED_STACK_ALIGNMENT
++	  && targetm.calls.preserve_overaligned_stack_slot (slot->type));
++}
++
+ /* Entry for the below hash table.  */
+ struct GTY((for_user)) temp_slot_address_entry {
+   hashval_t hash;
+@@ -814,6 +852,11 @@ assign_stack_temp_for_type (machine_mode mode, poly_int64 size, tree type)
+     {
+       for (p = avail_temp_slots; p; p = p->next)
+ 	{
++	  /* A preserved over-aligned slot uses a derived interior address.
++	     Do not recycle it through the ordinary fixed-slot path.  */
++	  if (temp_slot_preserves_overalignment_p (p))
++	    continue;
++
+ 	  if (p->align >= align
+ 	      && known_ge (p->size, size)
+ 	      && GET_MODE (p->slot) == mode
+@@ -876,21 +919,36 @@ assign_stack_temp_for_type (machine_mode mode, poly_int64 size, tree type)
+ 
+       p = ggc_alloc<temp_slot> ();
+ 
+-      /* We are passing an explicit alignment request to assign_stack_local.
+-	 One side effect of that is assign_stack_local will not round SIZE
+-	 to ensure the frame offset remains suitably aligned.
++      /* We are passing an explicit alignment request.  One side effect is
++	 that the allocator will not round SIZE to ensure the frame offset
++	 remains suitably aligned.
+ 
+ 	 So for requests which depended on the rounding of SIZE, we go ahead
+-	 and round it now.  We also make sure ALIGNMENT is at least
+-	 BIGGEST_ALIGNMENT.  */
+-      gcc_assert (mode != BLKmode || align == BIGGEST_ALIGNMENT);
+-      p->slot = assign_stack_local_1 (mode,
+-				      (mode == BLKmode
+-				       ? aligned_upper_bound (size,
+-							      (int) align
+-							      / BITS_PER_UNIT)
+-				       : size),
+-				      align, 0);
++	 and round it now.  */
++      bool preserve_alignment
++	= (align > MAX_SUPPORTED_STACK_ALIGNMENT
++	   && targetm.calls.overaligned_stack_slot_required ()
++	   && targetm.calls.preserve_overaligned_stack_slot (type));
++
++      gcc_assert (preserve_alignment || mode != BLKmode
++		  || align == BIGGEST_ALIGNMENT);
++
++      poly_int64 rounded_size
++	= (mode == BLKmode
++	   ? aligned_upper_bound (size, (int) align / BITS_PER_UNIT)
++	   : size);
++
++      if (preserve_alignment)
++	p->slot = assign_stack_local_aligned (mode, rounded_size, align);
++      else
++	p->slot = assign_stack_local_1 (mode, rounded_size, align, 0);
++
++      /* assign_stack_local_1 caps the real allocation.  Do not leave a
++	 stronger MEM alignment claim behind for an ordinary fixed slot.  */
++      if (!preserve_alignment
++	  && align > MAX_SUPPORTED_STACK_ALIGNMENT
++	  && targetm.calls.overaligned_stack_slot_required ())
++	align = MAX_SUPPORTED_STACK_ALIGNMENT;
+ 
+       p->align = align;
+ 
+@@ -1061,7 +1119,8 @@ combine_temp_slots (void)
+ 
+       next = p->next;
+ 
+-      if (GET_MODE (p->slot) != BLKmode)
++      if (GET_MODE (p->slot) != BLKmode
++	  || temp_slot_preserves_overalignment_p (p))
+ 	continue;
+ 
+       for (q = p->next; q; q = next_q)
+@@ -1070,7 +1129,8 @@ combine_temp_slots (void)
+ 
+ 	  next_q = q->next;
+ 
+-	  if (GET_MODE (q->slot) != BLKmode)
++	  if (GET_MODE (q->slot) != BLKmode
++	      || temp_slot_preserves_overalignment_p (q))
+ 	    continue;
+ 
+ 	  if (known_eq (p->base_offset + p->full_size, q->base_offset))
+@@ -3366,10 +3426,17 @@ assign_parm_setup_reg (struct assign_parm_data_all *all, tree parm,
+ 	  int align = STACK_SLOT_ALIGNMENT (TREE_TYPE (parm),
+ 					    TYPE_MODE (TREE_TYPE (parm)),
+ 					    TYPE_ALIGN (TREE_TYPE (parm)));
+-	  parmreg
+-	    = assign_stack_local (TYPE_MODE (TREE_TYPE (parm)),
+-				  GET_MODE_SIZE (TYPE_MODE (TREE_TYPE (parm))),
+-				  align);
++	  if (align > (int) MAX_SUPPORTED_STACK_ALIGNMENT
++	      && targetm.calls.overaligned_stack_slot_required ()
++	      && targetm.calls.preserve_overaligned_stack_slot
++		   (TREE_TYPE (parm)))
++	    parmreg = assign_stack_local_aligned
++	      (TYPE_MODE (TREE_TYPE (parm)),
++	       GET_MODE_SIZE (TYPE_MODE (TREE_TYPE (parm))), align);
++	  else
++	    parmreg = assign_stack_local
++	      (TYPE_MODE (TREE_TYPE (parm)),
++	       GET_MODE_SIZE (TYPE_MODE (TREE_TYPE (parm))), align);
+ 	  set_mem_attributes (parmreg, parm, 1);
+ 	}
+ 
+diff --git a/gcc/target.def b/gcc/target.def
+index 11b358f41..3efdab9e4 100644
+--- a/gcc/target.def
++++ b/gcc/target.def
+@@ -5200,6 +5200,25 @@ documentation.",
+  bool, (const function_arg_info &arg),
+  must_pass_in_stack_var_size_or_pad)
+ 
++DEFHOOK
++(overaligned_stack_slot_required,
++ "This hook should return @code{true} when stack slots whose requested\n\
++alignment exceeds @code{MAX_SUPPORTED_STACK_ALIGNMENT} need special handling\n\
++on the target.  This covers slots created by call expansion, temporary stack\n\
++slots, and incoming argument setup.  When @code{true}, GCC may avoid normal\n\
++fixed stack slots and use over-allocation plus dynamic address alignment.",
++ bool, (void),
++ hook_bool_void_false)
++
++DEFHOOK
++(preserve_overaligned_stack_slot,
++ "This hook should return @code{true} when a stack slot for @var{type} whose\n\
++requested alignment exceeds @code{MAX_SUPPORTED_STACK_ALIGNMENT} should\n\
++preserve that requested alignment instead of using the normal fixed stack\n\
++slot handling.",
++ bool, (tree type),
++ hook_bool_tree_false)
++
+ /* Return true if type TYPE, mode MODE, which is passed by reference,
+    should have the object copy generated by the callee rather than
+    the caller.  It is never called for TYPE requiring constructors.  */
+@@ -7681,4 +7700,3 @@ The default value is NULL.",
+ 
+ /* Close the 'struct gcc_target' definition.  */
+ HOOK_VECTOR_END (C90_EMPTY_HACK)
+-
+diff --git a/gcc/testsuite/g++.target/i386/pr54412-anonymous-temp-2.C b/gcc/testsuite/g++.target/i386/pr54412-anonymous-temp-2.C
+new file mode 100644
+index 000000000..b6fc1ebd0
+--- /dev/null
++++ b/gcc/testsuite/g++.target/i386/pr54412-anonymous-temp-2.C
+@@ -0,0 +1,47 @@
++/* PR target/54412 */
++/* { dg-do compile { target x86_64-*-mingw* } } */
++/* { dg-options "-O2 -fno-strict-aliasing -mavx2 -masm=intel -std=gnu++17 -fno-omit-frame-pointer" } */
++/* { dg-final { scan-assembler-not {lea[ \t]+r8, 63\[rsp\]} } } */
++/* { dg-final { scan-assembler-not {and[ \t]+r8, -32} } } */
++/* { dg-final { scan-assembler-not {vmovdqa[ \t]+YMMWORD PTR \[r8\], ymm0} } } */
++
++template <typename Iterator, typename Predicate>
++__attribute__ ((noinline, noclone))
++Iterator
++find_if_inner (Iterator first, Iterator last, Predicate &predicate)
++{
++  asm volatile ("" : : "g" (first), "g" (last), "g" (&predicate)
++		: "memory");
++  return first;
++}
++
++template <typename Iterator, typename Predicate>
++__attribute__ ((noinline, noclone))
++Iterator
++find_if (Iterator first, Iterator last, Predicate predicate)
++{
++  return find_if_inner (first, last, predicate);
++}
++
++struct string_view
++{
++  int size;
++  void *data;
++};
++
++struct iterator
++{
++  int value;
++};
++
++iterator first;
++iterator last;
++string_view name;
++string_view category;
++
++void
++exercise ()
++{
++  find_if (first, last, [category = category, name = name] (iterator)
++	   { return false; });
++}
+diff --git a/gcc/testsuite/g++.target/i386/pr54412-anonymous-temp.C b/gcc/testsuite/g++.target/i386/pr54412-anonymous-temp.C
+new file mode 100644
+index 000000000..6aaab78b3
+--- /dev/null
++++ b/gcc/testsuite/g++.target/i386/pr54412-anonymous-temp.C
+@@ -0,0 +1,32 @@
++/* PR target/54412 */
++/* { dg-do compile { target x86_64-*-mingw* } } */
++/* { dg-options "-O2 -mavx2 -masm=intel -std=gnu++17 -fno-omit-frame-pointer" } */
++/* { dg-final { scan-assembler-not "vmovdqa[ \t]+YMMWORD PTR -[0-9]+\\[rbp\\]" } } */
++
++template <typename Iterator, typename Predicate>
++__attribute__ ((noinline, noclone))
++void
++find_if (Iterator first, Iterator last, Predicate predicate)
++{
++  asm volatile ("" : : "g" (first), "g" (last), "g" (&predicate)
++		: "memory");
++}
++
++struct string_view
++{
++  int size;
++  void *data;
++
++  int begin () const;
++  int end () const;
++};
++
++string_view name;
++string_view category;
++
++void
++exercise ()
++{
++  find_if (&string_view::begin, &string_view::end,
++	   [category = category, name = name] {});
++}
+diff --git a/gcc/testsuite/g++.target/i386/pr54412-overaligned-byref.C b/gcc/testsuite/g++.target/i386/pr54412-overaligned-byref.C
+new file mode 100644
+index 000000000..b50d27007
+--- /dev/null
++++ b/gcc/testsuite/g++.target/i386/pr54412-overaligned-byref.C
+@@ -0,0 +1,29 @@
++/* PR target/54412 */
++/* { dg-do run { target { x86_64-*-mingw* && avx } } } */
++/* { dg-options "-O2 -mavx2 -std=gnu++17 -fno-omit-frame-pointer" } */
++
++typedef long long v4di __attribute__ ((vector_size (32), aligned (32)));
++
++struct wrapper
++{
++  v4di value;
++};
++
++__attribute__ ((noinline, noclone))
++long long
++check (wrapper value)
++{
++  if (((__UINTPTR_TYPE__) &value & 31) != 0)
++    __builtin_abort ();
++  return value.value[0] + value.value[1]
++    + value.value[2] + value.value[3];
++}
++
++int
++main ()
++{
++  wrapper value = {{ 1, 2, 3, 4 }};
++  if (((__UINTPTR_TYPE__) &value & 31) != 0)
++    __builtin_abort ();
++  return check (value) == 10 ? 0 : 1;
++}

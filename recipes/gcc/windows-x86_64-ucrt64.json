@@ -10,7 +10,7 @@
       "version": "gcc-16.2.0-3"
     }
   ],
-  "packageRevision": "move.1",
+  "packageRevision": "move.2",
   "profile": {
     "builder": {
       "bootstrapRuntimePackages": [
@@ -137,6 +137,14 @@
         "sourceDependency": "msys2-gcc-recipes",
         "strip": 1,
         "target": "gcc"
+      },
+      {
+        "applyRoot": "@source@",
+        "blob": "d2cd8163bdc1d332f787d93987cd4f2fe62fbf2e",
+        "path": "patches/gcc/0003-windows-pr54412-overaligned-stack-slots-gcc-16.2.patch",
+        "sourceDependency": "move-toolchains",
+        "strip": 1,
+        "target": "gcc"
       }
     ],
     "phases": [
@@ -229,7 +237,7 @@
         "id": "prepare-gcc",
         "operations": [
           {
-            "expectedTree": "01301fbf04e6bd96be2b6bb8b2cecc26a02b2595",
+            "expectedTree": "72b9079edba262c4555fd5eb514d7726c3d15500",
             "id": "prepare-gcc.apply-exact-patch-set",
             "kind": "apply-exact-patch-set",
             "mode": "git-apply-three-way-index",

@@ -22,6 +22,7 @@ test("loads the exact Windows UCRT64 Move GCC recipe", async () => {
     assert.deepEqual(loaded.recipe.source.patchRevisions, [
         "ced2ae7f6670c0371e0464e5aaa888c44ebd012a",
     ]);
+    assert.equal(loaded.recipe.packageRevision, "move.2");
     assert.equal(loaded.recipe.profile.runtime.family, "ucrt");
     assert.equal(loaded.recipe.profile.threadModel, "posix");
     assert.equal(loaded.recipe.profile.exceptionModel, "seh");
@@ -31,7 +32,7 @@ test("loads the exact Windows UCRT64 Move GCC recipe", async () => {
 test("keeps Move compiler patches separate from selected Windows host patches", async () => {
     const {recipe} = await loadGccRecipe(recipePath);
     assert.equal(recipe.source.patchRevisions.length, 1);
-    assert.equal(recipe.profile.patches.length, 8);
+    assert.equal(recipe.profile.patches.length, 9);
     assert.equal(recipe.profile.patches.filter((entry) =>
         entry.sourceDependency === "msys2-gcc-recipes" &&
         entry.path.startsWith("mingw-w64-gcc/") &&
@@ -39,9 +40,10 @@ test("keeps Move compiler patches separate from selected Windows host patches", 
     assert.deepEqual(recipe.profile.patches.filter((entry) =>
         entry.sourceDependency === "move-toolchains").map((entry) => entry.path), [
         "patches/gcc/0002-windows-posix-dir-exists-gcc-16.2.patch",
+        "patches/gcc/0003-windows-pr54412-overaligned-stack-slots-gcc-16.2.patch",
     ]);
     assert.equal(recipe.profile.phases[3].operations[0].expectedTree,
-        "01301fbf04e6bd96be2b6bb8b2cecc26a02b2595");
+        "72b9079edba262c4555fd5eb514d7726c3d15500");
 });
 
 test("uses locked MSYS2 dependencies without shipping its bootstrap GCC", async () => {

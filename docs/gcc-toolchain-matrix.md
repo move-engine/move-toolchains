@@ -279,9 +279,14 @@ Every packaged GCC artifact must pass from a clean module cache:
 The Windows profile additionally requires a Win64 AVX stack-slot alignment
 regression for GCC PR54412. The older MSYS2 `-mno-align-vector-insn` patch is
 not silently inherited: GCC upstream has objected to its global pessimization,
-and it does not apply cleanly to the pinned 16.2 source. If the exact source
-fails the regression, the Windows build remains unqualified until a separate
-reviewed correction is added to the platform recipe or Move GCC patch stack.
+and it does not apply cleanly to the pinned 16.2 source. The reviewed Move
+correction is maintained on GCC feature branch
+`feature/win64-pr54412-anonymous-stack-slot-alignment` at commit
+`cb72c32735ab8d1f0a4505106c747255c5241f51` and enters this matrix as the
+exact Windows-only recipe patch
+`0003-windows-pr54412-overaligned-stack-slots-gcc-16.2.patch`. Keeping it in
+the platform patch layer preserves the shared GCC semantic source revision and
+does not invalidate the already-qualified Linux compiler payloads.
 
 The minimized case is demonstrated once against the exact unpatched upstream
 base and once against the corrected source. All three artifacts independently
