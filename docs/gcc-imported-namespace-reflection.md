@@ -54,8 +54,8 @@ The candidate patch makes the visibility flag conditional on an associated
 type. This preserves the intended rule that same-module partition types are
 visible while avoiding a visibility claim for an absent type. The declaration
 chain remains independently visible and the exact Nez program still discovers
-`Record` at runtime. A minimized two-partition regression test verifies both
-the reflected member count and identifier.
+`Record` at runtime. A minimized two-partition regression test verifies the
+reflected member count, exact type identity, and identifier.
 
 ## Candidate patch
 
