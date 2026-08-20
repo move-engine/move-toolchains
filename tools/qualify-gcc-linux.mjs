@@ -99,7 +99,7 @@ struct Record { int Value; };
 
 consteval bool Reflects()
 {
-    constexpr auto members = std::meta::nonstatic_data_members_of(
+    auto members = std::meta::nonstatic_data_members_of(
         ^^Record, std::meta::access_context::unchecked());
     return members.size() == 1 && members[0] == ^^Record::Value &&
         std::meta::identifier_of(members[0]) == std::string_view("Value");
