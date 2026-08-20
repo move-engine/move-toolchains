@@ -88,6 +88,7 @@ function run(command, args, options = {}) {
         encoding: "utf8",
         stdio: options.inherit ? "inherit" : ["ignore", "pipe", "pipe"],
         env: options.env ?? process.env,
+        maxBuffer: options.maxBuffer ?? 128 * 1024 * 1024,
     });
     if (result.error) fail(`${command} could not start: ${result.error.message}`);
     const accepted = options.acceptedStatuses ?? new Set([0]);
