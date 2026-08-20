@@ -7,7 +7,9 @@ test("requires every Linux GCC packaging input", () => {
     const parsed = parseArguments([
         "--install-root", "/install", "--source-root", "/source",
         "--minimum-glibc", "2.35", "--probe-root", "/probe",
-        "--xmake", "/xmake", "--force",
+        "--xmake", "/xmake",
+        "--build-image", `ubuntu@sha256:${"a".repeat(64)}`,
+        "--jobs", "20", "--force",
     ]);
     assert.equal(parsed.values.get("--minimum-glibc"), "2.35");
     assert.equal(parsed.flags.has("--force"), true);

@@ -4,7 +4,7 @@ import {createHash} from "node:crypto";
 import {spawnSync} from "node:child_process";
 import {createReadStream} from "node:fs";
 import {
-    access, copyFile, cp, mkdir, mkdtemp, rm, stat, writeFile,
+    access, copyFile, cp, mkdir, mkdtemp, readFile, rm, stat, writeFile,
 } from "node:fs/promises";
 import {tmpdir} from "node:os";
 import path from "node:path";
@@ -13,6 +13,12 @@ import {fileURLToPath} from "node:url";
 import {detectLinuxLibc} from "./host-compatibility.mjs";
 import {normalizeLinuxGccRuntime} from "./gcc-linux-runtime.mjs";
 import {qualifyLinuxGcc} from "./qualify-gcc-linux.mjs";
+import {
+    canonicalJson,
+    sha256Bytes,
+    verifyBuildReceipt,
+    writeBuildReceipt,
+} from "./build-receipt.mjs";
 
 const scriptPath = fileURLToPath(import.meta.url);
 const repositoryRoot = path.resolve(path.dirname(scriptPath), "..");
@@ -20,6 +26,40 @@ const revision = "ced2ae7f6670c0371e0464e5aaa888c44ebd012a";
 const tree = "57f5cc6c172e3e3e08a66c4f1efcf032c84c0b65";
 const version = "16.2.0";
 const packageRevision = "move.1";
+const probeRevision = "06105d7c2cc9fa78c6db10231ace8c6847cadb67";
+const probeTree = "bfe086d87ff2c5c84d4c899b497e7a704e7e85f1";
+const upstreamBaseRevision = "78d4ac73dd391005b895a6148cd9831e28e1208b";
+const sourceDateEpoch = 1787208838;
+const configureArguments = Object.freeze([
+    "--prefix=@install@",
+    "--build=x86_64-pc-linux-gnu",
+    "--host=x86_64-pc-linux-gnu",
+    "--target=x86_64-pc-linux-gnu",
+    "--enable-bootstrap",
+    "--enable-checking=release",
+    "--with-arch=x86-64",
+    "--with-tune=generic",
+    "--enable-languages=c,c++,lto",
+    "--enable-lto",
+    "--enable-shared",
+    "--enable-static",
+    "--enable-libatomic",
+    "--enable-threads=posix",
+    "--enable-tls",
+    "--enable-graphite",
+    "--enable-libstdcxx-backtrace=yes",
+    "--enable-libstdcxx-filesystem-ts",
+    "--enable-libstdcxx-time",
+    "--enable-libgomp",
+    "--disable-multilib",
+    "--disable-nls",
+    "--disable-werror",
+    "--with-system-zlib",
+    "--with-pkgversion=Move GCC 16.2.0 move.1",
+    "--with-bugurl=https://github.com/move-engine/gcc/issues",
+    "--with-boot-ldflags=-static-libstdc++ -static-libgcc",
+    "--with-stage1-ldflags=-static-libstdc++ -static-libgcc",
+]);
 
 function fail(message) { throw new Error(message); }
 
@@ -29,6 +69,7 @@ function usage() {
 Usage:
   npm run package:gcc:linux -- --install-root PATH --source-root PATH
       --minimum-glibc VERSION --probe-root PATH --xmake PATH
+      --build-image IMAGE [--jobs N]
       [--output-dir PATH] [--staging-root PATH] [--force]
 
 The build installation is preserved. A staged copy receives an isolated,
@@ -48,7 +89,8 @@ export function parseArguments(argv) {
             continue;
         }
         if (!["--install-root", "--source-root", "--minimum-glibc",
-            "--probe-root", "--xmake", "--output-dir", "--staging-root"]
+            "--probe-root", "--xmake", "--build-image", "--jobs",
+            "--output-dir", "--staging-root"]
             .includes(name)) fail(`unknown argument: ${name}`);
         if (values.has(name)) fail(`duplicate argument: ${name}`);
         const value = argv[++index];
@@ -56,7 +98,7 @@ export function parseArguments(argv) {
         values.set(name, value);
     }
     for (const required of ["--install-root", "--source-root",
-        "--minimum-glibc", "--probe-root", "--xmake"]) {
+        "--minimum-glibc", "--probe-root", "--xmake", "--build-image"]) {
         if (!values.has(required)) fail(`${required} is required`);
     }
     return {help: false, values, flags};
@@ -86,6 +128,91 @@ async function sha256(file) {
     const hash = createHash("sha256");
     for await (const chunk of createReadStream(file)) hash.update(chunk);
     return hash.digest("hex");
+}
+
+async function buildReceiptInput(options) {
+    const buildRoot = path.dirname(options.install);
+    const packagesFile = path.join(buildRoot, "builder-packages.txt");
+    const buildLog = await readFile(path.join(buildRoot, "build.log"), "utf8");
+    const bootstrap = buildLog.match(/^bootstrap_cc=(.+)$/m)?.[1];
+    if (!bootstrap || !buildLog.includes(`glibc=glibc ${options.minimumGlibc}`) ||
+        !buildLog.includes(`source=${revision}`) ||
+        !buildLog.includes(`tree=${tree}`) ||
+        !/^build_completed=/m.test(buildLog)) {
+        fail("Linux GCC build evidence is incomplete or disagrees with the package");
+    }
+    const builderPackagesSha256 = await sha256(packagesFile);
+    const buildScriptSha256 = await sha256(path.join(
+        repositoryRoot, "tools", "linux", "build-gcc.sh"));
+    const profile = `linux-x86_64-glibc${options.minimumGlibc}`;
+    const buildCommands = [[
+        "make", "-C", "@build@", `-j${options.jobs}`,
+        "BOOT_CFLAGS=-O2 -march=x86-64 -mtune=generic", "profiledbootstrap",
+    ]];
+    const installCommands = [["make", "-C", "@build@", "install"]];
+    const derivation = {
+        profile,
+        source: {revision, tree, upstreamBaseRevision, patchRevisions: [revision]},
+        sourceDateEpoch,
+        buildImage: options.buildImage,
+        builderPackagesSha256,
+        buildScriptSha256,
+        configure: configureArguments,
+        buildCommands,
+        installCommands,
+        probe: {revision: probeRevision, tree: probeTree},
+    };
+    return {
+        component: "gcc",
+        componentVersion: version,
+        packageRevision,
+        manifestDigest: sha256Bytes(canonicalJson(derivation)),
+        profile,
+        source: {
+            repository: "https://github.com/move-engine/gcc.git",
+            revision,
+            tree,
+            upstreamBaseRevision,
+            patchRevisions: [revision],
+        },
+        sourceDateEpoch,
+        schemas: {manifest: 2, qualification: 1, package: 1},
+        build: {
+            triples: {
+                build: "x86_64-pc-linux-gnu",
+                host: "x86_64-pc-linux-gnu",
+                target: "x86_64-pc-linux-gnu",
+            },
+            configure: [...configureArguments],
+            bootstrap: {
+                identity: `Ubuntu glibc ${options.minimumGlibc} system GCC`,
+                observedVersion: bootstrap,
+            },
+            buildCommands,
+            installCommands,
+        },
+        environment: {
+            builderIdentity: `${options.buildImage}+dpkg@sha256:${builderPackagesSha256}`,
+            runtimeIdentity: {
+                family: "glibc", minimumVersion: options.minimumGlibc,
+            },
+            targetCpuBaseline: "x86-64",
+            variables: {
+                CC: "/usr/bin/gcc",
+                CXX: "/usr/bin/g++",
+                SOURCE_DATE_EPOCH: String(sourceDateEpoch),
+            },
+        },
+        dependencies: [{
+            id: "nez-imported-namespace-probe",
+            kind: "git",
+            source: "https://github.com/move-engine/nez.git",
+            version: probeRevision.slice(0, 8),
+            revision: probeRevision,
+            tree: probeTree,
+        }],
+        qualification: options.qualification,
+    };
 }
 
 async function validateInputs(install, source) {
@@ -146,6 +273,14 @@ async function main() {
     const xmake = path.resolve(parsed.values.get("--xmake"));
     const minimumGlibc = parsed.values.get("--minimum-glibc");
     if (!/^\d+\.\d+$/.test(minimumGlibc)) fail("--minimum-glibc is invalid");
+    const buildImage = parsed.values.get("--build-image");
+    if (!/^ubuntu@sha256:[0-9a-f]{64}$/.test(buildImage)) {
+        fail("--build-image must be an immutable Ubuntu image digest");
+    }
+    const jobs = Number(parsed.values.get("--jobs") ?? "20");
+    if (!Number.isInteger(jobs) || jobs < 1 || jobs > 64) {
+        fail("--jobs must be an integer from 1 through 64");
+    }
     const libc = detectLinuxLibc();
     if (libc.family !== "glibc" || libc.version !== minimumGlibc) {
         fail(`packaging requires glibc ${minimumGlibc}; found ${libc.family} ${libc.version}`);
@@ -159,7 +294,8 @@ async function main() {
     const archiveName = `${container}-linux-x86_64-glibc${minimumGlibc}.tar.gz`;
     const archive = path.join(output, archiveName);
     const checksum = `${archive}.sha256`;
-    if ((await exists(archive) || await exists(checksum)) &&
+    const evidence = `${archive}.evidence.json`;
+    if ((await exists(archive) || await exists(checksum) || await exists(evidence)) &&
         !parsed.flags.has("--force")) {
         fail(`output exists and was preserved: ${archive}`);
     }
@@ -193,13 +329,20 @@ async function main() {
             requirements: {architecture: "x86-64-baseline", minimumGlibc},
             runtime, qualification: stagedQualification.qualification,
         };
+        const receiptInput = await buildReceiptInput({
+            install, minimumGlibc, buildImage, jobs,
+            qualification: stagedQualification.qualification,
+        });
+        metadata.derivation = {configurationDigest: receiptInput.manifestDigest};
         await writeFile(path.join(stage, "move-artifact.json"),
             `${JSON.stringify(metadata, null, 2)}\n`);
         await writeFile(path.join(stage, "move-qualification.json"),
             `${JSON.stringify({qualified: true, ...metadata}, null, 2)}\n`);
+        const writtenReceipt = await writeBuildReceipt(stage, receiptInput);
 
         await rm(archive, {force: true});
         await rm(checksum, {force: true});
+        await rm(evidence, {force: true});
         const epoch = run("git", ["-C", source, "show", "-s", "--format=%ct", "HEAD"]);
         run("tar", ["--sort=name", `--mtime=@${epoch}`, "--owner=0", "--group=0",
             "--numeric-owner", "-czf", archive, "-C", archiveTree, container]);
@@ -208,19 +351,44 @@ async function main() {
         await mkdir(relocatedRoot);
         run("tar", ["-xzf", archive, "-C", relocatedRoot]);
         const relocated = path.join(relocatedRoot, container, "install");
-        await qualifyLinuxGcc({
+        const relocatedQualification = await qualifyLinuxGcc({
             installRoot: relocated, sourceRoot: source, minimumGlibc,
             probeRoot, xmake, scratchRoot: path.join(temporary, "relocated qualification"),
         });
+        const relocatedReceipt = await verifyBuildReceipt(relocated);
+        if (relocatedReceipt.sha256 !== writtenReceipt.sha256) {
+            fail("relocated build receipt identity changed after archiving");
+        }
         const digest = await sha256(archive);
         await writeFile(checksum, `${digest}  ${archiveName}\n`);
         const information = await stat(archive);
+        await writeFile(evidence, canonicalJson({
+            schemaVersion: 1,
+            component: "gcc",
+            profile: `linux-x86_64-glibc${minimumGlibc}`,
+            artifact: {file: archiveName, bytes: information.size, sha256: digest},
+            receipt: {
+                file: "move-build-receipt.json",
+                sha256: writtenReceipt.sha256,
+                installedTreeDigest: writtenReceipt.receipt.installedTree.digest,
+            },
+            cases: [
+                {id: "archive-checksum", status: "passed"},
+                {id: "archive-relocation-path-with-spaces", status: "passed"},
+                {id: "archive-runtime-closure", status: "passed"},
+                {id: "archive-reflection-and-modules", status: "passed"},
+            ],
+            hostRuntime: relocatedQualification.hostRuntime,
+        }));
         console.log(`package: ${archive}`);
         console.log(`bytes: ${information.size}`);
         console.log(`sha256: ${digest}`);
+        console.log(`receipt sha256: ${writtenReceipt.sha256}`);
+        console.log(`installed tree: ${writtenReceipt.receipt.installedTree.digest}`);
     } catch (error) {
         await rm(archive, {force: true});
         await rm(checksum, {force: true});
+        await rm(evidence, {force: true});
         throw error;
     } finally {
         await rm(temporary, {recursive: true, force: true});

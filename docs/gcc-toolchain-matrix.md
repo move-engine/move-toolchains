@@ -250,7 +250,8 @@ The current profile-specific packaging checkpoint is invoked through npm:
 
 ```text
 npm run package:gcc:linux -- --install-root <install> --source-root <source> \
-  --minimum-glibc <floor> --probe-root <exact-nez-probe> --xmake <xmake>
+  --minimum-glibc <floor> --probe-root <exact-nez-probe> --xmake <xmake> \
+  --build-image <immutable-ubuntu-image-digest>
 ```
 
 It preserves the build installation, stages the GCC and distribution runtime
