@@ -1,15 +1,21 @@
 {
   "schemaVersion": 1,
   "release": {
-    "tag": "toolchains-2026.08.7",
-    "title": "Move toolchains 2026.08.7",
-    "notes": "Moves clang-p2996 to the Move Engine fork at the exact ExplDependentCallExpr serialization fix. Provides Release artifacts for Windows and Ubuntu 22.04/glibc 2.35; the portable Linux artifact is also qualified on Debian 13 with newer glibc. The prior glibc 2.38 artifact remains unchanged in its immutable 2026.08.3 release. Release 2026.08.6 is superseded because its immutable Git tag did not match the release tag embedded in toolchains.json; consumers correctly rejected that source/manifest mismatch. Release 2026.08.4 is superseded because its old GitHub CLI upload batch left both large archive assets incomplete before immutability was applied. Linux downloads select the newest compatible glibc floor before transferring an archive. GCC packages will join this release set after their relocation boundary is qualified."
+    "tag": "toolchains-2026.08.8",
+    "title": "Move toolchains 2026.08.8",
+    "notes": "Adds the first patched Move GCC package: native Windows GCC 16.2.0 move.1 for x86_64 UCRT64, built from move-engine/gcc commit ced2ae7f6670c0371e0464e5aaa888c44ebd012a. It fixes the imported-namespace reflection/module compiler crash and is qualified after extraction to a path containing spaces with an isolated PE runtime audit, C++26 reflection smoke test, and the exact Nez imported-namespace module probe. The archive preserves GCC's configured install/ basename beneath a versioned outer directory so its sysroot remains relocatable. The two clang-p2996 0ac75f2f Windows and Ubuntu 22.04/glibc 2.35 artifacts are retained byte-for-byte from immutable release 2026.08.7."
   },
   "components": {
     "gcc": {
       "version": "16.2.0",
+      "packageRevision": "move.1",
       "minimumCompatibleVersion": "16.1.0",
-      "repository": "https://gcc.gnu.org/git/gcc.git",
+      "repository": "https://github.com/move-engine/gcc.git",
+      "revision": "ced2ae7f6670c0371e0464e5aaa888c44ebd012a",
+      "upstreamBaseRevision": "78d4ac73dd391005b895a6148cd9831e28e1208b",
+      "patchRevisions": [
+        "ced2ae7f6670c0371e0464e5aaa888c44ebd012a"
+      ],
       "releaseBaseUrl": "https://ftp.gnu.org/gnu/gcc"
     },
     "clang-p2996": {
@@ -82,6 +88,31 @@
       "requirements": {
         "target": "x86_64-w64-windows-gnu",
         "ucrt64Gcc": "16.2.0"
+      }
+    },
+    {
+      "id": "gcc-windows-x64-ucrt64",
+      "host": "windows-x86_64-ucrt64",
+      "file": "gcc-16.2.0-move.1-windows-x86_64-ucrt64.zip",
+      "checksumFile": "gcc-16.2.0-move.1-windows-x86_64-ucrt64.zip.sha256",
+      "archiveRoot": "gcc-16.2.0-move.1/install",
+      "requiredEntries": [
+        "bin/gcc.exe",
+        "bin/g++.exe",
+        "bin/libatomic-1.dll",
+        "bin/libgcc_s_seh-1.dll",
+        "bin/libgomp-1.dll",
+        "bin/libstdc++-6.dll",
+        "include/c++/16.2.0/meta",
+        "move-artifact.json",
+        "move-qualification.json"
+      ],
+      "requirements": {
+        "architecture": "x86-64-baseline",
+        "target": "x86_64-w64-mingw32",
+        "runtime": "ucrt",
+        "threadModel": "posix",
+        "packageRevision": "move.1"
       }
     },
     {

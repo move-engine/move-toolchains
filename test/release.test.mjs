@@ -13,10 +13,10 @@ import {
 } from "../tools/release.mjs";
 
 test("requires the requested tag to match the source manifest", () => {
-    const configuration = {release: {tag: "toolchains-2026.08.7"}};
-    assert.equal(resolveReleaseTag(configuration), "toolchains-2026.08.7");
+    const configuration = {release: {tag: "toolchains-2026.08.8"}};
+    assert.equal(resolveReleaseTag(configuration), "toolchains-2026.08.8");
     assert.equal(resolveReleaseTag(
-        configuration, "toolchains-2026.08.7"), "toolchains-2026.08.7");
+        configuration, "toolchains-2026.08.8"), "toolchains-2026.08.8");
     assert.throws(() => resolveReleaseTag(
         configuration, "toolchains-2026.08.6"), /does not match/u);
 });
