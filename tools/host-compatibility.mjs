@@ -76,6 +76,17 @@ export function unsupportedLinuxMessage(libc, component = "clangd") {
     return `no ${component} prebuilt supports glibc ${libc.version}`;
 }
 
+export function compatibleXmakeReleaseTag(host, minimum, libc = null) {
+    if (host !== "linux-x64") return null;
+    if (libc?.family !== "glibc" || !versionPattern.test(libc.version ?? "")) {
+        throw new Error(unsupportedLinuxMessage(libc, "Xmake"));
+    }
+    // Current Linux bundles are built on glibc 2.38. Retain the tested
+    // minimum supported bundle for older hosts instead of downloading an
+    // executable that cannot start after its checksum has already passed.
+    return compareVersions(libc.version, "2.38") < 0 ? `v${minimum}` : null;
+}
+
 export function sourceBuildAlternative(message) {
     return `${message}. No source build was started. To build the pinned ` +
         "toolchain explicitly, provide at least 80 GiB of free space and run " +

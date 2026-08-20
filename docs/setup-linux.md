@@ -97,7 +97,11 @@ If the system Xmake is sufficiently recent, it is retained. Otherwise, the
 manager downloads the official Linux x86-64 bundle, verifies the SHA-256 digest
 reported by GitHub, installs it beneath the selected workspace, marks it
 executable, and records its absolute path. It does not replace distro-managed
-files or modify global `PATH`.
+files or modify global `PATH`. Current Xmake bundles require glibc 2.38. On an
+older supported glibc host, the manager instead selects the tested Xmake 3.0.1
+bundle so that the downloaded executable can actually start. Musl and unknown
+libc environments fail before download with an explicit unsupported-host
+diagnostic.
 
 ## 5. Download the qualified clang-p2996 artifact
 

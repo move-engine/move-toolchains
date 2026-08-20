@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+    compatibleXmakeReleaseTag,
     detectLinuxLibc,
     selectCompatibleArtifact,
     sourceBuildAlternative,
@@ -70,4 +71,16 @@ test("unsupported errors promise no implicit source build", () => {
     assert.match(error, /glibc 2\.34/);
     assert.match(error, /No source build was started/);
     assert.match(error, /80 GiB/);
+});
+
+test("selects an Xmake bundle that can start on the host glibc floor", () => {
+    assert.equal(compatibleXmakeReleaseTag(
+        "linux-x64", "3.0.1", {family: "glibc", version: "2.35"}), "v3.0.1");
+    assert.equal(compatibleXmakeReleaseTag(
+        "linux-x64", "3.0.1", {family: "glibc", version: "2.37"}), "v3.0.1");
+    assert.equal(compatibleXmakeReleaseTag(
+        "linux-x64", "3.0.1", {family: "glibc", version: "2.38"}), null);
+    assert.equal(compatibleXmakeReleaseTag("win32-x64", "3.0.1"), null);
+    assert.throws(() => compatibleXmakeReleaseTag(
+        "linux-x64", "3.0.1", {family: "musl", version: null}), /musl/);
 });

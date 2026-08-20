@@ -182,6 +182,7 @@ function exactProbe(probeRoot, xmake, install, scratch, environment) {
     const probeEnvironment = {
         ...environment,
         XMAKE_CONFIGDIR: config,
+        ...(process.getuid?.() === 0 ? {XMAKE_ROOT: "y"} : {}),
         CC: path.join(install, "bin", "gcc"),
         CXX: path.join(install, "bin", "g++"),
     };

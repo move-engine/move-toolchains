@@ -29,6 +29,7 @@ import {
     saveHostSettings,
 } from "./tools/config.mjs";
 import {
+    compatibleXmakeReleaseTag,
     detectLinuxLibc,
     selectCompatibleArtifact,
     sourceBuildAlternative,
@@ -593,7 +594,9 @@ async function setupXmake(settings) {
         console.log(`Xmake ${match[1]} is already suitable: ${configured ?? "system PATH"}`);
         return;
     }
-    const release = await githubRelease("xmake-io/xmake");
+    const libc = settings.host === "linux-x64" ? detectLinuxLibc() : null;
+    const releaseTag = compatibleXmakeReleaseTag(settings.host, minimum, libc);
+    const release = await githubRelease("xmake-io/xmake", releaseTag);
     const tag = release.tag_name;
     let pattern;
     if (settings.host === "win32-x64") pattern = new RegExp(`^xmake-${tag}\\.win64\\.zip$`);
@@ -641,7 +644,7 @@ async function setupXmake(settings) {
         }
         const output = run(executable, ["--version"]);
         const relativeExecutable = path.relative(staging, executable);
-        await rename(staging, installRoot);
+        await renameWithRetry(staging, installRoot);
         staging = null;
         const installedExecutable = path.join(installRoot, relativeExecutable);
         await saveHostSettings({xmakePath: installedExecutable});
