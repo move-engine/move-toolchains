@@ -84,7 +84,7 @@
       },
       {
         "applyRoot": "@source@",
-        "blob": "78e78d0ec45d6c80af83f0eacf1a01109b897d4c",
+        "blob": "c49c38de8d6d168b3ebdd594425a3696be95db1e",
         "path": "patches/gcc/0002-windows-posix-dir-exists-gcc-16.2.patch",
         "sourceDependency": "move-toolchains",
         "strip": 1,

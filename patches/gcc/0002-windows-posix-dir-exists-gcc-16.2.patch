@@ -17,7 +17,7 @@ index 9234ead0d..69ffa8657 100644
 @@ -30,6 +30,14 @@ along with this program; see the file COPYING3.  If not see
  #include "md5.h"
  #include <dirent.h>
- 
+
 +/* Needed for stat_st_mode_symlink below */
 +#if defined(_WIN32)
 +#  define WIN32_LEAN_AND_MEAN
@@ -32,7 +32,7 @@ index 9234ead0d..69ffa8657 100644
 @@ -213,6 +221,49 @@ static int pchf_compare (const void *d_p, const void *e_p);
  static bool check_file_against_entries (cpp_reader *, _cpp_file *, bool);
  static void _cpp_post_stack_file (cpp_reader *, _cpp_file *, include_type, bool);
- 
+
 +#if defined(_WIN32)
 +
 +static int stat_st_mode_symlink (char const* path, struct stat* buf)
@@ -78,7 +78,7 @@ index 9234ead0d..69ffa8657 100644
 +
  /* Given a filename in FILE->PATH, with the empty string interpreted
     as <stdin>, open it.
- 
+
 @@ -242,6 +293,43 @@ open_file (_cpp_file *file)
      }
    else
@@ -120,6 +120,6 @@ index 9234ead0d..69ffa8657 100644
 +	}
 +    }
 +#endif
- 
+
    if (file->fd != -1)
      {
