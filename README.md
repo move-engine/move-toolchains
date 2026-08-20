@@ -123,8 +123,10 @@ npm run ubuntu2204:clangd -- package --output-dir M:\src\move-toolchains\.local\
 The package step audits every ELF executable and shared library, runs clang,
 clang++, and clangd, extracts beneath a different path containing spaces, and
 reruns the pinned reflection/libc++ qualification. It never changes the host
-glibc. The Dockerfile used to seed that WSL2 distribution is also suitable for
-CI or a Docker host with bind-mounted Linux storage.
+glibc. The glibc 2.35 artifact is the portable Linux release asset and is also
+qualified on newer maintained glibc hosts; a redundant newer-floor build is
+not required. The Dockerfile used to seed that WSL2 distribution is also
+suitable for CI or a Docker host with bind-mounted Linux storage.
 
 ## Linux GCC
 

@@ -3,7 +3,7 @@
   "release": {
     "tag": "toolchains-2026.08.4",
     "title": "Move toolchains 2026.08.4",
-    "notes": "Moves clang-p2996 to the Move Engine fork at the exact ExplDependentCallExpr serialization fix. Provides distinct Release artifacts for Windows, Ubuntu 22.04/glibc 2.35, and Debian 13/glibc 2.38; Linux downloads select the newest compatible glibc floor before transferring an archive. GCC packages will join this release set after their relocation boundary is qualified."
+    "notes": "Moves clang-p2996 to the Move Engine fork at the exact ExplDependentCallExpr serialization fix. Provides Release artifacts for Windows and Ubuntu 22.04/glibc 2.35; the portable Linux artifact is also qualified on Debian 13/glibc 2.38. The prior glibc 2.38 artifact remains unchanged in its immutable 2026.08.3 release. Linux downloads select the newest compatible glibc floor before transferring an archive. GCC packages will join this release set after their relocation boundary is qualified."
   },
   "components": {
     "gcc": {
@@ -104,23 +104,6 @@
       "requirements": {
         "architecture": "x86-64-baseline",
         "minimumGlibc": "2.35"
-      }
-    },
-    {
-      "id": "clang-p2996-linux-x64",
-      "host": "linux-x86_64-glibc2.38",
-      "file": "clangd-p2996-0ac75f2f-linux-x86_64-glibc2.38.tar.gz",
-      "checksumFile": "clangd-p2996-0ac75f2f-linux-x86_64-glibc2.38.tar.gz.sha256",
-      "archiveRoot": "clang-p2996/0ac75f2f9a8648feaa404e6b68513ce7d4121ece/install",
-      "requiredEntries": [
-        "bin/clangd",
-        "bin/clang",
-        "include/c++/v1/meta",
-        "move-qualification.json"
-      ],
-      "requirements": {
-        "architecture": "x86-64-baseline",
-        "minimumGlibc": "2.38"
       }
     }
   ]
