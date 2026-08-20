@@ -221,8 +221,8 @@ async function main() {
     const loaded = await loadGccRecipe(recipePath);
     const configuration = JSON.parse(await readFile(configurationPath, "utf8"));
     const packageRevision = loaded.recipe.packageRevision;
-    const archiveRoot = `gcc-${loaded.recipe.version}-${packageRevision}`;
-    const archiveName = `${archiveRoot}-windows-x86_64-ucrt64.zip`;
+    const archiveContainer = `gcc-${loaded.recipe.version}-${packageRevision}`;
+    const archiveName = `${archiveContainer}-windows-x86_64-ucrt64.zip`;
     await mkdir(outputDirectory, {recursive: true});
     await mkdir(stagingBase, {recursive: true});
     const archive = path.join(outputDirectory, archiveName);
@@ -234,8 +234,8 @@ async function main() {
 
     const temporary = await mkdtemp(path.join(stagingBase, ".move-gcc-package-"));
     try {
-        const stage = path.join(temporary, archiveRoot);
-        await mkdir(stage);
+        const stage = path.join(temporary, archiveContainer, "install");
+        await mkdir(stage, {recursive: true});
         run("robocopy.exe", [
             install, stage, "/E", "/COPY:DAT", "/DCOPY:T", "/R:2", "/W:1",
             "/XJ", "/NFL", "/NDL", "/NJH", "/NJS", "/NP",
@@ -291,7 +291,9 @@ async function main() {
 
         await rm(archive, {force: true});
         await rm(checksum, {force: true});
-        run("7z.exe", ["a", "-tzip", "-mx=7", "-mmt=on", archive, archiveRoot], {
+        run("7z.exe", [
+            "a", "-tzip", "-mx=7", "-mmt=on", archive, archiveContainer,
+        ], {
             cwd: temporary,
             inherit: true,
         });
@@ -299,7 +301,7 @@ async function main() {
         const relocated = path.join(temporary, "relocated package with spaces");
         await mkdir(relocated);
         run("7z.exe", ["x", "-y", `-o${relocated}`, archive], {inherit: true});
-        const extracted = path.join(relocated, archiveRoot);
+        const extracted = path.join(relocated, archiveContainer, "install");
         validateCompiler(extracted);
         await reflectionSmoke(extracted, relocated);
         await auditPeClosure(extracted);

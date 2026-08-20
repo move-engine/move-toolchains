@@ -498,9 +498,15 @@ async function downloadToolchain(settings, component, tag) {
             } else {
                 const entries = await readdir(staging);
                 if (entries.length !== 1) fail("GCC archive must contain one root directory");
-                const target = path.join(root, entries[0]);
-                if (await exists(target)) fail(`GCC target exists and was preserved: ${target}`);
-                await renameWithRetry(path.join(staging, entries[0]), target);
+                const container = path.join(root, entries[0]);
+                if (await exists(container)) {
+                    fail(`GCC target exists and was preserved: ${container}`);
+                }
+                await renameWithRetry(path.join(staging, entries[0]), container);
+                const nestedInstall = path.join(container, "install");
+                const target = await exists(path.join(nestedInstall, "bin", "g++.exe"))
+                    ? nestedInstall
+                    : container;
                 await validateGccRoot(target);
                 await saveHostSettings({gccRoot: target});
             }

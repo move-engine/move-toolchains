@@ -206,6 +206,11 @@ source spelling is required by compiler generators, while MSYS Makeinfo cannot
 consume those paths reliably. Info documentation is not part of the runtime
 toolchain payload.
 
+The Windows archive retains the configured `install/` prefix basename beneath
+its versioned outer directory. GCC and the MSYS2 UCRT64 toolchain both encode
+the sysroot relative to that basename; preserving it allows the outer directory
+and all of its ancestors to relocate without rebuilding or driver overrides.
+
 The manifest must settle and record:
 
 - `x86_64-w64-mingw32` build, host, and target triples;
