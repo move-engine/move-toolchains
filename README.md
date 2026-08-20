@@ -70,7 +70,7 @@ npm run doctor
 
 ## clang-p2996 source build
 
-The migrated bootstrap uses an exact shallow fetch of the Bloomberg fork,
+The migrated bootstrap uses an exact shallow fetch of the Move Engine fork,
 qualifies the result, and preserves resumable build state:
 
 ```text
@@ -83,6 +83,18 @@ bootstrap builds clang, clangd, libc++, libc++abi, and libunwind as one isolated
 toolchain. Linux release artifacts are built with explicit x86-64-baseline
 flags and are audited file-by-file for their maximum required GLIBC symbol
 version.
+
+To qualify an already-built exact Release tree without recompiling it, use:
+
+```powershell
+npm run import-build:clangd -- --source M:\path\to\source --build M:\path\to\build --root M:\path\to\toolchains --jobs 20
+```
+
+The importer fails closed unless the checkout is clean at the pinned revision,
+the origin identifies the configured repository, the CMake cache matches the
+host Release profile, and `clang`, `clang++`, and `clangd` identify the pinned
+commit. It reruns CMake generation/install and the same full qualification used
+for a clean source build; it does not relabel arbitrary binaries.
 
 Package and relocation-test the qualified Windows installation with:
 
@@ -111,8 +123,10 @@ npm run ubuntu2204:clangd -- package --output-dir M:\src\move-toolchains\.local\
 The package step audits every ELF executable and shared library, runs clang,
 clang++, and clangd, extracts beneath a different path containing spaces, and
 reruns the pinned reflection/libc++ qualification. It never changes the host
-glibc. The Dockerfile used to seed that WSL2 distribution is also suitable for
-CI or a Docker host with bind-mounted Linux storage.
+glibc. The glibc 2.35 artifact is the portable Linux release asset and is also
+qualified on newer maintained glibc hosts; a redundant newer-floor build is
+not required. The Dockerfile used to seed that WSL2 distribution is also
+suitable for CI or a Docker host with bind-mounted Linux storage.
 
 ## Linux GCC
 

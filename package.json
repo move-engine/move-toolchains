@@ -15,6 +15,7 @@
     "adopt:clangd": "node tools/reflection/bootstrap.mjs adopt --accept-prebuilt",
     "configure:clangd": "node tools/reflection/bootstrap.mjs configure",
     "install:clangd": "node tools/reflection/bootstrap.mjs install",
+    "import-build:clangd": "node tools/reflection/bootstrap.mjs import-build --accept-existing-build",
     "package:clang-p2996": "node tools/package-clang-p2996.mjs",
     "package:clang-p2996:linux": "node tools/package-linux-clang-p2996.mjs",
     "ubuntu2204:clangd": "node tools/ubuntu2204.mjs",

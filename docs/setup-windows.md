@@ -133,7 +133,7 @@ the full trusted-prebuilt reflection qualification at the final location.
 Use a specific published toolchain release when reproducibility matters:
 
 ```powershell
-npm start -- download clangd --tag toolchains-2026.08.3
+npm start -- download clangd --tag toolchains-2026.08.7
 ```
 
 If you already have an extracted qualified installation, integrate its

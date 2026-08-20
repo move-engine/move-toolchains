@@ -241,8 +241,18 @@ async function writeReleaseMetadata(configuration, verified, outputDirectory, ta
     return {manifestPath, manifestChecksumPath, notesPath};
 }
 
+export function resolveReleaseTag(configuration, requestedTag = null) {
+    const tag = requestedTag ?? configuration.release.tag;
+    if (tag !== configuration.release.tag) {
+        fail(
+            `requested release tag ${tag} does not match toolchains.json ` +
+            `${configuration.release.tag}`);
+    }
+    return tag;
+}
+
 async function verify(configuration, values) {
-    const tag = values.get("--tag") ?? configuration.release.tag;
+    const tag = resolveReleaseTag(configuration, values.get("--tag"));
     const {artifactDirectory, outputDirectory} = resolveDirectories(values, tag);
     const verified = await verifyArtifacts(configuration, artifactDirectory);
     const metadata = await writeReleaseMetadata(
@@ -294,6 +304,80 @@ function assertImmutableReleases(repository) {
     }
 }
 
+export function releaseAssetErrors(expectedAssets, remoteAssets) {
+    const actual = new Map(remoteAssets.map((asset) => [asset.name, asset]));
+    const errors = [];
+    for (const expected of expectedAssets) {
+        const remote = actual.get(expected.name);
+        if (!remote) {
+            errors.push(`missing remote asset: ${expected.name}`);
+            continue;
+        }
+        if (remote.state !== "uploaded") {
+            errors.push(
+                `${expected.name}: expected uploaded state, found ${remote.state}`);
+        }
+        if (remote.size !== expected.size) {
+            errors.push(
+                `${expected.name}: expected ${expected.size} bytes, ` +
+                `found ${remote.size}`);
+        }
+        if (remote.digest !== `sha256:${expected.sha256}`) {
+            errors.push(
+                `${expected.name}: expected sha256:${expected.sha256}, ` +
+                `found ${remote.digest ?? "no digest"}`);
+        }
+    }
+    for (const remote of remoteAssets) {
+        if (!expectedAssets.some((expected) => expected.name === remote.name)) {
+            errors.push(`unexpected remote asset: ${remote.name}`);
+        }
+    }
+    return errors;
+}
+
+async function describeAssets(assetPaths) {
+    return await Promise.all(assetPaths.map(async (file) => ({
+        file,
+        name: path.basename(file),
+        size: (await stat(file)).size,
+        sha256: await sha256(file),
+    })));
+}
+
+function uploadAsset(repository, tag, token, asset) {
+    run("gh", [
+        "release", "upload", tag, asset.file, "--repo", repository,
+    ], {
+        inherit: true,
+        env: {...process.env, GH_TOKEN: token},
+    });
+}
+
+async function remoteAssets(repository, releaseId) {
+    return JSON.parse(run("gh", [
+        "api", `repos/${repository}/releases/${releaseId}/assets`,
+    ]));
+}
+
+async function waitForVerifiedAssets(repository, releaseId, expected) {
+    for (let attempt = 0; attempt < 60; ++attempt) {
+        const actual = await remoteAssets(repository, releaseId);
+        const errors = releaseAssetErrors(expected, actual);
+        if (errors.length === 0) return actual;
+        if (errors.some((error) =>
+            error.startsWith("missing remote asset:") ||
+            error.startsWith("unexpected remote asset:") ||
+            /expected \d+ bytes/u.test(error))) {
+            fail(`remote release asset mismatch:\n${errors.join("\n")}`);
+        }
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+    const errors = releaseAssetErrors(
+        expected, await remoteAssets(repository, releaseId));
+    fail(`remote release assets did not finish qualification:\n${errors.join("\n")}`);
+}
+
 async function publish(configuration, flags, values) {
     const repository = values.get("--repository");
     if (!repository) fail("publish requires --repository OWNER/REPO");
@@ -319,28 +403,58 @@ async function publish(configuration, flags, values) {
     run("gh", ["auth", "status"], {inherit: true});
     assertImmutableReleases(repository);
     assertCleanRepository();
-    const existing = spawnSync("gh", [
-        "release", "view", release.tag, "--repo", repository,
-    ], {cwd: repositoryRoot, stdio: "ignore"});
-    if (!existing.error && existing.status === 0) {
+    const targetCommit = run("git", ["rev-parse", "HEAD"]);
+    const existing = JSON.parse(run("gh", [
+        "api", `repos/${repository}/releases?per_page=100`,
+    ])).find((candidate) => candidate.tag_name === release.tag);
+    if (existing && (existing.draft !== true ||
+        existing.immutable === true ||
+        existing.target_commitish !== targetCommit)) {
         fail(`release already exists: ${repository} ${release.tag}`);
     }
 
-    run("gh", [
-        "release", "create", release.tag,
-        "--repo", repository,
-        "--target", run("git", ["rev-parse", "HEAD"]),
-        "--title", configuration.release.title,
-        "--notes-file", release.metadata.notesPath,
-        "--draft",
-        ...assetPaths,
-    ], {inherit: true});
+    const releaseRecord = existing ?? JSON.parse(run("gh", [
+        "api", "--method", "POST", `repos/${repository}/releases`,
+        "-f", `tag_name=${release.tag}`,
+        "-f", `target_commitish=${targetCommit}`,
+        "-f", `name=${configuration.release.title}`,
+        "-f", `body=${await readFile(release.metadata.notesPath, "utf8")}`,
+        "-F", "draft=true",
+    ]));
     try {
-        run("gh", [
-            "release", "edit", release.tag,
-            "--repo", repository,
-            "--draft=false",
-        ], {inherit: true});
+        const token = run("gh", ["auth", "token"]);
+        const expectedAssets = await describeAssets(assetPaths);
+        const presentAssets = await remoteAssets(repository, releaseRecord.id);
+        const expectedByName = new Map(
+            expectedAssets.map((asset) => [asset.name, asset]));
+        for (const present of presentAssets) {
+            const expected = expectedByName.get(present.name);
+            if (!expected) {
+                fail(`recoverable draft has unexpected asset: ${present.name}`);
+            }
+            const errors = releaseAssetErrors([expected], [present]);
+            if (errors.length !== 0) {
+                fail(
+                    `recoverable draft has an invalid existing asset:\n` +
+                    errors.join("\n"));
+            }
+        }
+        const presentNames = new Set(presentAssets.map((asset) => asset.name));
+        for (const asset of expectedAssets) {
+            if (presentNames.has(asset.name)) continue;
+            console.log(`uploading ${asset.name} (${asset.size} bytes)`);
+            uploadAsset(repository, release.tag, token, asset);
+        }
+        await waitForVerifiedAssets(
+            repository, releaseRecord.id, expectedAssets);
+        const published = JSON.parse(run("gh", [
+            "api", "--method", "PATCH",
+            `repos/${repository}/releases/${releaseRecord.id}`,
+            "-F", "draft=false",
+        ]));
+        if (published.draft !== false || published.immutable !== true) {
+            fail("GitHub did not publish the release as immutable");
+        }
     } catch (error) {
         fail(`assets were uploaded to a recoverable draft, but publication failed: ${error.message}`);
     }

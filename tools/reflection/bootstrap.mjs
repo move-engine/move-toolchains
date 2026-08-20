@@ -20,6 +20,10 @@ import path from "node:path";
 import process from "node:process";
 import {fileURLToPath} from "node:url";
 import {parseLdd} from "../elf-compatibility.mjs";
+import {
+    existingBuildCacheErrors,
+    sameRepository,
+} from "./existing-build.mjs";
 
 const scriptPath = fileURLToPath(import.meta.url);
 const projectRoot = path.resolve(path.dirname(scriptPath), "..", "..");
@@ -39,6 +43,7 @@ Usage:
   npm run doctor:clangd -- [--root PATH] [--ucrt64-root PATH]
   npm run status:clangd -- [--root PATH] [--ucrt64-root PATH]
   npm run install:clangd -- --accept-cost [--root PATH] [--ucrt64-root PATH] [--jobs N]
+  npm run import-build:clangd -- --source PATH --build PATH [--root PATH] [--ucrt64-root PATH] [--jobs N]
   npm run adopt:clangd -- [--root PATH] [--ucrt64-root PATH]
   npm run configure:clangd -- [--force] [--root PATH] [--ucrt64-root PATH]
 
@@ -62,9 +67,11 @@ function parseArguments(argv) {
     const flags = new Set();
     const values = new Map();
     const booleanNames = new Set([
-        "--accept-cost", "--accept-prebuilt", "--force",
+        "--accept-cost", "--accept-existing-build", "--accept-prebuilt", "--force",
     ]);
-    const valueNames = new Set(["--root", "--ucrt64-root", "--jobs"]);
+    const valueNames = new Set([
+        "--root", "--ucrt64-root", "--jobs", "--source", "--build",
+    ]);
     for (let index = 1; index < argv.length; ++index) {
         const value = argv[index];
         if (booleanNames.has(value)) {
@@ -92,15 +99,20 @@ function parseArguments(argv) {
 function validateCommandArguments(command, flags, values) {
     const allowedFlags =
         command === "install" ? new Set(["--accept-cost"]) :
+        command === "import-build" ? new Set(["--accept-existing-build"]) :
         command === "adopt" ? new Set(["--accept-prebuilt"]) :
         command === "configure" ? new Set(["--force"]) :
         new Set();
     const allowedValues =
-        command === "install"
+        ["install", "import-build"].includes(command)
             ? new Set(["--root", "--ucrt64-root", "--jobs"])
             : ["doctor", "status", "adopt", "configure"].includes(command)
                 ? new Set(["--root", "--ucrt64-root"])
                 : new Set();
+    if (command === "import-build") {
+        allowedValues.add("--source");
+        allowedValues.add("--build");
+    }
     for (const flag of flags) {
         if (!allowedFlags.has(flag)) {
             fail(`${flag} is not valid for ${command}`);
@@ -518,7 +530,7 @@ async function ensureSource(config, paths) {
     const origin = await run(
         "git", ["remote", "get-url", "origin"],
         {cwd: paths.source, capture: true});
-    if (origin !== config.repository) {
+    if (!sameRepository(origin, config.repository)) {
         fail(`source origin mismatch: expected ${config.repository}, found ${origin}`);
     }
     const current = spawnSync("git", ["rev-parse", "HEAD"], {
@@ -549,6 +561,58 @@ async function ensureSource(config, paths) {
         {cwd: paths.source, capture: true});
     if (sourceStatus !== "") {
         fail(`source checkout is dirty; preserve and inspect ${paths.source} before retrying`);
+    }
+}
+
+async function verifyExistingBuild(config, profile, source, build) {
+    for (const required of [source, build]) {
+        if (!(await exists(required))) {
+            fail(`existing build path does not exist: ${required}`);
+        }
+    }
+    const origin = await run(
+        "git", ["remote", "get-url", "origin"],
+        {cwd: source, capture: true});
+    if (!sameRepository(origin, config.repository)) {
+        fail(
+            `existing source origin mismatch: expected ${config.repository}, ` +
+            `found ${origin}`);
+    }
+    const head = await run("git", ["rev-parse", "HEAD"], {
+        cwd: source,
+        capture: true,
+    });
+    if (head !== config.revision) {
+        fail(
+            `existing source revision mismatch: expected ${config.revision}, ` +
+            `found ${head}`);
+    }
+    const sourceStatus = await run(
+        "git", ["status", "--porcelain", "--untracked-files=all"],
+        {cwd: source, capture: true});
+    if (sourceStatus !== "") {
+        fail(`existing source checkout is dirty: ${source}`);
+    }
+    const cachePath = path.join(build, "CMakeCache.txt");
+    if (!(await exists(cachePath))) {
+        fail(`existing build is missing CMakeCache.txt: ${build}`);
+    }
+    const cacheErrors = existingBuildCacheErrors(
+        profile, source, await readFile(cachePath, "utf8"));
+    if (cacheErrors.length !== 0) {
+        fail(`existing build configuration mismatch:\n${cacheErrors.join("\n")}`);
+    }
+    for (const name of ["clang", "clang++", "clangd"]) {
+        const binary = path.join(build, "bin", executableName(name));
+        if (!(await exists(binary))) {
+            fail(`existing build is missing ${name}: ${binary}`);
+        }
+        const version = await run(binary, ["--version"], {capture: true});
+        if (!version.includes(config.revision)) {
+            fail(
+                `existing ${name} does not identify pinned revision ` +
+                `${config.revision}: ${binary}`);
+        }
     }
 }
 
@@ -994,6 +1058,83 @@ async function install(
     }
 }
 
+async function importBuild(
+    config, profile, flags, values, toolchainRoot, ucrt64Root) {
+    if (!flags.has("--accept-existing-build")) {
+        fail(
+            "import-build executes an existing compiler build; inspect its " +
+            "source and cache, then pass --accept-existing-build");
+    }
+    for (const name of ["--source", "--build"]) {
+        if (!values.has(name)) fail(`import-build requires ${name} PATH`);
+    }
+    const source = path.resolve(values.get("--source"));
+    const build = path.resolve(values.get("--build"));
+    const paths = pathsFor(config, toolchainRoot);
+    const existing = await readQualification(paths.install);
+    if (qualifiedMarker(existing, config, profile, ucrt64Root)) {
+        console.log("matching qualified installation already exists");
+        return;
+    }
+    const python = findPython();
+    const jobs = resolveJobs(values);
+    const identity = configurationIdentity(config, profile, ucrt64Root);
+    await verifyExistingBuild(config, profile, source, build);
+    console.log(`existing source: ${source}`);
+    console.log(`existing build: ${build}`);
+    console.log(`staging: ${paths.staging}`);
+    console.log(`install: ${paths.install}`);
+    console.log(`configuration: ${identity}`);
+    await mkdir(paths.root, {recursive: true});
+    await acquireLock(paths.lock, identity);
+    let ownsLock = true;
+    const release = async () => {
+        if (ownsLock) {
+            ownsLock = false;
+            await rm(paths.lock, {recursive: true, force: true});
+        }
+    };
+    try {
+        if (await exists(paths.install)) {
+            fail(`unqualified installation exists and was preserved: ${paths.install}`);
+        }
+        if (await exists(paths.staging)) {
+            fail(`existing staging directory was preserved: ${paths.staging}`);
+        }
+        const externalPaths = {...paths, source, build};
+        await mkdir(paths.staging, {recursive: true});
+        await run("cmake", cmakeArguments(profile, externalPaths, python));
+        await run("cmake", [
+            "--build", build, "--target", ...profile.installTargets,
+            "--parallel", String(jobs),
+        ]);
+        await stageLibcxxHeaders(profile, externalPaths);
+        const stagingMarker = await qualify(
+            config, profile, paths.staging, ucrt64Root);
+        await atomicJson(
+            path.join(paths.staging, "move-qualification.json"),
+            stagingMarker);
+        await rename(paths.staging, paths.install);
+        try {
+            const installedMarker = await qualify(
+                config, profile, paths.install, ucrt64Root);
+            await atomicJson(
+                path.join(paths.install, "move-qualification.json"),
+                installedMarker);
+        } catch (error) {
+            const quarantine = `${paths.install}.failed-${Date.now()}`;
+            await rename(paths.install, quarantine);
+            fail(
+                "post-publication qualification failed; preserved at " +
+                `${quarantine}: ${error.message}`);
+        }
+        console.log("existing Release build imported and qualified");
+        console.log("run configure to select it for development");
+    } finally {
+        await release();
+    }
+}
+
 async function configure(
     config, profile, flags, toolchainRoot, ucrt64Root) {
     const paths = pathsFor(config, toolchainRoot);
@@ -1078,6 +1219,11 @@ async function main() {
     }
     if (command === "install") {
         await install(
+            config, profile, flags, values, toolchainRoot, ucrt64Root);
+        return;
+    }
+    if (command === "import-build") {
+        await importBuild(
             config, profile, flags, values, toolchainRoot, ucrt64Root);
         return;
     }
