@@ -54,6 +54,14 @@ export function existingBuildCacheErrors(
     if (configuration.cxxFlags) {
         expected.set("CMAKE_CXX_FLAGS", configuration.cxxFlags);
     }
+    if (configuration.linkerFlags) {
+        expected.set("CMAKE_EXE_LINKER_FLAGS", configuration.linkerFlags);
+        expected.set("CMAKE_SHARED_LINKER_FLAGS", configuration.linkerFlags);
+        expected.set("CMAKE_MODULE_LINKER_FLAGS", configuration.linkerFlags);
+    }
+    if (configuration.staticLinkCxxStdlib === true) {
+        expected.set("LLVM_STATIC_LINK_CXX_STDLIB", "ON");
+    }
     const errors = [];
     for (const [name, value] of expected) {
         if (cache.get(name) !== value) {

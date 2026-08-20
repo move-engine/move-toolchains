@@ -61,3 +61,34 @@ LLVM_TARGETS_TO_BUILD:STRING=X86
     assert.match(errors.join("\n"), /CMAKE_HOME_DIRECTORY/u);
     assert.match(errors.join("\n"), /LLVM_ENABLE_PROJECTS/u);
 });
+
+test("requires the complete Linux baseline and isolated-link profile", () => {
+    const linuxProfile = {configuration: {
+        ...profile.configuration,
+        runtimes: "libcxx;libcxxabi;libunwind",
+        cFlags: "-march=x86-64 -mtune=generic",
+        cxxFlags: "-march=x86-64 -mtune=generic",
+        linkerFlags: "-static-libgcc",
+        staticLinkCxxStdlib: true,
+    }};
+    const incomplete = `
+CMAKE_BUILD_TYPE:STRING=Release
+CMAKE_C_FLAGS:STRING=-march=x86-64 -mtune=generic
+CMAKE_CXX_FLAGS:STRING=-march=x86-64 -mtune=generic
+CMAKE_EXE_LINKER_FLAGS:STRING=
+CMAKE_SHARED_LINKER_FLAGS:STRING=
+CMAKE_MODULE_LINKER_FLAGS:STRING=
+CMAKE_GENERATOR:INTERNAL=Ninja
+CMAKE_HOME_DIRECTORY:INTERNAL=/src/fork/llvm
+LLVM_ENABLE_PROJECTS:STRING=clang;clang-tools-extra
+LLVM_ENABLE_RUNTIMES:STRING=libcxx;libcxxabi;libunwind
+LLVM_STATIC_LINK_CXX_STDLIB:BOOL=OFF
+LLVM_TARGETS_TO_BUILD:STRING=X86
+`;
+    const errors = existingBuildCacheErrors(
+        linuxProfile, "/src/fork", incomplete, "linux");
+    assert.match(errors.join("\n"), /CMAKE_EXE_LINKER_FLAGS/u);
+    assert.match(errors.join("\n"), /CMAKE_SHARED_LINKER_FLAGS/u);
+    assert.match(errors.join("\n"), /CMAKE_MODULE_LINKER_FLAGS/u);
+    assert.match(errors.join("\n"), /LLVM_STATIC_LINK_CXX_STDLIB/u);
+});
