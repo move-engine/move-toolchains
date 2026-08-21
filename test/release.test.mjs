@@ -11,6 +11,7 @@ import {
     resolveReleaseTag,
     verifyArtifacts,
     windowsPathForWsl,
+    writeReleaseMetadata,
 } from "../tools/release.mjs";
 import {
     parseTarVerboseListing,
@@ -92,6 +93,34 @@ test("requires every remote release asset to be uploaded and digested", () => {
     }]);
     assert.match(errors.join("\n"), /expected uploaded state/u);
     assert.match(errors.join("\n"), /found no digest/u);
+});
+
+test("writes byte-stable release metadata across publication retries", async (context) => {
+    const root = await mkdtemp(path.join(tmpdir(), "move-release-metadata-"));
+    context.after(() => rm(root, {recursive: true, force: true}));
+    const configuration = {
+        release: {
+            tag: "toolchains-2026.08.9",
+            title: "Move toolchains 2026.08.9",
+            notes: "Fixture release.",
+        },
+    };
+    const verified = [{
+        file: "fixture.zip",
+        component: "gcc",
+        profile: "windows-x86_64-ucrt64",
+        sha256: "a".repeat(64),
+    }];
+    const first = await writeReleaseMetadata(
+        configuration, verified, root, configuration.release.tag);
+    const firstManifest = await readFile(first.manifestPath, "utf8");
+    const firstChecksum = await readFile(first.manifestChecksumPath, "utf8");
+    const second = await writeReleaseMetadata(
+        configuration, verified, root, configuration.release.tag);
+    assert.equal(await readFile(second.manifestPath, "utf8"), firstManifest);
+    assert.equal(
+        await readFile(second.manifestChecksumPath, "utf8"), firstChecksum);
+    assert.doesNotMatch(firstManifest, /generatedAt/u);
 });
 
 async function fixture() {

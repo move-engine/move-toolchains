@@ -228,12 +228,12 @@ export async function verifyArtifacts(
     return verified;
 }
 
-async function writeReleaseMetadata(configuration, verified, outputDirectory, tag) {
+export async function writeReleaseMetadata(
+    configuration, verified, outputDirectory, tag) {
     await mkdir(outputDirectory, {recursive: true});
     const manifest = {
         ...configuration,
         tag,
-        generatedAt: new Date().toISOString(),
         source: {
             repositoryCommit: tryRun("git", ["rev-parse", "HEAD"]),
         },
