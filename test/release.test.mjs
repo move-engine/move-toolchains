@@ -7,12 +7,15 @@ import path from "node:path";
 import test from "node:test";
 import {
     immutableReleasesEnabled,
-    parseTarVerboseListing,
     releaseAssetErrors,
     resolveReleaseTag,
     verifyArtifacts,
     windowsPathForWsl,
 } from "../tools/release.mjs";
+import {
+    parseTarVerboseListing,
+    parseZipLongListing,
+} from "../tools/archive-inspection.mjs";
 import {canonicalJson, writeBuildReceipt} from "../tools/build-receipt.mjs";
 
 const qualificationCases = [
@@ -28,6 +31,18 @@ test("requires the requested tag to match the source manifest", () => {
         configuration, "toolchains-2026.08.8"), "toolchains-2026.08.8");
     assert.throws(() => resolveReleaseTag(
         configuration, "toolchains-2026.08.6"), /does not match/u);
+});
+
+test("validates Linux ZIP metadata and rejects links before extraction", () => {
+    const listing = [
+        "Archive: fixture.zip",
+        "drwxr-xr-x  2.0 unx 0 bx 0 stor 26-Aug-20 18:48 root/",
+        "-rw-r--r--  2.0 unx 1 tx 1 stor 26-Aug-20 18:48 root/file",
+    ].join("\n");
+    assert.equal(parseZipLongListing(listing).length, 2);
+    assert.throws(() => parseZipLongListing(
+        `${listing}\nlrwxrwxrwx  2.0 unx 4 tx 4 stor 26-Aug-20 18:48 root/link`),
+    /link or unsupported/u);
 });
 
 test("requires an explicit enabled immutable-release response", () => {

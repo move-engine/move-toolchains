@@ -36,6 +36,7 @@ import {
     unsupportedLinuxMessage,
 } from "./tools/host-compatibility.mjs";
 import {renameWithRetry} from "./tools/filesystem.mjs";
+import {inspectPortableArchive} from "./tools/archive-inspection.mjs";
 import {
     selectCompatibleToolchainSet,
     validateToolchainManifest,
@@ -95,6 +96,7 @@ function run(command, args, options = {}) {
     const result = spawnSync(command, args, {
         cwd: options.cwd ?? repositoryRoot,
         encoding: "utf8",
+        maxBuffer: 64 * 1024 * 1024,
         stdio: options.inherit ? "inherit" : ["ignore", "pipe", "pipe"],
         env: options.env ?? process.env,
     });
@@ -417,20 +419,7 @@ function parseChecksum(text, expectedFile) {
 }
 
 function inspectArchive(file) {
-    const listing = file.toLowerCase().endsWith(".zip") && process.platform !== "win32"
-        ? run("unzip", ["-Z1", file])
-        : run("tar", ["-tf", file]);
-    const entries = listing.split(/\r?\n/)
-        .map((entry) => entry.replaceAll("\\", "/").replace(/^\.\//, ""))
-        .filter(Boolean);
-    for (const entry of entries) {
-        const normalized = entry.replace(/\/$/, "");
-        if (normalized.startsWith("/") || /^[A-Za-z]:\//.test(normalized) ||
-            normalized.split("/").includes("..")) {
-            fail(`unsafe archive entry in ${path.basename(file)}: ${entry}`);
-        }
-    }
-    return entries;
+    return inspectPortableArchive(file, run);
 }
 
 function extractArchive(file, destination) {
