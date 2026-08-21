@@ -20,8 +20,9 @@ Usage: build-gcc.sh --root PATH --expected-glibc VERSION [--jobs N]
 
 Build the exact Move GCC 16.2.0 move.2 source already cloned at ROOT/source.
 The source checkout must be clean at the pinned revision and tree. The script
-creates ROOT/build and ROOT/install, runs a release-checking profiled bootstrap,
-and installs the result without changing system compiler selection.
+configures or incrementally reconfigures ROOT/build for the exact recipe, runs
+a release-checking profiled bootstrap, and installs the result without changing
+system compiler selection or discarding a matching resumable build tree.
 EOF
 }
 
@@ -99,43 +100,41 @@ printf 'source=%s\n' "$expected_revision"
 printf 'tree=%s\n' "$expected_tree"
 printf 'bootstrap_cc=%s\n' "$(gcc --version | head -n 1)"
 
-if [[ ! -f "${build_root}/Makefile" ]]; then
-    configure_arguments=(
-        "--prefix=${install_root}"
-        "--build=x86_64-pc-linux-gnu"
-        "--host=x86_64-pc-linux-gnu"
-        "--target=x86_64-pc-linux-gnu"
-        "--enable-bootstrap"
-        "--enable-checking=release"
-        "--with-arch=x86-64"
-        "--with-tune=generic"
-        "--enable-languages=c,c++,lto"
-        "--enable-lto"
-        "--enable-shared"
-        "--enable-static"
-        "--enable-libatomic"
-        "--enable-threads=posix"
-        "--enable-tls"
-        "--enable-graphite"
-        "--enable-libstdcxx-backtrace=yes"
-        "--enable-libstdcxx-filesystem-ts"
-        "--enable-libstdcxx-time"
-        "--enable-libgomp"
-        "--disable-multilib"
-        "--disable-nls"
-        "--disable-werror"
-        "--with-system-zlib"
-        "--with-pkgversion=Move GCC 16.2.0 move.2"
-        "--with-bugurl=https://github.com/move-engine/gcc/issues"
-        "--with-boot-ldflags=-static-libstdc++ -static-libgcc"
-        "--with-stage1-ldflags=-static-libstdc++ -static-libgcc"
-    )
-    (
-        cd "$build_root"
-        CC=/usr/bin/gcc CXX=/usr/bin/g++ \
-            "${source_root}/configure" "${configure_arguments[@]}"
-    )
-fi
+configure_arguments=(
+    "--prefix=${install_root}"
+    "--build=x86_64-pc-linux-gnu"
+    "--host=x86_64-pc-linux-gnu"
+    "--target=x86_64-pc-linux-gnu"
+    "--enable-bootstrap"
+    "--enable-checking=release"
+    "--with-arch=x86-64"
+    "--with-tune=generic"
+    "--enable-languages=c,c++,lto"
+    "--enable-lto"
+    "--enable-shared"
+    "--enable-static"
+    "--enable-libatomic"
+    "--enable-threads=posix"
+    "--enable-tls"
+    "--enable-graphite"
+    "--enable-libstdcxx-backtrace=yes"
+    "--enable-libstdcxx-filesystem-ts"
+    "--enable-libstdcxx-time"
+    "--enable-libgomp"
+    "--disable-multilib"
+    "--disable-nls"
+    "--disable-werror"
+    "--with-system-zlib"
+    "--with-pkgversion=Move GCC 16.2.0 move.2"
+    "--with-bugurl=https://github.com/move-engine/gcc/issues"
+    "--with-boot-ldflags=-static-libstdc++ -static-libgcc"
+    "--with-stage1-ldflags=-static-libstdc++ -static-libgcc"
+)
+(
+    cd "$build_root"
+    CC=/usr/bin/gcc CXX=/usr/bin/g++ \
+        "${source_root}/configure" "${configure_arguments[@]}"
+)
 
 make -C "$build_root" -j"$jobs" \
     'BOOT_CFLAGS=-O2 -march=x86-64 -mtune=generic' profiledbootstrap
