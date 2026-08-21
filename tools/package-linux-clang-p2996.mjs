@@ -21,6 +21,18 @@ import process from "node:process";
 import {fileURLToPath} from "node:url";
 import {auditElfTree} from "./elf-compatibility.mjs";
 import {detectLinuxLibc} from "./host-compatibility.mjs";
+import {existingBuildCacheErrors} from "./reflection/existing-build.mjs";
+import {
+    canonicalJson,
+    verifyBuildReceipt,
+    writeBuildReceipt,
+} from "./build-receipt.mjs";
+import {
+    clangReceiptInput,
+    clangSourceIdentity,
+    clangToolsPackageRevision,
+    clangToolsVersion,
+} from "./clang-build-receipt.mjs";
 
 const scriptPath = fileURLToPath(import.meta.url);
 const repositoryRoot = path.resolve(path.dirname(scriptPath), "..");
@@ -36,8 +48,9 @@ function usage() {
     console.log(`Package a qualified Linux clang-p2996 build
 
 Usage:
-  npm run package:clang-p2996:linux -- --root PATH [--output-dir PATH]
-      --minimum-glibc VERSION [--build-image ID] [--force]
+  npm run package:clang-p2996:linux -- --root PATH --source-root PATH
+      --build-root PATH --nez-root PATH [--output-dir PATH]
+      --minimum-glibc VERSION --build-image ID [--force]
 
 The package is assembled from ROOT/clang-p2996/<revision>/install. Every ELF
 executable and shared library is audited against the declared glibc floor,
@@ -55,13 +68,18 @@ function parseArguments(argv) {
             flags.add(name);
             continue;
         }
-        if (!["--root", "--output-dir", "--minimum-glibc", "--build-image"]
+        if (!["--root", "--output-dir", "--minimum-glibc", "--build-image",
+            "--source-root", "--build-root", "--nez-root"]
             .includes(name)) {
             fail(`unknown argument: ${name}`);
         }
         const value = argv[++index];
         if (!value || value.startsWith("--")) fail(`${name} requires a value`);
         values.set(name, value);
+    }
+    for (const required of ["--root", "--minimum-glibc", "--build-image",
+        "--source-root", "--build-root", "--nez-root"]) {
+        if (!values.has(required)) fail(`${required} is required`);
     }
     return {help: false, flags, values};
 }
@@ -179,6 +197,9 @@ async function main() {
     const {flags, values} = parsed;
     const root = path.resolve(values.get("--root") ??
         path.join(repositoryRoot, ".local", "toolchains"));
+    const sourceRoot = path.resolve(values.get("--source-root"));
+    const buildRoot = path.resolve(values.get("--build-root"));
+    const nezRoot = path.resolve(values.get("--nez-root"));
     const outputDirectory = path.resolve(values.get("--output-dir") ??
         path.join(repositoryRoot, ".local", "prebuilt"));
     const maximumGlibc = values.get("--minimum-glibc");
@@ -187,19 +208,42 @@ async function main() {
     }
     const libc = detectLinuxLibc();
     const osRelease = parseOsRelease(await readFile("/etc/os-release", "utf8"));
-    if (libc.family !== "glibc" || libc.version !== maximumGlibc ||
-        osRelease.ID !== "ubuntu" || osRelease.VERSION_ID !== "22.04") {
+    const requiredDistribution = {
+        "2.35": "22.04",
+        "2.38": "23.10",
+    }[maximumGlibc];
+    if (!requiredDistribution || libc.family !== "glibc" ||
+        libc.version !== maximumGlibc || osRelease.ID !== "ubuntu" ||
+        osRelease.VERSION_ID !== requiredDistribution) {
         fail(
-            `packaging requires Ubuntu 22.04/glibc ${maximumGlibc}; found ` +
+            `packaging requires Ubuntu ${requiredDistribution ?? "unsupported"}/` +
+            `glibc ${maximumGlibc}; found ` +
             `${osRelease.ID ?? "unknown"} ${osRelease.VERSION_ID ?? "unknown"}/` +
             `${libc.family} ${libc.version ?? "unknown"}`);
     }
     const configuration = JSON.parse(await readFile(configurationPath, "utf8"));
-    const reflection = configuration.components?.["clang-p2996"];
+    const rawReflection = configuration.components?.clangTools ??
+        configuration.components?.["clang-p2996"];
+    const reflection = rawReflection ? {
+        ...rawReflection,
+        revision: rawReflection.revision ?? rawReflection.source?.revision,
+    } : null;
     if (!reflection || !/^[0-9a-f]{40}$/.test(reflection.revision)) {
         fail("invalid pinned clang-p2996 configuration");
     }
     const revision = reflection.revision;
+    if (revision !== clangSourceIdentity.revision ||
+        run("git", ["-C", sourceRoot, "rev-parse", "HEAD"]) !== revision ||
+        run("git", ["-C", sourceRoot, "status", "--porcelain",
+            "--untracked-files=all"])) {
+        fail("clang source is not the exact clean pinned revision");
+    }
+    const sourceTree = run("git", ["-C", sourceRoot, "write-tree"]);
+    const cache = await readFile(path.join(buildRoot, "CMakeCache.txt"), "utf8");
+    const cacheErrors = existingBuildCacheErrors(
+        reflection.hosts["linux-x64"], sourceRoot, cache);
+    if (cacheErrors.length) fail(
+        `clang build cache is not the pinned Linux Release profile:\n${cacheErrors.join("\n")}`);
     const sourceInstall = path.join(root, "clang-p2996", revision, "install");
     const marker = JSON.parse(await readFile(
         path.join(sourceInstall, "move-qualification.json"), "utf8"));
@@ -212,7 +256,9 @@ async function main() {
     const archiveName = `clangd-p2996-${revision.slice(0, 8)}-linux-x86_64-glibc${maximumGlibc}.tar.gz`;
     const archive = path.join(outputDirectory, archiveName);
     const checksumFile = `${archive}.sha256`;
-    if ((await exists(archive) || await exists(checksumFile)) &&
+    const evidenceFile = `${archive}.evidence.json`;
+    if ((await exists(archive) || await exists(checksumFile) ||
+        await exists(evidenceFile)) &&
         !flags.has("--force")) {
         fail(`output exists and was preserved: ${archive}; pass --force to replace it`);
     }
@@ -257,9 +303,24 @@ async function main() {
         };
         await writeFile(path.join(stagedInstall, "move-artifact.json"),
             `${JSON.stringify(metadata, null, 2)}\n`);
+        run(process.execPath, [path.join(
+            nezRoot, "tools", "reflection", "compdb_test.mjs")]);
+        const profile = `linux-x86_64-glibc${maximumGlibc}`;
+        const receiptInput = clangReceiptInput({
+            profile,
+            builderIdentity: values.get("--build-image"),
+            bootstrapVersion: run("c++", ["--version"]).split(/\r?\n/)[0],
+            configuration: reflection.hosts["linux-x64"].configuration,
+            installTargets: reflection.hosts["linux-x64"].installTargets,
+            environment: {},
+            sourceTree,
+        });
+        const writtenReceipt = await writeBuildReceipt(
+            stagedInstall, receiptInput);
 
         await rm(archive, {force: true});
         await rm(checksumFile, {force: true});
+        await rm(evidenceFile, {force: true});
         run("tar", ["-czf", archive, "-C", archiveTree, "clang-p2996"]);
         const digest = await sha256(archive);
         await writeFile(checksumFile, `${digest}  ${archiveName}\n`);
@@ -271,7 +332,32 @@ async function main() {
             relocatedRoot, "clang-p2996", revision, "install");
         const qualified = await qualifyInstall(
             relocatedInstall, relocatedRoot, revision, maximumGlibc);
+        const relocatedReceipt = await verifyBuildReceipt(relocatedInstall);
+        if (relocatedReceipt.sha256 !== writtenReceipt.sha256) {
+            fail("relocated clang receipt changed after archiving");
+        }
         const information = await stat(archive);
+        await writeFile(evidenceFile, canonicalJson({
+            schemaVersion: 1,
+            component: "clangTools",
+            profile,
+            artifact: {file: archiveName, bytes: information.size, sha256: digest},
+            receipt: {
+                file: "move-build-receipt.json",
+                sha256: writtenReceipt.sha256,
+                installedTreeDigest: writtenReceipt.receipt.installedTree.digest,
+            },
+            cases: [
+                {id: "archive-checksum", status: "passed"},
+                {id: "archive-relocation-path-with-spaces", status: "passed"},
+                {id: "archive-runtime-closure", status: "passed"},
+                {id: "archive-reflection-and-modules", status: "passed"},
+            ],
+            componentIdentity: {
+                version: clangToolsVersion,
+                packageRevision: clangToolsPackageRevision,
+            },
+        }));
         console.log(`package: ${archive}`);
         console.log(`bytes: ${information.size}`);
         console.log(`sha256: ${digest}`);
@@ -280,9 +366,11 @@ async function main() {
         console.log(`clang: ${qualified.versions.clang}`);
         console.log(`clang++: ${qualified.versions.clangxx}`);
         console.log(`clangd: ${qualified.versions.clangd}`);
+        console.log(`evidence: ${evidenceFile}`);
     } catch (error) {
         await rm(archive, {force: true});
         await rm(checksumFile, {force: true});
+        await rm(evidenceFile, {force: true});
         throw error;
     } finally {
         await rm(temporary, {recursive: true, force: true});

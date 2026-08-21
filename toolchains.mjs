@@ -664,7 +664,10 @@ async function setupMsys2(settings, accepted) {
 
 async function setupXmake(settings) {
     const configuration = await manifest();
-    const minimum = configuration.components.xmake.minimumVersion;
+    const xmakeConfiguration = configuration.supportingTools?.xmake ??
+        configuration.components.xmake;
+    if (!xmakeConfiguration) fail("toolchain manifest has no Xmake policy");
+    const minimum = xmakeConfiguration.minimumVersion;
     const configured = settings.xmakePath;
     const systemVersion = tryRun(configured ?? "xmake", ["--version"]);
     const match = systemVersion?.match(/xmake v(\d+\.\d+\.\d+)/i);
