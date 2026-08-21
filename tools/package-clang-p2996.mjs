@@ -105,6 +105,7 @@ function run(command, args, options = {}) {
         encoding: "utf8",
         stdio: options.inherit ? "inherit" : ["ignore", "pipe", "pipe"],
         env: options.env ?? process.env,
+        maxBuffer: 256 * 1024 * 1024,
     });
     if (result.error) fail(`${command} could not start: ${result.error.message}`);
     if (result.status !== 0) {
