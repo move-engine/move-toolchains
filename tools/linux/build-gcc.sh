@@ -18,7 +18,7 @@ usage() {
     cat <<'EOF'
 Usage: build-gcc.sh --root PATH --expected-glibc VERSION [--jobs N]
 
-Build the exact Move GCC 16.2.0 move.1 source already cloned at ROOT/source.
+Build the exact Move GCC 16.2.0 move.2 source already cloned at ROOT/source.
 The source checkout must be clean at the pinned revision and tree. The script
 creates ROOT/build and ROOT/install, runs a release-checking profiled bootstrap,
 and installs the result without changing system compiler selection.
@@ -125,7 +125,7 @@ if [[ ! -f "${build_root}/Makefile" ]]; then
         "--disable-nls"
         "--disable-werror"
         "--with-system-zlib"
-        "--with-pkgversion=Move GCC 16.2.0 move.1"
+        "--with-pkgversion=Move GCC 16.2.0 move.2"
         "--with-bugurl=https://github.com/move-engine/gcc/issues"
         "--with-boot-ldflags=-static-libstdc++ -static-libgcc"
         "--with-stage1-ldflags=-static-libstdc++ -static-libgcc"

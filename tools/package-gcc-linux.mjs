@@ -55,7 +55,7 @@ const configureArguments = Object.freeze([
     "--disable-nls",
     "--disable-werror",
     "--with-system-zlib",
-    "--with-pkgversion=Move GCC 16.2.0 move.1",
+    "--with-pkgversion=Move GCC 16.2.0 move.2",
     "--with-bugurl=https://github.com/move-engine/gcc/issues",
     "--with-boot-ldflags=-static-libstdc++ -static-libgcc",
     "--with-stage1-ldflags=-static-libstdc++ -static-libgcc",

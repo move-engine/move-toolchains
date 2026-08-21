@@ -302,7 +302,7 @@
               "--with-mpfr=@install@",
               "--with-mpc=@install@",
               "--with-isl=@install@",
-              "--with-pkgversion=Move GCC 16.2.0 move.1",
+              "--with-pkgversion=Move GCC 16.2.0 move.2",
               "--with-bugurl=https://github.com/move-engine/gcc/issues",
               "--with-gnu-as",
               "--with-gnu-ld",

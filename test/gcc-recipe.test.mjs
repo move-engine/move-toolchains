@@ -84,6 +84,8 @@ test("produces a complete read-only normalized derivation plan", async () => {
     windowsGccOperationIds);
     assert.equal(plan.roots.source, "@workspace@/source/gcc");
     assert.equal(plan.environmentPolicy.mode, "allowlist-plus-recipe");
+    assert.ok(plan.phases[4].operations[0].arguments.includes(
+        "--with-pkgversion=Move GCC 16.2.0 move.2"));
 });
 
 test("rejects profile, dependency, patch, builder, and payload drift", async () => {
