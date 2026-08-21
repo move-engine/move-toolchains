@@ -39,8 +39,10 @@ function usage() {
 Usage:
   npm run doctor
   npm run release:verify -- [--artifact-dir PATH] [--output-dir PATH]
+      [--linux-verifier-distro NAME]
   npm run release:publish -- --repository OWNER/REPO [--tag TAG]
-      [--artifact-dir PATH] [--output-dir PATH] [--publish]
+      [--artifact-dir PATH] [--output-dir PATH]
+      [--linux-verifier-distro NAME] [--publish]
 
 verify is read-only except for generated release metadata beneath --output-dir.
 publish is a dry run unless --publish is supplied. A real publication creates a
@@ -55,6 +57,7 @@ function parseArguments(argv) {
     const flagNames = new Set(["--publish"]);
     const valueNames = new Set([
         "--artifact-dir", "--output-dir", "--repository", "--tag",
+        "--linux-verifier-distro",
     ]);
     for (let index = 1; index < argv.length; ++index) {
         const name = argv[index];
@@ -175,7 +178,8 @@ function extractArchive(file, destination) {
     }
 }
 
-export async function verifyArtifacts(configuration, artifactDirectory) {
+export async function verifyArtifacts(
+    configuration, artifactDirectory, options = {}) {
     const verified = [];
     for (const artifact of configuration.artifacts) {
         const archive = path.join(artifactDirectory, artifact.file);
@@ -205,18 +209,24 @@ export async function verifyArtifacts(configuration, artifactDirectory) {
         }
         parseAndValidateReleaseEvidence(evidenceText, artifact);
 
-        const temporary = await mkdtemp(path.join(tmpdir(), "move-release-verify-"));
-        try {
-            extractArchive(archive, temporary);
-            const install = path.join(
-                temporary, ...artifact.archiveRoot.split("/"));
-            const embedded = await verifyBuildReceipt(install);
-            if (embedded.sha256 !== artifact.receipt.sha256) {
-                fail(`embedded receipt hash disagrees with artifact ${artifact.id}`);
+        const externallyVerified = options.verifyReceipt
+            ? await options.verifyReceipt(artifact) : false;
+        if (!externallyVerified) {
+            const temporary = await mkdtemp(
+                path.join(tmpdir(), "move-release-verify-"));
+            try {
+                extractArchive(archive, temporary);
+                const install = path.join(
+                    temporary, ...artifact.archiveRoot.split("/"));
+                const embedded = await verifyBuildReceipt(install);
+                if (embedded.sha256 !== artifact.receipt.sha256) {
+                    fail(`embedded receipt hash disagrees with artifact ${artifact.id}`);
+                }
+                validateReceiptIdentity(
+                    embedded.receipt, artifact, configuration);
+            } finally {
+                await rm(temporary, {recursive: true, force: true});
             }
-            validateReceiptIdentity(embedded.receipt, artifact, configuration);
-        } finally {
-            await rm(temporary, {recursive: true, force: true});
         }
         verified.push({...artifact});
     }
@@ -269,10 +279,42 @@ export function resolveReleaseTag(configuration, requestedTag = null) {
     return tag;
 }
 
+export function windowsPathForWsl(candidate) {
+    return path.resolve(candidate).replaceAll("\\", "/");
+}
+
 async function verify(configuration, values) {
     const tag = resolveReleaseTag(configuration, values.get("--tag"));
     const {artifactDirectory, outputDirectory} = resolveDirectories(values, tag);
-    const verified = await verifyArtifacts(configuration, artifactDirectory);
+    let verifyReceipt = null;
+    const linuxVerifierDistro = values.get("--linux-verifier-distro");
+    if (linuxVerifierDistro) {
+        if (process.platform !== "win32" ||
+            !/^[A-Za-z0-9_.-]+$/.test(linuxVerifierDistro)) {
+            fail("--linux-verifier-distro requires a simple WSL distro name on Windows");
+        }
+        const linuxPath = (candidate) => run("wsl.exe", [
+            "-d", linuxVerifierDistro, "--", "wslpath", "-a",
+            windowsPathForWsl(candidate),
+        ]);
+        const helper = linuxPath(path.join(
+            repositoryRoot, "tools", "verify-artifact-receipt.mjs"));
+        const linuxConfiguration = linuxPath(configurationPath);
+        const linuxArtifacts = linuxPath(artifactDirectory);
+        verifyReceipt = async (artifact) => {
+            if (!artifact.profile.startsWith("linux-")) return false;
+            run("wsl.exe", [
+                "-d", linuxVerifierDistro, "--", "env",
+                "PATH=/usr/local/bin:/usr/bin:/bin", "node", helper,
+                "--configuration", linuxConfiguration,
+                "--artifact-dir", linuxArtifacts,
+                "--artifact-id", artifact.id,
+            ]);
+            return true;
+        };
+    }
+    const verified = await verifyArtifacts(
+        configuration, artifactDirectory, {verifyReceipt});
     const metadata = await writeReleaseMetadata(
         configuration, verified, outputDirectory, tag);
     console.log(`verified ${verified.length} release artifacts`);

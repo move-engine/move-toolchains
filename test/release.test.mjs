@@ -10,6 +10,7 @@ import {
     releaseAssetErrors,
     resolveReleaseTag,
     verifyArtifacts,
+    windowsPathForWsl,
 } from "../tools/release.mjs";
 import {canonicalJson, writeBuildReceipt} from "../tools/build-receipt.mjs";
 
@@ -32,6 +33,12 @@ test("requires an explicit enabled immutable-release response", () => {
     assert.equal(immutableReleasesEnabled('{"enabled":true}'), true);
     assert.equal(immutableReleasesEnabled('{"enabled":false}'), false);
     assert.equal(immutableReleasesEnabled("not json"), false);
+});
+
+test("passes Windows paths to WSL without backslash argument loss", () => {
+    assert.equal(
+        windowsPathForWsl("C:\\build root\\artifact.zip"),
+        "C:/build root/artifact.zip");
 });
 
 test("requires every remote release asset to be uploaded and digested", () => {
@@ -139,6 +146,20 @@ test("verifies a complete archive and checksum", async (context) => {
     const result = await verifyArtifacts(configuration, root);
     assert.equal(result.length, 1);
     assert.equal(result[0].id, "fixture");
+});
+
+test("accepts an explicit native cross-host receipt verifier", async (context) => {
+    const {root, configuration, artifact} = await fixture();
+    context.after(() => rm(root, {recursive: true, force: true}));
+    const seen = [];
+    const result = await verifyArtifacts(configuration, root, {
+        verifyReceipt(candidate) {
+            seen.push(candidate.id);
+            return true;
+        },
+    });
+    assert.deepEqual(seen, [artifact.id]);
+    assert.equal(result.length, 1);
 });
 
 test("rejects a checksum mismatch", async (context) => {

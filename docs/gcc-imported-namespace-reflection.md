@@ -2,8 +2,9 @@
 
 ## Status
 
-This is a candidate compiler correction, not an upstreamed GCC fix and not yet
-part of the normal Move toolchain installation path.
+This is a downstream compiler correction, not an upstreamed GCC fix. It is
+carried by the qualified Move GCC 16.2 `move.2` release line and participates
+in the normal atomic GCC + Clang tools release set.
 
 Move's declaration scanner needs to reflect a namespace imported from another
 C++ module partition. The exact repository probe is published at Nez commit
@@ -22,14 +23,16 @@ partition after importing the partition that declares the namespace members.
 | GCC 16.2.0 official release | Fails | Same failure boundary after an incremental frontend rebuild from the signed release archive. |
 | GCC master `c090d57e384733d726fad8f61018a3c6d2c559f0` | Fails unmodified | GCC reports `17.0.0 20260820 (experimental)`; the exact probe fails in `walk_namespace_bindings`. |
 | Same GCC master plus the candidate patch | Passes | The exact probe compiles, links, and executes successfully. GCC's directly related `reflect-2` and `reflect-3` tests also pass when compiled manually. |
+| Move GCC 16.2 `move.2` | Passes | Windows UCRT64, Ubuntu 22.04/glibc 2.35, and Debian 13/glibc 2.38 archives pass the exact imported-namespace probe plus the focused GCC reflection suite. |
 
 The GCC 16.2 source archive used for qualification had SHA-256
 `e6738e29597f733270731aa90600f37ffdc045079dfc27ec7e8192cc81085c3e`
 and a valid GNU release signature. The GCC master archive had SHA-256
 `7f8d525d2a51a16e893696cb73c249a1c64a6c6edbca4a60c98377a3b8433f78`.
-The candidate patch dry-runs cleanly against that exact GCC 16.2 source. A
-patched 16.2 binary has not yet been built and qualified; do not infer that
-result from source compatibility alone.
+The patch applies cleanly to the exact GCC 16.2 release base. The published
+Move source identity, ordered patch revision, build receipt, installed-tree
+digest, and release-side qualification evidence bind each host archive to that
+same corrected source.
 
 The clean master compiler was configured as a non-bootstrap C/C++ frontend
 build using the installed GCC 16.1 toolchain as host. Probe qualification used
@@ -79,5 +82,5 @@ Before adopting a patched compiler release:
 5. either link an upstream GCC bug/fix or carry a versioned downstream patch
    with exact source identity in the release manifest.
 
-The Bloomberg Clang/clangd result is a separate qualification lane. Success or
+The Move Engine Clang/clangd result is a separate qualification lane. Success or
 failure there does not close this GCC frontend defect.

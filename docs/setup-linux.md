@@ -3,7 +3,7 @@
 This guide configures a Linux x86-64 development environment with:
 
 - GCC 16.1 or newer after an actual C++26 reflection feature probe;
-- the pinned Bloomberg `clang-p2996` toolchain for clangd/editor tooling; and
+- the pinned Move Engine `clang-p2996` toolchain for clangd/editor tooling; and
 - Xmake 3.0.1 or newer.
 
 Published Linux clang-p2996 artifacts target x86-64 baseline and declare their
@@ -183,8 +183,9 @@ To discover and build the latest official stable GNU GCC release instead:
 npm start -- build gcc --jobs 20 --latest-release
 ```
 
-This is a system-aware developer installer, not yet the portable GCC archive
-builder. It uses Apt and `sudo` to install source-build prerequisites, verifies
+This is a system-aware developer installer, separate from the reproducible
+portable Move GCC release builder. It uses Apt and `sudo` to install
+source-build prerequisites, verifies
 the official GNU source tarball with GNU's detached signature/keyring, selects
 a non-experimental bootstrap compiler, and performs the source build. Review
 those system changes before running it.

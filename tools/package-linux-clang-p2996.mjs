@@ -27,6 +27,7 @@ import {
     verifyBuildReceipt,
     writeBuildReceipt,
 } from "./build-receipt.mjs";
+import {validateReceiptIdentity} from "./artifact-contract.mjs";
 import {
     clangReceiptInput,
     clangSourceIdentity,
@@ -49,7 +50,7 @@ function usage() {
 
 Usage:
   npm run package:clang-p2996:linux -- --root PATH --source-root PATH
-      --build-root PATH --nez-root PATH [--output-dir PATH]
+      --build-root PATH --nez-root PATH --gcc-archive PATH [--output-dir PATH]
       --minimum-glibc VERSION --build-image ID [--force]
 
 The package is assembled from ROOT/clang-p2996/<revision>/install. Every ELF
@@ -69,7 +70,7 @@ function parseArguments(argv) {
             continue;
         }
         if (!["--root", "--output-dir", "--minimum-glibc", "--build-image",
-            "--source-root", "--build-root", "--nez-root"]
+            "--source-root", "--build-root", "--nez-root", "--gcc-archive"]
             .includes(name)) {
             fail(`unknown argument: ${name}`);
         }
@@ -78,7 +79,7 @@ function parseArguments(argv) {
         values.set(name, value);
     }
     for (const required of ["--root", "--minimum-glibc", "--build-image",
-        "--source-root", "--build-root", "--nez-root"]) {
+        "--source-root", "--build-root", "--nez-root", "--gcc-archive"]) {
         if (!values.has(required)) fail(`${required} is required`);
     }
     return {help: false, flags, values};
@@ -200,6 +201,7 @@ async function main() {
     const sourceRoot = path.resolve(values.get("--source-root"));
     const buildRoot = path.resolve(values.get("--build-root"));
     const nezRoot = path.resolve(values.get("--nez-root"));
+    const gccArchive = path.resolve(values.get("--gcc-archive"));
     const outputDirectory = path.resolve(values.get("--output-dir") ??
         path.join(repositoryRoot, ".local", "prebuilt"));
     const maximumGlibc = values.get("--minimum-glibc");
@@ -232,6 +234,13 @@ async function main() {
         fail("invalid pinned clang-p2996 configuration");
     }
     const revision = reflection.revision;
+    const profile = `linux-x86_64-glibc${maximumGlibc}`;
+    const gccArtifact = configuration.artifacts?.find(candidate =>
+        candidate.component === "gcc" && candidate.profile === profile);
+    if (!gccArtifact || path.basename(gccArchive) !== gccArtifact.file ||
+        await sha256(gccArchive) !== gccArtifact.sha256) {
+        fail(`--gcc-archive is not the exact paired GCC artifact for ${profile}`);
+    }
     if (revision !== clangSourceIdentity.revision ||
         run("git", ["-C", sourceRoot, "rev-parse", "HEAD"]) !== revision ||
         run("git", ["-C", sourceRoot, "status", "--porcelain",
@@ -279,6 +288,24 @@ async function main() {
         await rm(path.join(stagedInstall, "move-smoke"), {
             recursive: true, force: true,
         });
+        const pairedGccRoot = path.join(temporary, "paired-gcc");
+        await mkdir(pairedGccRoot, {recursive: true});
+        run("tar", ["-xzf", gccArchive, "-C", pairedGccRoot]);
+        const pairedGccInstall = path.join(
+            pairedGccRoot, ...gccArtifact.archiveRoot.split("/"));
+        const pairedGccReceipt = await verifyBuildReceipt(pairedGccInstall);
+        validateReceiptIdentity(
+            pairedGccReceipt.receipt, gccArtifact, configuration);
+        if (pairedGccReceipt.sha256 !== gccArtifact.receipt.sha256) {
+            fail("paired GCC embedded receipt digest disagrees with toolchains.json");
+        }
+        const libgcc = path.join(pairedGccInstall, "lib64", "libgcc_s.so.1");
+        if (!await exists(libgcc)) {
+            fail("paired GCC archive does not contain lib64/libgcc_s.so.1");
+        }
+        await cp(libgcc, path.join(stagedInstall, "lib", "libgcc_s.so.1"), {
+            preserveTimestamps: true,
+        });
         await makeRuntimeLibrariesRelocatable(stagedInstall);
         const audit = await auditElfTree(stagedInstall, maximumGlibc);
         const metadata = {
@@ -305,7 +332,6 @@ async function main() {
             `${JSON.stringify(metadata, null, 2)}\n`);
         run(process.execPath, [path.join(
             nezRoot, "tools", "reflection", "compdb_test.mjs")]);
-        const profile = `linux-x86_64-glibc${maximumGlibc}`;
         const receiptInput = clangReceiptInput({
             profile,
             builderIdentity: values.get("--build-image"),
@@ -314,6 +340,14 @@ async function main() {
             installTargets: reflection.hosts["linux-x64"].installTargets,
             environment: {},
             sourceTree,
+            runtimeDependency: {
+                id: "paired-move-gcc-runtime",
+                kind: "archive",
+                file: gccArtifact.file,
+                source: `https://github.com/move-engine/move-toolchains/releases/download/${configuration.release.tag}/${gccArtifact.file}`,
+                version: `${configuration.components.gcc.version}-${configuration.components.gcc.packageRevision}`,
+                checksum: {algorithm: "sha256", digest: gccArtifact.sha256},
+            },
         });
         const writtenReceipt = await writeBuildReceipt(
             stagedInstall, receiptInput);
@@ -351,7 +385,7 @@ async function main() {
                 {id: "archive-checksum", status: "passed"},
                 {id: "archive-relocation-path-with-spaces", status: "passed"},
                 {id: "archive-runtime-closure", status: "passed"},
-                {id: "archive-reflection-and-modules", status: "passed"},
+                {id: "archive-reflection-runtime", status: "passed"},
             ],
             componentIdentity: {
                 version: clangToolsVersion,

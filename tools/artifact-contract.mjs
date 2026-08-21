@@ -30,8 +30,14 @@ export function validateReleaseEvidence(evidence, artifact) {
         "archive-checksum",
         "archive-relocation-path-with-spaces",
         "archive-runtime-closure",
-        "archive-reflection-and-modules",
     ];
+    if (artifact.component === "gcc") {
+        required.push("archive-reflection-and-modules");
+    } else if (artifact.component === "clangTools") {
+        required.push("archive-reflection-runtime", "archive-module-lsp");
+    } else {
+        fail(`release evidence has unknown component ${artifact.component}`);
+    }
     if (artifact.component === "gcc" &&
         artifact.profile === "windows-x86_64-ucrt64") {
         required.push("archive-win64-avx-stack-alignment");

@@ -371,7 +371,7 @@ async function main() {
                 {id: "archive-checksum", status: "passed"},
                 {id: "archive-relocation-path-with-spaces", status: "passed"},
                 {id: "archive-runtime-closure", status: "passed"},
-                {id: "archive-reflection-and-modules", status: "passed"},
+                {id: "archive-reflection-runtime", status: "passed"},
             ],
             componentIdentity: {
                 version: clangToolsVersion,

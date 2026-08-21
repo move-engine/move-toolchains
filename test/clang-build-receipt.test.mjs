@@ -43,3 +43,23 @@ test("records the exact normalized bootstrap CMake policy", () => {
     ]);
     assert.ok(arguments_.includes("-DLLVM_ENABLE_PROJECTS=clang;clang-tools-extra"));
 });
+
+test("binds a paired GCC runtime archive into Linux clang derivation", () => {
+    const common = {
+        profile: "linux-x86_64-glibc2.38",
+        builderIdentity: "fixture-builder",
+        bootstrapVersion: "fixture compiler",
+        configuration: {generator: "Ninja", buildType: "Release"},
+        installTargets: ["install-clang", "install-clangd"],
+        environment: {}, sourceTree: "f".repeat(40),
+    };
+    const withoutRuntime = clangReceiptInput(common);
+    const dependency = {
+        id: "paired-move-gcc-runtime", kind: "archive", file: "gcc.tar.gz",
+        source: "https://example.invalid/gcc.tar.gz", version: "16.2.0-move.2",
+        checksum: {algorithm: "sha256", digest: "e".repeat(64)},
+    };
+    const withRuntime = clangReceiptInput({...common, runtimeDependency: dependency});
+    assert.deepEqual(withRuntime.dependencies.at(-1), dependency);
+    assert.notEqual(withRuntime.manifestDigest, withoutRuntime.manifestDigest);
+});

@@ -70,6 +70,7 @@ export function clangReceiptInput(options) {
         buildEnvironment: options.builderIdentity,
         configuration: options.configuration,
         installTargets: options.installTargets,
+        runtimeDependency: options.runtimeDependency ?? null,
     };
     return {
         component: "clangTools",
@@ -109,7 +110,7 @@ export function clangReceiptInput(options) {
             version: clangSourceIdentity.revision.slice(0, 8),
             revision: clangSourceIdentity.revision,
             tree: options.sourceTree,
-        }],
+        }, ...(options.runtimeDependency ? [options.runtimeDependency] : [])],
         qualification: {
             schemaVersion: 1,
             cases: clangQualificationCases(),

@@ -3,7 +3,7 @@
 This guide configures a native Windows x86-64 development environment with:
 
 - MSYS2 UCRT64 GCC 16.2 as the production C++ compiler;
-- the pinned Bloomberg `clang-p2996` build for clangd/editor tooling; and
+- the pinned Move Engine `clang-p2996` build for clangd/editor tooling; and
 - Xmake 3.0.1 or newer.
 
 The fastest path uses qualified prebuilt artifacts. Building clang-p2996 from

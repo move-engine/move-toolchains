@@ -5,19 +5,18 @@ repositories. Move currently depends on C++26 static reflection, so a coherent
 development environment requires both a reflection-capable production compiler
 and editor tooling that can understand the same code. It provides local build,
 qualification, packaging, and release scripts for GCC 16 and a reflection-aware
-clangd built from Bloomberg's `clang-p2996` fork. Check the
+clangd built from the Move Engine `clang-p2996` fork. Check the
 [GitHub Releases page](https://github.com/move-engine/move-toolchains/releases)
 for the latest prebuilt toolchains. The release artifacts are portable and
 structured to be easily consumed by Move's new Xmake toolchain.
 
-The initial implementation deliberately targets the two environments already
-qualified by the project:
+The current release matrix targets three qualified host profiles:
 
 - Windows x86-64 with MSYS2 UCRT64 GCC 16.2 and a native clang-p2996 language
   server; and
 - Linux x86-64 with native GCC 16.2 and the full clang-p2996/libc++
-  toolchain. Published Linux artifacts declare a glibc floor; the manager
-  selects the newest artifact compatible with the running glibc.
+  toolchain, packaged separately for glibc 2.35 and 2.38. The manager selects
+  the newest complete GCC + Clang tools set compatible with the running glibc.
 
 Setup guides:
 
@@ -123,10 +122,10 @@ npm run ubuntu2204:clangd -- package --output-dir M:\src\move-toolchains\.local\
 The package step audits every ELF executable and shared library, runs clang,
 clang++, and clangd, extracts beneath a different path containing spaces, and
 reruns the pinned reflection/libc++ qualification. It never changes the host
-glibc. The glibc 2.35 artifact is the portable Linux release asset and is also
-qualified on newer maintained glibc hosts; a redundant newer-floor build is
-not required. The Dockerfile used to seed that WSL2 distribution is also
-suitable for CI or a Docker host with bind-mounted Linux storage.
+glibc. A separate glibc 2.38 lane produces the newer compatible set; the
+downloader chooses 2.35 on older hosts and prefers 2.38 where available. The
+Dockerfile used to seed the 2.35 WSL2 distribution is also suitable for CI or a
+Docker host with bind-mounted Linux storage.
 
 ## Linux GCC
 
@@ -139,33 +138,43 @@ sudo env GCC_VERSION=16.2.0 GCC_BUILD_JOBS=20 INSTALL_ONLY=1 \
   ./platform/linux/install-modern-toolchains.sh
 ```
 
-This remains a developer-machine installer, not yet the GCC archive builder.
-The archive lane must install into a staging prefix, qualify relocation, and
-close non-baseline runtime dependencies before a GCC asset is added to
-`toolchains.json`.
+This remains a developer-machine installer. Release packaging instead consumes
+an isolated staged Move GCC install, closes its runtime dependencies, writes an
+embedded build receipt, and qualifies both the staged and relocated trees.
 
-The current GCC releases and upstream master crash when reflecting an imported
-namespace from a C++ module partition. See the
-[qualification report and candidate patch](docs/gcc-imported-namespace-reflection.md)
-before selecting a GCC checkpoint for Move's generated declaration pipeline.
-The planned source-branch, host-profile, receipt, packaging, qualification, and
-composed-toolchain-set boundaries are recorded in the
+Official GCC 16.2 and the audited upstream-trunk checkpoint crash when
+reflecting an imported namespace from a C++ module partition. Move GCC 16.2
+`move.2` carries the qualified correction described in the
+[imported-namespace report](docs/gcc-imported-namespace-reflection.md). The
+source-branch, host-profile, receipt, packaging, qualification, and composed
+toolchain-set boundaries are recorded in the
 [GCC and Clang tools matrix](docs/gcc-toolchain-matrix.md). No compiler build is
-an implicit setup fallback; large source builds always require an explicit
-cost acceptance.
+an implicit setup fallback; large source builds always require explicit cost
+acceptance.
 
 ## Verify the current release set
 
-The first manifest describes the already-qualified clang-p2996 archives. Point
-the verifier at the directory holding them:
+The manifest describes three complete GCC + Clang tools sets. Point the
+verifier at the directory holding all six archives and their adjacent checksum
+and evidence files:
 
 ```text
-npm run release:verify -- \
-  --artifact-dir .local\prebuilt
+npm run release:verify -- --artifact-dir .local/prebuilt
+```
+
+When verifying a mixed Windows/Linux release set from Windows, delegate Linux
+installed-tree receipt checks to a compatible WSL distribution so POSIX mode
+bits are evaluated on a native filesystem:
+
+```powershell
+npm run release:verify -- `
+  --artifact-dir .local/prebuilt `
+  --linux-verifier-distro MoveToolchains-Ubuntu2310
 ```
 
 Verification checks every declared asset and adjacent checksum, rejects unsafe
-archive paths, and confirms required toolchain entries. It generates release
+archive paths, confirms required toolchain entries, and recomputes each
+receipt-bound installed-tree digest on its native host. It generates release
 notes and a machine-readable release manifest beneath `.local/releases`.
 
 ## Publish a GitHub Release
