@@ -11,9 +11,10 @@ minimum glibc. The manager reads the runtime glibc from Node's process report
 and selects the newest artifact whose floor is no greater than the host. It
 does not parse localized `ldd` output for selection.
 
-The packaged libc++, libc++abi, and libunwind shared libraries use a relative
-`$ORIGIN` runtime search path, so they resolve from the relocated installation
-rather than from similarly named host libraries.
+The packaged libc++, libc++abi, and libunwind shared libraries use relative
+`$ORIGIN` search paths. The clang package also carries the checksum-bound
+paired GCC set's `libgcc_s` and `libatomic` runtimes, so every non-system
+runtime resolves from the relocated installation rather than the host.
 
 ## 1. Clone the repository
 
@@ -135,8 +136,9 @@ set by the declared glibc floor before downloading either large archive,
 qualifies both in a disposable relocated tree, then freshly extracts and
 activates them with one directory rename. The Linux qualification executes
 clang, clangd, GCC, and the reflection/libc++ smoke tests; it also verifies
-that libc++, libc++abi, and libunwind resolve from the isolated installation
-rather than the host. A partial or failed set never becomes selected.
+that libc++, libc++abi, libunwind, libgcc_s, and libatomic resolve from the
+isolated installation rather than the host. A partial or failed set never
+becomes selected.
 
 If no artifact supports the runtime glibc, the command fails before downloading
 the archive and prints the explicit source-build command. It never silently

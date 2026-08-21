@@ -1,7 +1,32 @@
 import {canonicalJson} from "./build-receipt.mjs";
+import {importedNamespaceProbeRevision} from "./record-clang-module-evidence.mjs";
 
 function fail(message) {
     throw new Error(message);
+}
+
+function validateModuleLspCase(entry, artifact) {
+    const resultKeys = [
+        "definitionLocations",
+        "importedRenameDocuments",
+        "referenceLocations",
+        "renameDocuments",
+        "semanticTokenWords",
+    ];
+    if (JSON.stringify(Object.keys(entry).sort()) !== JSON.stringify([
+        "id", "probeRevision", "result", "status", "toolchainRevision",
+    ]) || entry.probeRevision !== importedNamespaceProbeRevision ||
+        entry.toolchainRevision !== artifact.derivation?.sourceRevision ||
+        !entry.result ||
+        JSON.stringify(Object.keys(entry.result).sort()) !==
+            JSON.stringify(resultKeys)) {
+        fail(`release evidence for ${artifact.id} has invalid module LSP identity`);
+    }
+    for (const key of resultKeys) {
+        if (!Number.isSafeInteger(entry.result[key]) || entry.result[key] < 1) {
+            fail(`release evidence for ${artifact.id} has invalid module LSP result`);
+        }
+    }
 }
 
 export function validateReleaseEvidence(evidence, artifact) {
@@ -46,6 +71,9 @@ export function validateReleaseEvidence(evidence, artifact) {
         if (cases.get(id)?.status !== "passed") {
             fail(`release evidence for ${artifact.id} lacks passing case ${id}`);
         }
+    }
+    if (artifact.component === "clangTools") {
+        validateModuleLspCase(cases.get("archive-module-lsp"), artifact);
     }
     return evidence;
 }

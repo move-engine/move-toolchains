@@ -73,6 +73,11 @@ export function parseLdd(output) {
     return rows;
 }
 
+export function isIsolatedElfDependency(name) {
+    return /^(?:libstdc\+\+|libgcc_s|libatomic|libc\+\+|libc\+\+abi|libunwind|libgmp|libisl|libmpc|libmpfr|libz)\.so(?:\.|$)/
+        .test(name);
+}
+
 function isInside(root, candidate) {
     const relative = path.relative(root, candidate);
     return relative !== ".." && !relative.startsWith(`..${path.sep}`) &&
@@ -99,8 +104,7 @@ export async function auditElfTree(install, maximumGlibc) {
                 fail(`${file} has an unresolved shared-library dependency:\n${linked.trim()}`);
             }
             for (const row of parseLdd(linked)) {
-                const isolated = /^(?:libstdc\+\+|libgcc_s|libc\+\+|libc\+\+abi|libunwind|libgmp|libisl|libmpc|libmpfr|libz)\.so(?:\.|$)/
-                    .test(row.name);
+                const isolated = isIsolatedElfDependency(row.name);
                 if (isolated) {
                     if (row.resolved === "not" || !path.isAbsolute(row.resolved)) {
                         fail(`${file} did not resolve ${row.name}`);

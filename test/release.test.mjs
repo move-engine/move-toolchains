@@ -7,6 +7,7 @@ import path from "node:path";
 import test from "node:test";
 import {
     immutableReleasesEnabled,
+    parseTarVerboseListing,
     releaseAssetErrors,
     resolveReleaseTag,
     verifyArtifacts,
@@ -39,6 +40,25 @@ test("passes Windows paths to WSL without backslash argument loss", () => {
     assert.equal(
         windowsPathForWsl("C:\\build root\\artifact.zip"),
         "C:/build root/artifact.zip");
+});
+
+test("validates archive links and portable path topology before extraction", () => {
+    const listing = [
+        "drwxr-xr-x  0 root root 0 Aug 20 20:01 root/",
+        "-rw-r--r--  0 root root 1 Aug 20 20:01 root/file",
+        "-rw-r--r--  0 root root 1 Jan 07 2024 root/older-file",
+        "lrwxrwxrwx  0 root root 0 Aug 20 20:01 root/link -> file",
+    ].join("\n");
+    assert.equal(parseTarVerboseListing(listing).length, 4);
+    assert.throws(() => parseTarVerboseListing(
+        `${listing}\nlrwxrwxrwx  0 root root 0 Aug 20 20:01 root/escape -> ../../outside`),
+    /escapes its root/u);
+    assert.throws(() => parseTarVerboseListing(
+        `${listing}\n-rw-r--r--  0 root root 1 Aug 20 20:01 ROOT/other`),
+    /case-fold collision/u);
+    assert.throws(() => parseTarVerboseListing(
+        `${listing}\n-rw-r--r--  0 root root 1 Aug 20 20:01 root/file/child`),
+    /non-directory parent/u);
 });
 
 test("requires every remote release asset to be uploaded and digested", () => {

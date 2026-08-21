@@ -234,7 +234,7 @@ claim. Every shipped ELF executable and shared library is inspected for:
 
 - maximum required `GLIBC_*` symbol version;
 - unresolved dynamic dependencies;
-- required GCC, C++, unwind, and other non-system runtime closure; and
+- required GCC, atomic, C++, unwind, and other non-system runtime closure; and
 - an RPATH/RUNPATH and interpreter policy that survives relocation.
 
 The glibc 2.35 lane uses the pinned Ubuntu 22.04 builder. The glibc 2.38 lane

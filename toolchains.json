@@ -145,16 +145,16 @@
       "file": "clangd-p2996-0ac75f2f-linux-x86_64-glibc2.38.tar.gz",
       "checksumFile": "clangd-p2996-0ac75f2f-linux-x86_64-glibc2.38.tar.gz.sha256",
       "archiveRoot": "clang-p2996/0ac75f2f9a8648feaa404e6b68513ce7d4121ece/install",
-      "sha256": "23e67b415a358c62e30c8b9acd31ca347f7faf1dec8518b4539c0366bacf5dcd",
-      "bytes": 99467280,
+      "sha256": "4196d7dd53d101ccab12a69c993577ddafb7c794b30d1ba93f72632a53a557ed",
+      "bytes": 99501144,
       "derivation": {
         "sourceRevision": "0ac75f2f9a8648feaa404e6b68513ce7d4121ece",
         "upstreamBaseRevision": "7220baffd57ea5b0f8cf59bee494dd5b7cc2b748",
         "patchRevisions": ["0ac75f2f9a8648feaa404e6b68513ce7d4121ece"],
         "configurationDigest": "de484158fbfd0ed6648e2199a3b990c1c70219e189698874851d1d6e1dbd7826"
       },
-      "receipt": {"schemaVersion": 1, "file": "move-build-receipt.json", "sha256": "24896bed8fdfadcd78719bf9298c4e41978e01a6597e20aa0f73aa605b3d0f0f", "installedTreeDigest": "e83fababe37bb689add9862072178a058a8dcf61767a1ec3dcc4beab83087f5b"},
-      "evidence": {"schemaVersion": 1, "file": "clangd-p2996-0ac75f2f-linux-x86_64-glibc2.38.tar.gz.evidence.json", "sha256": "faed6870702a13577cba8065795dec2f97ab7b202f97e41c8a5db8900f4aee67"}
+      "receipt": {"schemaVersion": 1, "file": "move-build-receipt.json", "sha256": "3b8fe993377820327275d53e84d2abf9b8be395077bacc5203a77d6915eeec4f", "installedTreeDigest": "ea9f19284a413016c9b7cf6fec84d1751d911fe7d4b075f54b6ec95a1b808d45"},
+      "evidence": {"schemaVersion": 1, "file": "clangd-p2996-0ac75f2f-linux-x86_64-glibc2.38.tar.gz.evidence.json", "sha256": "72865eeb0dc526e27976e4be0b888343d5568cbe7e55549ff3a192f413c8133b"}
     },
     {
       "id": "gcc-linux-x86_64-glibc2.35",
@@ -181,16 +181,16 @@
       "file": "clangd-p2996-0ac75f2f-linux-x86_64-glibc2.35.tar.gz",
       "checksumFile": "clangd-p2996-0ac75f2f-linux-x86_64-glibc2.35.tar.gz.sha256",
       "archiveRoot": "clang-p2996/0ac75f2f9a8648feaa404e6b68513ce7d4121ece/install",
-      "sha256": "80e9d82710b678c8cd8408788ed76fd74a46458a44036b9dc486c3b5b3817297",
-      "bytes": 87175961,
+      "sha256": "66d9708d8d36fc4e30f26139825044a847caaffcd996dc2ffd7d916752a5359e",
+      "bytes": 87220619,
       "derivation": {
         "sourceRevision": "0ac75f2f9a8648feaa404e6b68513ce7d4121ece",
         "upstreamBaseRevision": "7220baffd57ea5b0f8cf59bee494dd5b7cc2b748",
         "patchRevisions": ["0ac75f2f9a8648feaa404e6b68513ce7d4121ece"],
         "configurationDigest": "c1b5d8c358a4dcc524f1032dd1d266560718a466ef99f8f7d3d4c19d96b8629f"
       },
-      "receipt": {"schemaVersion": 1, "file": "move-build-receipt.json", "sha256": "3df25f86593823aa2e6c02a81f5eec52274895b1cbf480517bfcede448aa149e", "installedTreeDigest": "b91614849a0ad549c5cf5a6c542de9fb91feab5cbeeb81b835ebef78df548d52"},
-      "evidence": {"schemaVersion": 1, "file": "clangd-p2996-0ac75f2f-linux-x86_64-glibc2.35.tar.gz.evidence.json", "sha256": "e8a511fd54f32bfb06a17a9ddde6f8ab30ba1382255ac642ed382cfef05af7ff"}
+      "receipt": {"schemaVersion": 1, "file": "move-build-receipt.json", "sha256": "c33cb35d09f0092bfe998ea65c4a56b6f771d032e39607f2cd36f531d8fd74ff", "installedTreeDigest": "4d2cf9ffbb54a88f4354c05ddb69e10eb2e3fb8adaf7c652d53031e6cbce27fa"},
+      "evidence": {"schemaVersion": 1, "file": "clangd-p2996-0ac75f2f-linux-x86_64-glibc2.35.tar.gz.evidence.json", "sha256": "6a997352b379e26ba4711cad093ed8a5df38f648ce0c5624577b34267cc021a3"}
     }
   ],
   "toolchainSets": [

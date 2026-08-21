@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
     elfToolMaxBuffer,
+    isIsolatedElfDependency,
     parseLdd,
     requiredGlibcVersions,
 } from "../tools/elf-compatibility.mjs";
@@ -14,6 +15,11 @@ test("extracts, deduplicates, and sorts required GLIBC versions", () => {
       Name: GLIBCXX_3.4.30
       Name: GLIBC_2.35
     `), ["2.2.5", "2.34", "2.35"]);
+});
+
+test("requires GCC atomic runtime dependencies to resolve inside the package", () => {
+    assert.equal(isIsolatedElfDependency("libatomic.so.1"), true);
+    assert.equal(isIsolatedElfDependency("libc.so.6"), false);
 });
 
 test("allows readelf output larger than Node's default child-process buffer", () => {

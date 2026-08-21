@@ -28,6 +28,7 @@ import {
     writeBuildReceipt,
 } from "./build-receipt.mjs";
 import {validateReceiptIdentity} from "./artifact-contract.mjs";
+import {copyPairedGccRuntimeLibraries} from "./clang-linux-runtime.mjs";
 import {
     clangReceiptInput,
     clangSourceIdentity,
@@ -149,6 +150,7 @@ async function makeRuntimeLibrariesRelocatable(install) {
         fail("installed libc++, libc++abi, and libunwind shared libraries were not found together");
     }
     const patched = new Set();
+    const relativeRuntimePath = "$ORIGIN:$ORIGIN/..";
     for (const name of names) {
         const library = await realpath(path.join(runtimeDirectory, name));
         const relative = path.relative(canonicalInstall, library);
@@ -157,8 +159,8 @@ async function makeRuntimeLibrariesRelocatable(install) {
             fail(`runtime symlink escaped the packaged installation: ${library}`);
         }
         if (patched.has(library)) continue;
-        run("patchelf", ["--set-rpath", "$ORIGIN", library]);
-        if (run("patchelf", ["--print-rpath", library]) !== "$ORIGIN") {
+        run("patchelf", ["--set-rpath", relativeRuntimePath, library]);
+        if (run("patchelf", ["--print-rpath", library]) !== relativeRuntimePath) {
             fail(`failed to set a relative runtime search path on ${library}`);
         }
         patched.add(library);
@@ -299,13 +301,7 @@ async function main() {
         if (pairedGccReceipt.sha256 !== gccArtifact.receipt.sha256) {
             fail("paired GCC embedded receipt digest disagrees with toolchains.json");
         }
-        const libgcc = path.join(pairedGccInstall, "lib64", "libgcc_s.so.1");
-        if (!await exists(libgcc)) {
-            fail("paired GCC archive does not contain lib64/libgcc_s.so.1");
-        }
-        await cp(libgcc, path.join(stagedInstall, "lib", "libgcc_s.so.1"), {
-            preserveTimestamps: true,
-        });
+        await copyPairedGccRuntimeLibraries(pairedGccInstall, stagedInstall);
         await makeRuntimeLibrariesRelocatable(stagedInstall);
         const audit = await auditElfTree(stagedInstall, maximumGlibc);
         const metadata = {

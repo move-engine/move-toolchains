@@ -24,6 +24,7 @@ import {
     validateReceiptIdentity,
 } from "./artifact-contract.mjs";
 import {validateToolchainManifest} from "./toolchain-set.mjs";
+import {validateArchiveManifest} from "./gcc-build-io.mjs";
 
 const scriptPath = fileURLToPath(import.meta.url);
 const repositoryRoot = path.resolve(path.dirname(scriptPath), "..");
@@ -81,6 +82,7 @@ function run(command, args, options = {}) {
     const result = spawnSync(command, args, {
         cwd: options.cwd ?? repositoryRoot,
         encoding: "utf8",
+        maxBuffer: 64 * 1024 * 1024,
         stdio: options.inherit ? "inherit" : ["ignore", "pipe", "pipe"],
         env: options.env ?? process.env,
     });
@@ -155,19 +157,43 @@ function normalizeArchiveEntry(entry) {
     return entry.replaceAll("\\", "/").replace(/^\.\//, "").replace(/\/$/, "");
 }
 
-function inspectArchive(file) {
-    const listing = file.toLowerCase().endsWith(".zip") && process.platform !== "win32"
-        ? run("unzip", ["-Z1", file])
-        : run("tar", ["-tf", file]);
-    const entries = listing.split(/\r?\n/)
-        .map(normalizeArchiveEntry).filter(Boolean);
-    for (const entry of entries) {
-        if (entry.startsWith("/") || /^[A-Za-z]:\//.test(entry) ||
-            entry.split("/").includes("..")) {
-            fail(`unsafe archive entry in ${path.basename(file)}: ${entry}`);
+export function parseTarVerboseListing(listing) {
+    const entries = [];
+    for (const line of listing.split(/\r?\n/).filter(Boolean)) {
+        const match = line.match(
+            /^([bcdhlps-])[rwxStTs-]{9}\s+(?:\d+\s+\S+\s+\S+\s+\d+\s+\S+\s+\d+\s+(?:\d{2}:\d{2}|\d{4})|\S+\s+\d+\s+\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2})\s+(.+)$/u);
+        if (!match) fail(`could not parse archive metadata: ${line}`);
+        const kinds = {"-": "file", d: "directory", h: "hardlink", l: "symlink"};
+        const type = kinds[match[1]];
+        if (!type) fail(`archive contains unsupported entry type: ${line}`);
+        let archivePath = match[2];
+        let linkTarget;
+        if (type === "symlink") {
+            const separator = archivePath.lastIndexOf(" -> ");
+            if (separator < 0) fail(`archive symlink has no target: ${line}`);
+            linkTarget = archivePath.slice(separator + 4);
+            archivePath = archivePath.slice(0, separator);
+        } else if (type === "hardlink") {
+            const separator = archivePath.lastIndexOf(" link to ");
+            if (separator < 0) fail(`archive hardlink has no target: ${line}`);
+            linkTarget = archivePath.slice(separator + 9);
+            archivePath = archivePath.slice(0, separator);
         }
+        const entry = {
+            mode: 0,
+            path: normalizeArchiveEntry(archivePath),
+            type,
+        };
+        if (type === "file") entry.sha256 = "0".repeat(64);
+        if (linkTarget !== undefined) entry.linkTarget = linkTarget;
+        entries.push(entry);
     }
-    return new Set(entries);
+    return validateArchiveManifest(entries);
+}
+
+function inspectArchive(file) {
+    const entries = parseTarVerboseListing(run("tar", ["-tvf", file]));
+    return new Set(entries.map(entry => entry.path));
 }
 
 function extractArchive(file, destination) {
