@@ -120,22 +120,23 @@ node -p 'process.report.getReport().header.glibcVersionRuntime'
 Then download and qualify the latest compatible artifact:
 
 ```bash
-npm start -- download clangd
+npm start -- download toolchain
 ```
 
 For a reproducible setup, select an exact release:
 
 ```bash
-npm start -- download clangd --tag toolchains-2026.08.8
+npm start -- download toolchain --tag toolchains-2026.08.9
 ```
 
-The manager verifies the release manifest and archive checksums, rejects unsafe
-archive entries, selects by the declared `minimumGlibc` before downloading the
-large archive, publishes the versioned install beneath the configured root,
-and runs the full trusted-prebuilt qualification at the final location. The
-Linux qualification executes clang, clangd, and a reflection/libc++ smoke test;
-it also verifies that libc++, libc++abi, and libunwind resolve from the isolated
-installation rather than the host.
+The manager verifies the complete release manifest and both components'
+checksums, receipts, and release evidence. It selects a complete GCC + clangd
+set by the declared glibc floor before downloading either large archive,
+qualifies both in a disposable relocated tree, then freshly extracts and
+activates them with one directory rename. The Linux qualification executes
+clang, clangd, GCC, and the reflection/libc++ smoke tests; it also verifies
+that libc++, libc++abi, and libunwind resolve from the isolated installation
+rather than the host. A partial or failed set never becomes selected.
 
 If no artifact supports the runtime glibc, the command fails before downloading
 the archive and prints the explicit source-build command. It never silently
@@ -225,7 +226,7 @@ wrong-revision source checkout is rejected.
 ## Troubleshooting
 
 - **`installation: absent or unqualified`:** confirm the configured root and
-  run `npm start -- download clangd`, or use `npm run adopt:clangd --` only for
+  run `npm start -- download toolchain`, or use `npm run adopt:clangd --` only for
   a checksum-verified archive.
 - **No compatible glibc artifact:** use the printed opt-in source-build command
   or publish a package built on the required older baseline. Do not replace the

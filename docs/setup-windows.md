@@ -111,7 +111,7 @@ the manager downloads the official Win64 portable ZIP, verifies GitHub's
 SHA-256 digest, installs it under the configured local workspace, and records
 the executable path without replacing a system installation.
 
-## 5. Download the qualified clangd artifact
+## 5. Download the qualified GCC + clangd set
 
 Assign the public release repository once:
 
@@ -119,21 +119,23 @@ Assign the public release repository once:
 npm start -- assign releases move-engine/move-toolchains
 ```
 
-Then download the latest compatible Win64 artifact:
+Then download the latest compatible Win64 toolchain set:
 
 ```powershell
-npm start -- download clangd
+npm start -- download toolchain
 ```
 
-The manager downloads the release manifest, verifies its checksum, selects the
-Win64 asset, verifies both GitHub's asset digest and the published checksum,
-rejects unsafe archive paths, extracts to the configured clang root, and runs
-the full trusted-prebuilt reflection qualification at the final location.
+The manager verifies the complete release manifest before downloading either
+large archive. It authenticates both archives, checks their embedded build
+receipts and release evidence, and qualifies GCC and clangd together in a
+disposable relocated tree. It then freshly extracts both components, verifies
+their receipts again, and activates the set with one directory rename. A
+partial or failed set never becomes selected.
 
 Use a specific published toolchain release when reproducibility matters:
 
 ```powershell
-npm start -- download clangd --tag toolchains-2026.08.8
+npm start -- download toolchain --tag toolchains-2026.08.9
 ```
 
 If you already have an extracted qualified installation, integrate its

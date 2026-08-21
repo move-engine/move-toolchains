@@ -11,6 +11,7 @@ import {
     readFile,
     readdir,
     rm,
+    stat,
     writeFile,
 } from "node:fs/promises";
 import {tmpdir} from "node:os";
@@ -31,11 +32,19 @@ import {
 import {
     compatibleXmakeReleaseTag,
     detectLinuxLibc,
-    selectCompatibleArtifact,
     sourceBuildAlternative,
     unsupportedLinuxMessage,
 } from "./tools/host-compatibility.mjs";
 import {renameWithRetry} from "./tools/filesystem.mjs";
+import {
+    selectCompatibleToolchainSet,
+    validateToolchainManifest,
+} from "./tools/toolchain-set.mjs";
+import {verifyBuildReceipt} from "./tools/build-receipt.mjs";
+import {
+    parseAndValidateReleaseEvidence,
+    validateReceiptIdentity,
+} from "./tools/artifact-contract.mjs";
 
 const bootstrapPath = path.join(
     repositoryRoot, "tools", "reflection", "bootstrap.mjs");
@@ -62,7 +71,7 @@ Usage:
   npm start -- integrate ROOT
   npm start -- build clangd [--jobs N]
   npm start -- build gcc [--jobs N] [--latest-release]
-  npm start -- download clangd|gcc [--tag TAG]
+  npm start -- download toolchain [--tag TAG]
   npm start -- package clangd [--force]
   npm start -- publish [--tag TAG] [--publish]
   npm start -- setup msys2 [--accept-system-changes]
@@ -145,8 +154,21 @@ function resolveJobs(values) {
 
 async function manifest() {
     const value = JSON.parse(await readFile(manifestPath, "utf8"));
-    if (value.schemaVersion !== 1) fail("unsupported toolchains.json schema");
+    if (![1, 2].includes(value.schemaVersion)) {
+        fail("unsupported toolchains.json schema");
+    }
     return value;
+}
+
+function clangConfiguration(configuration) {
+    const component = configuration.components.clangTools ??
+        configuration.components["clang-p2996"];
+    if (!component) fail("toolchain manifest has no clang tools component");
+    return {
+        ...component,
+        repository: component.repository ?? component.source?.repository,
+        revision: component.revision ?? component.source?.revision,
+    };
 }
 
 function compareVersions(left, right) {
@@ -182,7 +204,7 @@ async function showStatus(settings) {
     console.log(`Xmake override: ${settings.xmakePath ?? "system/default"}`);
     console.log(`release repository: ${settings.releaseRepository ?? "not assigned"}`);
 
-    const clangRevision = configuration.components["clang-p2996"].revision;
+    const clangRevision = clangConfiguration(configuration).revision;
     const clangInstall = path.join(
         settings.clangRoot, "clang-p2996", clangRevision, "install");
     const clangd = path.join(clangInstall, "bin", executableName("clangd"));
@@ -234,7 +256,8 @@ async function findClangRoot(root, revision) {
 
 async function validateGccRoot(root) {
     const configuration = await manifest();
-    const minimum = configuration.components.gcc.minimumCompatibleVersion;
+    const minimum = configuration.components.gcc.minimumCompatibleVersion ??
+        configuration.components.gcc.version;
     const compiler = path.join(root, "bin", executableName("g++"));
     if (!(await exists(compiler))) fail(`G++ is absent: ${compiler}`);
     const version = run(compiler, ["-dumpfullversion"]);
@@ -273,7 +296,7 @@ async function validateGccRoot(root) {
 async function integrate(root) {
     if (!root) fail("integrate requires an existing root");
     const configuration = await manifest();
-    const revision = configuration.components["clang-p2996"].revision;
+    const revision = clangConfiguration(configuration).revision;
     const clangRoot = await findClangRoot(root, revision);
     let gcc = null;
     try {
@@ -418,10 +441,43 @@ function extractArchive(file, destination) {
     }
 }
 
-async function downloadToolchain(settings, component, tag) {
+function artifactsForSet(configuration, toolchainSet) {
+    const artifacts = new Map(configuration.artifacts.map(
+        (artifact) => [artifact.id, artifact]));
+    return ["gcc", "clangTools"].map((component) => {
+        const artifact = artifacts.get(toolchainSet.components[component]);
+        if (!artifact) fail(`selected toolchain set has no ${component} artifact`);
+        return artifact;
+    });
+}
+
+function artifactInstall(root, artifact) {
+    return path.join(root, ...artifact.archiveRoot.split("/"));
+}
+
+async function verifyExtractedArtifact(root, artifact, configuration) {
+    const install = artifactInstall(root, artifact);
+    const embedded = await verifyBuildReceipt(install);
+    if (embedded.sha256 !== artifact.receipt.sha256) {
+        fail(`embedded receipt hash disagrees with artifact ${artifact.id}`);
+    }
+    validateReceiptIdentity(embedded.receipt, artifact, configuration);
+    return install;
+}
+
+async function saveInstalledSet(settings, root, artifacts) {
+    const gccArtifact = artifacts.find((artifact) => artifact.component === "gcc");
+    const gccRoot = artifactInstall(root, gccArtifact);
+    const update = {clangRoot: root, gccRoot};
+    if (settings.host === "win32-x64") update.ucrt64Root = gccRoot;
+    await saveHostSettings(update);
+    return update;
+}
+
+async function downloadToolchainSet(settings, tag) {
     const libc = settings.host === "linux-x64" ? detectLinuxLibc() : null;
     if (settings.host === "linux-x64" && libc.family !== "glibc") {
-        fail(sourceBuildAlternative(unsupportedLinuxMessage(libc, component)));
+        fail(sourceBuildAlternative(unsupportedLinuxMessage(libc, "toolchain set")));
     }
     const release = await githubRelease(settings.releaseRepository, tag);
     const temporary = await mkdtemp(path.join(tmpdir(), "move-toolchain-download-"));
@@ -440,89 +496,111 @@ async function downloadToolchain(settings, component, tag) {
         if (await sha256(downloadedManifest) !== expectedManifest) {
             fail("release manifest checksum mismatch");
         }
-        const releaseManifest = JSON.parse(await readFile(downloadedManifest, "utf8"));
-        const artifact = selectCompatibleArtifact(
-            releaseManifest.artifacts, component, settings.host, libc);
-        if (!artifact) {
+        const manifestHash = await sha256(downloadedManifest);
+        const releaseManifest = validateToolchainManifest(
+            JSON.parse(await readFile(downloadedManifest, "utf8")));
+        const toolchainSet = selectCompatibleToolchainSet(
+            releaseManifest, settings.host, libc);
+        if (!toolchainSet) {
             const message = settings.host === "linux-x64"
-                ? unsupportedLinuxMessage(libc, component)
-                : `release ${release.tag_name} has no ${component} artifact for ${settings.host}`;
-            fail(component === "clangd"
-                ? sourceBuildAlternative(message)
-                : message);
+                ? unsupportedLinuxMessage(libc, "toolchain set")
+                : `release ${release.tag_name} has no toolchain set for ${settings.host}`;
+            fail(sourceBuildAlternative(message));
         }
-        const archiveAsset = releaseAsset(release, artifact.file);
-        const checksumAsset = releaseAsset(release, artifact.checksumFile);
-        const archive = path.join(temporary, artifact.file);
-        const checksum = path.join(temporary, artifact.checksumFile);
-        await downloadAsset(archiveAsset, archive);
-        await downloadAsset(checksumAsset, checksum);
-        const expected = parseChecksum(await readFile(checksum, "utf8"), artifact.file);
-        if (await sha256(archive) !== expected || expected !== artifact.sha256) {
-            fail(`release checksum disagreement for ${artifact.file}`);
+        const artifacts = artifactsForSet(releaseManifest, toolchainSet);
+        const finalRoot = path.join(
+            settings.localRoot, "toolchain-sets", toolchainSet.profile,
+            manifestHash.slice(0, 16));
+        if (await exists(finalRoot)) {
+            for (const artifact of artifacts) {
+                await verifyExtractedArtifact(finalRoot, artifact, releaseManifest);
+            }
+            await saveInstalledSet(settings, finalRoot, artifacts);
+            console.log(`reused qualified toolchain set ${toolchainSet.id}: ${finalRoot}`);
+            return;
         }
 
-        const root = component === "clangd" ? settings.clangRoot : settings.localRoot;
-        await mkdir(root, {recursive: true});
-        const staging = path.join(root, `.download-${process.pid}-${Date.now()}`);
-        await mkdir(staging);
-        try {
-            inspectArchive(archive);
-            extractArchive(archive, staging);
-            if (component === "clangd") {
-                const revision = releaseManifest.source?.components?.["clang-p2996"]?.revision;
-                if (!/^[0-9a-f]{40}$/.test(revision ?? "")) {
-                    fail("release manifest has no full clang-p2996 revision");
-                }
-                const source = path.join(staging, "clang-p2996", revision);
-                const container = path.join(root, "clang-p2996");
-                const target = path.join(container, revision);
-                if (!(await exists(source))) fail("clang-p2996 archive layout is invalid");
-                if (await exists(target)) {
-                    fail(`clang-p2996 revision exists and was preserved: ${target}`);
-                }
-                await mkdir(container, {recursive: true});
-                await renameWithRetry(source, target);
-                const args = [
-                    bootstrapPath, "adopt", "--accept-prebuilt", "--root", root,
-                ];
-                if (settings.ucrt64Root) {
-                    args.push("--ucrt64-root", settings.ucrt64Root);
-                }
-                try {
-                    run(process.execPath, args, {inherit: true});
-                } catch (error) {
-                    const quarantine = `${target}.failed-${Date.now()}`;
-                    await renameWithRetry(target, quarantine);
-                    fail(`downloaded clang-p2996 failed qualification and was preserved at ${quarantine}: ${error.message}`);
-                }
-            } else {
-                const entries = await readdir(staging);
-                if (entries.length !== 1) fail("GCC archive must contain one root directory");
-                const container = path.join(root, entries[0]);
-                if (await exists(container)) {
-                    fail(`GCC target exists and was preserved: ${container}`);
-                }
-                await renameWithRetry(path.join(staging, entries[0]), container);
-                const nestedInstall = path.join(container, "install");
-                const target = await exists(path.join(nestedInstall, "bin", "g++.exe"))
-                    ? nestedInstall
-                    : container;
-                try {
-                    await validateGccRoot(target);
-                    await saveHostSettings({gccRoot: target});
-                } catch (error) {
-                    const quarantine = `${container}.failed-${Date.now()}`;
-                    await renameWithRetry(container, quarantine);
-                    fail(
-                        `downloaded GCC failed qualification and was preserved at ` +
-                        `${quarantine}: ${error.message}`);
-                }
+        const downloaded = new Map();
+        for (const artifact of artifacts) {
+            const checksumAsset = releaseAsset(release, artifact.checksumFile);
+            const evidenceAsset = releaseAsset(release, artifact.evidence.file);
+            const checksum = path.join(temporary, artifact.checksumFile);
+            const evidenceFile = path.join(temporary, artifact.evidence.file);
+            await downloadAsset(checksumAsset, checksum);
+            await downloadAsset(evidenceAsset, evidenceFile);
+            const evidenceText = await readFile(evidenceFile, "utf8");
+            if (await sha256(evidenceFile) !== artifact.evidence.sha256) {
+                fail(`release evidence hash disagrees with artifact ${artifact.id}`);
             }
-        } finally {
-            await rm(staging, {recursive: true, force: true});
+            parseAndValidateReleaseEvidence(evidenceText, artifact);
+            downloaded.set(artifact.id, {checksum, evidenceFile});
         }
-        console.log(`installed ${component} from ${settings.releaseRepository} ${release.tag_name}`);
+
+        for (const artifact of artifacts) {
+            const archiveAsset = releaseAsset(release, artifact.file);
+            const archive = path.join(temporary, artifact.file);
+            await downloadAsset(archiveAsset, archive);
+            const expected = parseChecksum(
+                await readFile(downloaded.get(artifact.id).checksum, "utf8"),
+                artifact.file);
+            const information = await stat(archive);
+            if (await sha256(archive) !== expected || expected !== artifact.sha256 ||
+                information.size !== artifact.bytes) {
+                fail(`release checksum or size disagreement for ${artifact.file}`);
+            }
+            inspectArchive(archive);
+            downloaded.get(artifact.id).archive = archive;
+        }
+
+        const qualificationRoot = path.join(temporary, "qualification set with spaces");
+        await mkdir(qualificationRoot);
+        for (const artifact of artifacts) {
+            extractArchive(downloaded.get(artifact.id).archive, qualificationRoot);
+            await verifyExtractedArtifact(
+                qualificationRoot, artifact, releaseManifest);
+        }
+        const gccArtifact = artifacts.find((artifact) => artifact.component === "gcc");
+        const gccRoot = artifactInstall(qualificationRoot, gccArtifact);
+        await validateGccRoot(gccRoot);
+        const clangArguments = [
+            bootstrapPath, "adopt", "--accept-prebuilt", "--root",
+            qualificationRoot,
+        ];
+        if (settings.host === "win32-x64") {
+            clangArguments.push("--ucrt64-root", gccRoot);
+        }
+        run(process.execPath, clangArguments, {inherit: true});
+        const clangRevision = releaseManifest.components.clangTools.source.revision;
+        const localQualificationRelative = path.join(
+            "clang-p2996", clangRevision, "local-qualification.json");
+        const localQualification = path.join(
+            qualificationRoot, localQualificationRelative);
+        if (!(await exists(localQualification))) {
+            fail("clang prebuilt qualification did not produce a local marker");
+        }
+
+        const parent = path.dirname(finalRoot);
+        await mkdir(parent, {recursive: true});
+        const activationRoot = path.join(
+            parent, `.staging-${manifestHash.slice(0, 16)}-${process.pid}`);
+        await rm(activationRoot, {recursive: true, force: true});
+        await mkdir(activationRoot);
+        try {
+            for (const artifact of artifacts) {
+                extractArchive(downloaded.get(artifact.id).archive, activationRoot);
+                await verifyExtractedArtifact(
+                    activationRoot, artifact, releaseManifest);
+            }
+            const activationQualification = path.join(
+                activationRoot, localQualificationRelative);
+            await mkdir(path.dirname(activationQualification), {recursive: true});
+            await copyFile(localQualification, activationQualification);
+            await renameWithRetry(activationRoot, finalRoot);
+        } finally {
+            await rm(activationRoot, {recursive: true, force: true});
+        }
+        await saveInstalledSet(settings, finalRoot, artifacts);
+        console.log(`installed atomic toolchain set ${toolchainSet.id}: ${finalRoot}`);
     } finally {
         await rm(temporary, {recursive: true, force: true});
     }
@@ -675,9 +753,9 @@ async function interactive() {
             console.log("  2. Assign workspace/build root");
             console.log("  3. Assign or integrate clangd root");
             console.log("  4. Build clang-p2996");
-            console.log("  5. Download latest compatible clangd");
+            console.log("  5. Download latest compatible GCC + clangd set");
             console.log("  6. Assign or integrate GCC root");
-            console.log("  7. Download latest compatible GCC prebuilt");
+            console.log("  7. Download latest compatible GCC + clangd set");
             console.log("  8. Build configured GCC release");
             console.log("  9. Build latest official stable GCC release");
             console.log(" 10. Set up/check MSYS2 UCRT64 GCC");
@@ -697,10 +775,10 @@ async function interactive() {
                     await ask("Existing clang-p2996 workspace or install root", settings.clangRoot));
                 else if (choice === "4") await buildClang(settings,
                     Number(await ask("Parallel jobs", "20")));
-                else if (choice === "5") await downloadToolchain(settings, "clangd", "latest");
+                else if (choice === "5") await downloadToolchainSet(settings, "latest");
                 else if (choice === "6") await integrate(
                     await ask("Existing GCC/UCRT64 root", settings.gccRoot));
-                else if (choice === "7") await downloadToolchain(settings, "gcc", "latest");
+                else if (choice === "7") await downloadToolchainSet(settings, "latest");
                 else if (choice === "8") await buildGcc(settings,
                     Number(await ask("Parallel jobs", "20")), false);
                 else if (choice === "9") await buildGcc(settings,
@@ -748,8 +826,14 @@ async function main() {
     } else if (command === "build" && subject === "gcc") {
         await buildGcc(settings, resolveJobs(parsed.values),
             parsed.flags.has("--latest-release"));
-    } else if (command === "download" && ["clangd", "gcc"].includes(subject)) {
-        await downloadToolchain(settings, subject, parsed.values.get("--tag") ?? "latest");
+    } else if (command === "download" &&
+        ["toolchain", "clangd", "gcc"].includes(subject)) {
+        if (subject !== "toolchain") {
+            console.log(
+                `${subject} is installed only as part of its compatible GCC + clangd set`);
+        }
+        await downloadToolchainSet(
+            settings, parsed.values.get("--tag") ?? "latest");
     } else if (command === "package" && subject === "clangd") {
         await packageClang(settings, parsed.flags.has("--force"));
     } else if (command === "publish") {

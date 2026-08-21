@@ -129,12 +129,21 @@ async function readJson(file) {
     return JSON.parse(await readFile(file, "utf8"));
 }
 
-async function readConfiguration() {
-    const root = await readJson(configPath);
-    if (root.schemaVersion !== 1 || !root.components?.["clang-p2996"]) {
+export function reflectionConfiguration(root) {
+    let config = null;
+    if (root.schemaVersion === 1) {
+        config = root.components?.["clang-p2996"] ?? null;
+    } else if (root.schemaVersion === 2 && root.components?.clangTools) {
+        const component = root.components.clangTools;
+        config = {
+            ...component,
+            repository: component.source?.repository,
+            revision: component.source?.revision,
+        };
+    }
+    if (!config) {
         fail("unsupported reflection toolchain configuration schema");
     }
-    const config = root.components["clang-p2996"];
     if (!/^[0-9a-f]{40}$/.test(config.revision)) {
         fail("toolchain revision must be a full lowercase Git commit");
     }
@@ -146,6 +155,10 @@ async function readConfiguration() {
         fail("reflection toolchain host configurations are missing");
     }
     return config;
+}
+
+async function readConfiguration() {
+    return reflectionConfiguration(await readJson(configPath));
 }
 
 function hostIdentity() {
@@ -182,15 +195,21 @@ function resolveJobs(values) {
     return jobs;
 }
 
-function configurationIdentity(config, profile, ucrt64Root) {
+export function reflectionConfigurationIdentity(
+    config, profile, ucrt64Root, host = hostIdentity()) {
     return createHash("sha256").update(JSON.stringify({
-        host: hostIdentity(),
+        host,
         repository: config.repository,
         revision: config.revision,
         profile,
-        ucrt64Root,
+        ucrt64: ucrt64Root ? {
+            gccVersion: profile.gccVersion,
+            gccTarget: profile.gccTarget,
+        } : null,
     })).digest("hex");
 }
+
+const configurationIdentity = reflectionConfigurationIdentity;
 
 function pathsFor(config, toolchainRoot) {
     const root = path.join(toolchainRoot, "clang-p2996", config.revision);
@@ -200,6 +219,7 @@ function pathsFor(config, toolchainRoot) {
         build: path.join(root, "build"),
         staging: path.join(root, "staging"),
         install: path.join(root, "install"),
+        localQualification: path.join(root, "local-qualification.json"),
         lock: path.join(root, "install.lock"),
         buildState: path.join(root, "build-state.json"),
     };
@@ -403,6 +423,15 @@ async function readQualification(install) {
     }
 }
 
+async function readEffectiveQualification(paths) {
+    try {
+        return await readJson(paths.localQualification);
+    } catch (error) {
+        if (error.code !== "ENOENT") throw error;
+    }
+    return await readQualification(paths.install);
+}
+
 function qualifiedMarker(marker, config, profile, ucrt64Root) {
     return marker?.schemaVersion === config.qualificationSchemaVersion &&
         marker.qualified === true &&
@@ -415,7 +444,7 @@ function qualifiedMarker(marker, config, profile, ucrt64Root) {
 
 async function status(config, profile, toolchainRoot, ucrt64Root) {
     const paths = pathsFor(config, toolchainRoot);
-    const marker = await readQualification(paths.install);
+    const marker = await readEffectiveQualification(paths);
     const markerQualified = qualifiedMarker(
         marker, config, profile, ucrt64Root);
     const clangxx = markerQualified
@@ -772,11 +801,11 @@ async function runtimeLibraryDirectory(install) {
     return null;
 }
 
-async function qualifyFullToolchain(config, profile, install) {
+async function qualifyFullToolchain(config, profile, install, scratchRoot = null) {
     const clangxx = path.join(
         install, "bin", executableName("clang++"));
     const clangd = path.join(install, "bin", executableName("clangd"));
-    const smokeRoot = path.join(install, "move-smoke");
+    const smokeRoot = scratchRoot ?? path.join(install, "move-smoke");
     await mkdir(smokeRoot, {recursive: true});
     const source = path.join(smokeRoot, "reflection.cpp");
     const executable = path.join(smokeRoot, "reflection");
@@ -873,7 +902,7 @@ async function stageLibcxxHeaders(profile, paths) {
 }
 
 async function qualifyLanguageServer(
-    config, profile, install, ucrt64Root) {
+    config, profile, install, ucrt64Root, scratchRoot = null) {
     const clangxx = path.join(
         install, "bin", executableName("clang++"));
     const clangd = path.join(install, "bin", executableName("clangd"));
@@ -884,7 +913,7 @@ async function qualifyLanguageServer(
             fail(`Windows language-server qualification is missing: ${required}`);
         }
     }
-    const smokeRoot = path.join(install, "move-smoke");
+    const smokeRoot = scratchRoot ?? path.join(install, "move-smoke");
     await mkdir(smokeRoot, {recursive: true});
     const source = path.join(smokeRoot, "reflection.cpp");
     await writeFile(source, reflectionSmoke);
@@ -916,13 +945,14 @@ async function qualifyLanguageServer(
     return qualificationMarker(config, profile, ucrt64Root);
 }
 
-async function qualify(config, profile, install, ucrt64Root) {
+async function qualify(config, profile, install, ucrt64Root, scratchRoot = null) {
     if (profile.qualificationKind === "full-toolchain") {
-        return await qualifyFullToolchain(config, profile, install);
+        return await qualifyFullToolchain(
+            config, profile, install, scratchRoot);
     }
     if (profile.qualificationKind === "language-server") {
         return await qualifyLanguageServer(
-            config, profile, install, ucrt64Root);
+            config, profile, install, ucrt64Root, scratchRoot);
     }
     fail(`unsupported qualification kind: ${profile.qualificationKind}`);
 }
@@ -955,12 +985,15 @@ async function adopt(
         if (!prebuiltMarker(lockedMarker, config, profile)) {
             fail("prebuilt marker changed while acquiring the install lock");
         }
-        const adoptedMarker = await qualify(
-            config, profile, paths.install, ucrt64Root);
-        throwIfInterrupted();
-        await atomicJson(
-            path.join(paths.install, "move-qualification.json"),
-            adoptedMarker);
+        const scratch = await mkdtemp(path.join(paths.root, "adopt-smoke-"));
+        try {
+            const adoptedMarker = await qualify(
+                config, profile, paths.install, ucrt64Root, scratch);
+            throwIfInterrupted();
+            await atomicJson(paths.localQualification, adoptedMarker);
+        } finally {
+            await rm(scratch, {recursive: true, force: true});
+        }
         console.log("trusted prebuilt qualified for this host");
         console.log("run configure to select it for development");
     } finally {
@@ -974,7 +1007,7 @@ async function install(
         fail("install requires --accept-cost after reviewing help and doctor");
     }
     const paths = pathsFor(config, toolchainRoot);
-    const existing = await readQualification(paths.install);
+    const existing = await readEffectiveQualification(paths);
     if (qualifiedMarker(existing, config, profile, ucrt64Root)) {
         console.log("matching qualified installation already exists");
         return;
@@ -1014,12 +1047,14 @@ async function install(
         const lockedExisting = await readQualification(paths.install);
         if (qualifiedMarker(
             lockedExisting, config, profile, ucrt64Root)) {
+            await rm(paths.localQualification, {force: true});
             console.log("matching qualified installation already exists");
             return;
         }
         if (await exists(paths.install)) {
             fail(`unqualified installation exists and was preserved: ${paths.install}`);
         }
+        await rm(paths.localQualification, {force: true});
         await ensureSource(config, paths);
         await ensureBuildState(config, profile, paths, ucrt64Root);
         await mkdir(paths.staging, {recursive: true});
@@ -1071,7 +1106,7 @@ async function importBuild(
     const source = path.resolve(values.get("--source"));
     const build = path.resolve(values.get("--build"));
     const paths = pathsFor(config, toolchainRoot);
-    const existing = await readQualification(paths.install);
+    const existing = await readEffectiveQualification(paths);
     if (qualifiedMarker(existing, config, profile, ucrt64Root)) {
         console.log("matching qualified installation already exists");
         return;
@@ -1095,6 +1130,7 @@ async function importBuild(
         }
     };
     try {
+        await rm(paths.localQualification, {force: true});
         if (await exists(paths.install)) {
             fail(`unqualified installation exists and was preserved: ${paths.install}`);
         }
@@ -1138,7 +1174,7 @@ async function importBuild(
 async function configure(
     config, profile, flags, toolchainRoot, ucrt64Root) {
     const paths = pathsFor(config, toolchainRoot);
-    const marker = await readQualification(paths.install);
+    const marker = await readEffectiveQualification(paths);
     if (!qualifiedMarker(marker, config, profile, ucrt64Root)) {
         fail("no matching qualified installation; run status or install");
     }
@@ -1240,7 +1276,9 @@ async function main() {
     fail(`unknown command: ${command}`);
 }
 
-main().catch((error) => {
-    console.error(`error: ${error.message}`);
-    process.exitCode = error.exitCode ?? 1;
-});
+if (process.argv[1] && path.resolve(process.argv[1]) === scriptPath) {
+    main().catch((error) => {
+        console.error(`error: ${error.message}`);
+        process.exitCode = error.exitCode ?? 1;
+    });
+}
