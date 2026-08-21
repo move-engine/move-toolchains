@@ -139,6 +139,13 @@ function validateResolvedArtifact(artifact, id) {
         !sha256Pattern.test(receipt.installedTreeDigest ?? "")) {
         fail(`artifact ${id} has invalid receipt identity`);
     }
+    const evidence = requireObject(artifact.evidence, `artifact ${id} evidence`);
+    if (evidence.schemaVersion !== 1 ||
+        safeArchivePath(evidence.file, `artifact ${id} evidence file`) !==
+            `${file}.evidence.json` ||
+        !sha256Pattern.test(evidence.sha256 ?? "")) {
+        fail(`artifact ${id} has invalid release evidence identity`);
+    }
     return file;
 }
 

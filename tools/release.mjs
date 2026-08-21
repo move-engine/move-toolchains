@@ -5,13 +5,22 @@ import {spawnSync} from "node:child_process";
 import {
     access,
     mkdir,
+    mkdtemp,
     readFile,
+    rm,
     stat,
     writeFile,
 } from "node:fs/promises";
+import {tmpdir} from "node:os";
 import path from "node:path";
 import process from "node:process";
 import {fileURLToPath} from "node:url";
+import {
+    buildReceiptFile,
+    canonicalJson,
+    verifyBuildReceipt,
+} from "./build-receipt.mjs";
+import {validateToolchainManifest} from "./toolchain-set.mjs";
 
 const scriptPath = fileURLToPath(import.meta.url);
 const repositoryRoot = path.resolve(path.dirname(scriptPath), "..");
@@ -107,25 +116,8 @@ async function exists(file) {
 
 async function readConfiguration() {
     const configuration = JSON.parse(await readFile(configurationPath, "utf8"));
-    if (configuration.schemaVersion !== 1 ||
-        !configuration.release ||
-        !Array.isArray(configuration.artifacts) ||
-        configuration.artifacts.length === 0) {
-        fail("unsupported or incomplete toolchains.json schema");
-    }
-    const ids = new Set();
-    const files = new Set();
-    for (const artifact of configuration.artifacts) {
-        if (!artifact.id || !artifact.file || !artifact.checksumFile ||
-            !artifact.archiveRoot || !Array.isArray(artifact.requiredEntries)) {
-            fail("artifact entries require id, file, checksumFile, archiveRoot, and requiredEntries");
-        }
-        if (ids.has(artifact.id)) fail(`duplicate artifact id: ${artifact.id}`);
-        if (files.has(artifact.file)) fail(`duplicate artifact file: ${artifact.file}`);
-        ids.add(artifact.id);
-        files.add(artifact.file);
-    }
-    return configuration;
+    if (!configuration.release) fail("toolchains.json has no release declaration");
+    return validateToolchainManifest(configuration);
 }
 
 function resolveDirectories(values, tag) {
@@ -172,35 +164,118 @@ function inspectArchive(file) {
     return new Set(entries);
 }
 
+function extractArchive(file, destination) {
+    if (file.toLowerCase().endsWith(".zip") && process.platform !== "win32") {
+        run("unzip", ["-q", file, "-d", destination]);
+    } else {
+        run("tar", ["-xf", file, "-C", destination]);
+    }
+}
+
+function validateReleaseEvidence(evidence, artifact) {
+    if (evidence.schemaVersion !== 1 || evidence.component !== artifact.component ||
+        evidence.profile !== artifact.profile ||
+        evidence.artifact?.file !== artifact.file ||
+        evidence.artifact?.bytes !== artifact.bytes ||
+        evidence.artifact?.sha256 !== artifact.sha256 ||
+        evidence.receipt?.file !== artifact.receipt.file ||
+        evidence.receipt?.sha256 !== artifact.receipt.sha256 ||
+        evidence.receipt?.installedTreeDigest !==
+            artifact.receipt.installedTreeDigest) {
+        fail(`release evidence disagrees with artifact ${artifact.id}`);
+    }
+    if (!Array.isArray(evidence.cases)) {
+        fail(`release evidence for ${artifact.id} has no case results`);
+    }
+    const cases = new Map();
+    for (const entry of evidence.cases) {
+        if (!entry || typeof entry.id !== "string" || cases.has(entry.id)) {
+            fail(`release evidence for ${artifact.id} has an invalid case set`);
+        }
+        cases.set(entry.id, entry);
+    }
+    const required = [
+        "archive-checksum",
+        "archive-relocation-path-with-spaces",
+        "archive-runtime-closure",
+        "archive-reflection-and-modules",
+    ];
+    if (artifact.component === "gcc" &&
+        artifact.profile === "windows-x86_64-ucrt64") {
+        required.push("archive-win64-avx-stack-alignment");
+    }
+    for (const id of required) {
+        if (cases.get(id)?.status !== "passed") {
+            fail(`release evidence for ${artifact.id} lacks passing case ${id}`);
+        }
+    }
+}
+
+function validateReceiptIdentity(receipt, artifact, configuration) {
+    const component = configuration.components[artifact.component];
+    if (receipt.component !== artifact.component ||
+        receipt.componentVersion !== component.version ||
+        receipt.packageRevision !== component.packageRevision ||
+        receipt.profile !== artifact.profile ||
+        receipt.manifestDigest !== artifact.derivation.configurationDigest ||
+        receipt.source.revision !== artifact.derivation.sourceRevision ||
+        receipt.source.upstreamBaseRevision !==
+            artifact.derivation.upstreamBaseRevision ||
+        JSON.stringify(receipt.source.patchRevisions) !==
+            JSON.stringify(artifact.derivation.patchRevisions) ||
+        receipt.installedTree.digest !== artifact.receipt.installedTreeDigest) {
+        fail(`embedded receipt disagrees with artifact ${artifact.id}`);
+    }
+}
+
 export async function verifyArtifacts(configuration, artifactDirectory) {
     const verified = [];
     for (const artifact of configuration.artifacts) {
         const archive = path.join(artifactDirectory, artifact.file);
         const checksumFile = path.join(artifactDirectory, artifact.checksumFile);
+        const evidenceFile = path.join(artifactDirectory, artifact.evidence.file);
         if (!(await exists(archive))) fail(`required artifact is missing: ${archive}`);
         if (!(await exists(checksumFile))) fail(`required checksum is missing: ${checksumFile}`);
+        if (!(await exists(evidenceFile))) {
+            fail(`required release evidence is missing: ${evidenceFile}`);
+        }
         const expected = parseChecksum(await readFile(checksumFile, "utf8"), artifact.file);
         const actual = await sha256(archive);
-        if (actual !== expected) {
+        const information = await stat(archive);
+        if (actual !== expected || actual !== artifact.sha256 ||
+            information.size !== artifact.bytes) {
             fail(`SHA-256 mismatch for ${artifact.file}: expected ${expected}, got ${actual}`);
         }
         const entries = inspectArchive(archive);
-        for (const required of artifact.requiredEntries) {
-            const full = normalizeArchiveEntry(`${artifact.archiveRoot}/${required}`);
-            if (!entries.has(full)) {
-                fail(`${artifact.file} is missing required entry ${full}`);
-            }
+        const receiptEntry = normalizeArchiveEntry(
+            `${artifact.archiveRoot}/${buildReceiptFile}`);
+        if (!entries.has(receiptEntry)) {
+            fail(`${artifact.file} is missing embedded receipt ${receiptEntry}`);
         }
-        const information = await stat(archive);
-        verified.push({
-            id: artifact.id,
-            host: artifact.host,
-            file: artifact.file,
-            checksumFile: artifact.checksumFile,
-            sha256: actual,
-            bytes: information.size,
-            requirements: artifact.requirements ?? {},
-        });
+        const evidenceText = await readFile(evidenceFile, "utf8");
+        if (await sha256(evidenceFile) !== artifact.evidence.sha256) {
+            fail(`release evidence hash disagrees with artifact ${artifact.id}`);
+        }
+        const evidence = JSON.parse(evidenceText);
+        if (canonicalJson(evidence) !== evidenceText) {
+            fail(`release evidence is not canonical JSON: ${evidenceFile}`);
+        }
+        validateReleaseEvidence(evidence, artifact);
+
+        const temporary = await mkdtemp(path.join(tmpdir(), "move-release-verify-"));
+        try {
+            extractArchive(archive, temporary);
+            const install = path.join(
+                temporary, ...artifact.archiveRoot.split("/"));
+            const embedded = await verifyBuildReceipt(install);
+            if (embedded.sha256 !== artifact.receipt.sha256) {
+                fail(`embedded receipt hash disagrees with artifact ${artifact.id}`);
+            }
+            validateReceiptIdentity(embedded.receipt, artifact, configuration);
+        } finally {
+            await rm(temporary, {recursive: true, force: true});
+        }
+        verified.push({...artifact});
     }
     return verified;
 }
@@ -208,12 +283,11 @@ export async function verifyArtifacts(configuration, artifactDirectory) {
 async function writeReleaseMetadata(configuration, verified, outputDirectory, tag) {
     await mkdir(outputDirectory, {recursive: true});
     const manifest = {
-        schemaVersion: 1,
+        ...configuration,
         tag,
         generatedAt: new Date().toISOString(),
         source: {
             repositoryCommit: tryRun("git", ["rev-parse", "HEAD"]),
-            components: configuration.components,
         },
         artifacts: verified,
     };
@@ -232,7 +306,8 @@ async function writeReleaseMetadata(configuration, verified, outputDirectory, ta
         "## Assets",
         "",
         ...verified.map((artifact) =>
-            `- \`${artifact.file}\` — ${artifact.host}, SHA-256 \`${artifact.sha256}\``),
+            `- \`${artifact.file}\` — ${artifact.component}, ${artifact.profile}, ` +
+            `SHA-256 \`${artifact.sha256}\``),
         "",
         "Verify the downloaded archive against its adjacent `.sha256` file before extraction.",
         "",
@@ -387,6 +462,8 @@ async function publish(configuration, flags, values) {
     for (const artifact of release.verified) {
         assetPaths.push(path.join(release.artifactDirectory, artifact.file));
         assetPaths.push(path.join(release.artifactDirectory, artifact.checksumFile));
+        assetPaths.push(path.join(
+            release.artifactDirectory, artifact.evidence.file));
     }
     assetPaths.push(release.metadata.manifestPath);
     assetPaths.push(release.metadata.manifestChecksumPath);

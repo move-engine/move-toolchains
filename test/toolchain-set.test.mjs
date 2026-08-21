@@ -73,6 +73,11 @@ function fixture() {
                     sha256: "f".repeat(64),
                     installedTreeDigest: "1".repeat(64),
                 },
+                evidence: {
+                    schemaVersion: 1,
+                    file: `${gcc}.tar.gz.evidence.json`,
+                    sha256: "7".repeat(64),
+                },
             },
             {
                 id: clangTools,
@@ -94,6 +99,11 @@ function fixture() {
                     file: "move-build-receipt.json",
                     sha256: "5".repeat(64),
                     installedTreeDigest: "6".repeat(64),
+                },
+                evidence: {
+                    schemaVersion: 1,
+                    file: `${clangTools}.tar.gz.evidence.json`,
+                    sha256: "8".repeat(64),
                 },
             },
         );
@@ -181,6 +191,7 @@ test("requires archive, derivation, and receipt identities", () => {
         ["sourceRevision", (artifact) => artifact.derivation.sourceRevision = "bad"],
         ["derivation", (artifact) => artifact.derivation.configurationDigest = "bad"],
         ["receipt", (artifact) => artifact.receipt.installedTreeDigest = "bad"],
+        ["evidence", (artifact) => artifact.evidence.sha256 = "bad"],
         ["safe relative", (artifact) => artifact.file = "../escape.tar.gz"],
     ];
     for (const [message, mutate] of cases) {
