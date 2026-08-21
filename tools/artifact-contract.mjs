@@ -59,7 +59,8 @@ export function validateReleaseEvidence(evidence, artifact) {
     if (artifact.component === "gcc") {
         required.push("archive-reflection-and-modules");
     } else if (artifact.component === "clangTools") {
-        required.push("archive-reflection-runtime", "archive-module-lsp");
+        required.push("archive-reflection-runtime",
+            "archive-import-std-reflection", "archive-module-lsp");
     } else {
         fail(`release evidence has unknown component ${artifact.component}`);
     }

@@ -19,6 +19,7 @@
     "import-build:clangd": "node tools/reflection/bootstrap.mjs import-build --accept-existing-build",
     "package:clang-p2996": "node tools/package-clang-p2996.mjs",
     "package:clang-p2996:linux": "node tools/package-linux-clang-p2996.mjs",
+    "qualify:clang-module-lsp": "node tools/qualify-clang-module-lsp.mjs",
     "record:clang-module-evidence": "node tools/record-clang-module-evidence.mjs",
     "package:gcc:windows": "node tools/package-gcc-windows.mjs",
     "package:gcc:linux": "node tools/package-gcc-linux.mjs",

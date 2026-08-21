@@ -5,7 +5,7 @@ import {fileURLToPath} from "node:url";
 import {canonicalJson} from "./build-receipt.mjs";
 
 export const importedNamespaceProbeRevision =
-    "06105d7c2cc9fa78c6db10231ace8c6847cadb67";
+    "move-toolchains-import-std-lsp-v1";
 
 function fail(message) {
     throw new Error(message);
@@ -20,11 +20,11 @@ function positiveInteger(value, name) {
 
 export function moduleLspCase(result, expectedRevision, expectedHost) {
     if (!result || typeof result !== "object" ||
+        result.probeRevision !== importedNamespaceProbeRevision ||
         result.toolchainRevision !== expectedRevision ||
         result.toolchainHost !== expectedHost || result.hover !== true ||
         result.importedPrepareRename !== true || result.prepareRename !== true ||
-        result.completionHasRecord !== true ||
-        result.completionHasWeightedValue !== true ||
+        result.completionHasImportedMember !== true ||
         result.diagnosticCount !== 0 ||
         !Array.isArray(result.diagnostics) || result.diagnostics.length !== 0) {
         fail("clang module LSP probe did not pass the exact toolchain contract");
@@ -69,6 +69,11 @@ export function addModuleLspEvidence(evidence, result, configuration) {
         candidate.id === "archive-reflection-runtime" ||
         candidate.id === "archive-reflection-and-modules")) {
         fail("clang release evidence lacks its packaged reflection runtime case");
+    }
+    if (!evidence.cases.some(candidate =>
+        candidate.id === "archive-import-std-reflection" &&
+        candidate.status === "passed")) {
+        fail("clang release evidence lacks its packaged import std reflection case");
     }
     const cases = evidence.cases.filter(candidate =>
         candidate.id !== "archive-module-lsp" &&

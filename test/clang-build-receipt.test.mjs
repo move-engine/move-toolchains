@@ -42,6 +42,25 @@ test("records the exact normalized bootstrap CMake policy", () => {
         "-DCMAKE_BUILD_TYPE=Release",
     ]);
     assert.ok(arguments_.includes("-DLLVM_ENABLE_PROJECTS=clang;clang-tools-extra"));
+    assert.ok(arguments_.includes("-DLIBCXX_INSTALL_MODULES=ON"));
+});
+
+test("records distinct Windows and Linux libc++ module installation strategies", () => {
+    const common = {
+        profile: "windows-x86_64-ucrt64",
+        builderIdentity: "fixture-builder",
+        bootstrapVersion: "fixture compiler",
+        configuration: {generator: "Ninja", buildType: "Release"},
+        installTargets: ["install-clang", "install-clangd"],
+        environment: {}, sourceTree: "f".repeat(40),
+    };
+    const windows = clangReceiptInput({...common, stageLibcxxHeaders: true});
+    const nested = clangReceiptInput(common);
+    assert.notEqual(windows.manifestDigest, nested.manifestDigest);
+    assert.equal(windows.build.installCommands.at(-1)[0],
+        "stage-libcxx-module-sources");
+    assert.equal(nested.build.installCommands.at(-1).at(-1),
+        "install-cxx-modules");
 });
 
 test("binds a paired GCC runtime archive into Linux clang derivation", () => {

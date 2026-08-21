@@ -54,7 +54,7 @@ function usage() {
 
 Usage:
   npm run package:clang-p2996 -- [--root PATH] [--output-dir PATH]
-      --source-root PATH --build-root PATH --nez-root PATH
+      --source-root PATH --build-root PATH
       [--ucrt64-root PATH] [--vc-runtime-dir PATH] [--force]
 
 The package is assembled from ROOT/clang-p2996/<revision>/install, receives the
@@ -68,7 +68,7 @@ function parseArguments(argv) {
     const flagNames = new Set(["--force"]);
     const valueNames = new Set([
         "--root", "--output-dir", "--ucrt64-root", "--vc-runtime-dir",
-        "--source-root", "--build-root", "--nez-root",
+        "--source-root", "--build-root",
     ]);
     for (let index = 0; index < argv.length; ++index) {
         const name = argv[index];
@@ -84,7 +84,7 @@ function parseArguments(argv) {
         if (!value || value.startsWith("--")) fail(`${name} requires a value`);
         values.set(name, value);
     }
-    for (const required of ["--source-root", "--build-root", "--nez-root"]) {
+    for (const required of ["--source-root", "--build-root"]) {
         if (!values.has(required)) fail(`${required} is required`);
     }
     return {help: false, flags, values};
@@ -222,7 +222,6 @@ async function main() {
         "C:\\msys64\\ucrt64");
     const sourceRoot = path.resolve(values.get("--source-root"));
     const buildRoot = path.resolve(values.get("--build-root"));
-    const nezRoot = path.resolve(values.get("--nez-root"));
     const configuration = JSON.parse(await readFile(configurationPath, "utf8"));
     const rawReflection = configuration.components?.clangTools ??
         configuration.components?.["clang-p2996"];
@@ -309,8 +308,6 @@ async function main() {
         await writeFile(path.join(stagedInstall, "move-artifact.json"),
             `${JSON.stringify(artifactMetadata, null, 2)}\n`);
 
-        run(process.execPath, [path.join(
-            nezRoot, "tools", "reflection", "compdb_test.mjs")]);
         const profile = "windows-x86_64-ucrt64";
         const receiptInput = clangReceiptInput({
             profile,
@@ -320,6 +317,7 @@ async function main() {
                 "MSVC version recorded by the pinned Release build",
             configuration: reflection.hosts["win32-x64"].configuration,
             installTargets: reflection.hosts["win32-x64"].installTargets,
+            stageLibcxxHeaders: true,
             environment: {},
             sourceTree,
         });
@@ -372,6 +370,7 @@ async function main() {
                 {id: "archive-relocation-path-with-spaces", status: "passed"},
                 {id: "archive-runtime-closure", status: "passed"},
                 {id: "archive-reflection-runtime", status: "passed"},
+                {id: "archive-import-std-reflection", status: "passed"},
             ],
             componentIdentity: {
                 version: clangToolsVersion,

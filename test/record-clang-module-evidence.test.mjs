@@ -11,7 +11,10 @@ const evidence = {
     component: "clangTools",
     profile: "windows-x86_64-ucrt64",
     artifact: {file: "clang.zip", bytes: 1, sha256: "b".repeat(64)},
-    cases: [{id: "archive-reflection-runtime", status: "passed"}],
+    cases: [
+        {id: "archive-reflection-runtime", status: "passed"},
+        {id: "archive-import-std-reflection", status: "passed"},
+    ],
 };
 const configuration = {
     components: {clangTools: {source: {revision}}},
@@ -19,11 +22,12 @@ const configuration = {
         file: evidence.artifact.file, sha256: evidence.artifact.sha256}],
 };
 const result = {
+    probeRevision: importedNamespaceProbeRevision,
     toolchainHost: "win32-x64", toolchainRevision: revision,
     hover: true, definitionLocations: 1, referenceLocations: 3,
     importedPrepareRename: true, importedRenameDocuments: 3,
     prepareRename: true, renameDocuments: 1, semanticTokenWords: 11,
-    completionHasRecord: true, completionHasWeightedValue: true,
+    completionHasImportedMember: true,
     diagnosticCount: 0, diagnostics: [],
 };
 
@@ -38,7 +42,10 @@ test("records exact successful clang module LSP evidence", () => {
 test("narrows legacy packaging evidence before adding exact LSP evidence", () => {
     const updated = addModuleLspEvidence({
         ...evidence,
-        cases: [{id: "archive-reflection-and-modules", status: "passed"}],
+        cases: [
+            {id: "archive-reflection-and-modules", status: "passed"},
+            {id: "archive-import-std-reflection", status: "passed"},
+        ],
     }, result, configuration);
     assert.equal(updated.cases.some(candidate =>
         candidate.id === "archive-reflection-and-modules"), false);

@@ -26,8 +26,7 @@ Usage:
       [--distro NAME]
   npm run ubuntu2204:clangd -- build [--root LINUX_PATH] [--jobs N]
       [--distro NAME]
-  npm run ubuntu2204:clangd -- package [--root LINUX_PATH]
-      --nez-root PATH [--output-dir PATH] [--distro NAME] [--force]
+  npm run ubuntu2204:clangd -- package [--root LINUX_PATH] [--output-dir PATH] [--distro NAME] [--force]
   npm run ubuntu2204:clangd -- shell [--distro NAME]
 
 The build and package run inside the pinned Ubuntu 22.04/glibc 2.35 image.
@@ -46,8 +45,7 @@ function parseArguments(argv) {
             flags.add(name);
             continue;
         }
-        if (!["--root", "--jobs", "--output-dir", "--storage-root", "--distro",
-            "--nez-root"]
+        if (!["--root", "--jobs", "--output-dir", "--storage-root", "--distro"]
             .includes(name)) {
             fail(`unknown argument: ${name}`);
         }
@@ -167,7 +165,7 @@ function runInWsl(distro, args, options = {}) {
     ], options);
 }
 
-function containerArguments(root, outputDirectory = null, nezRoot = null) {
+function containerArguments(root, outputDirectory = null) {
     const args = [
         "run", "--rm", "--platform", "linux/amd64",
         "--mount", `type=bind,source=${repositoryRoot},target=/repo,readonly`,
@@ -177,9 +175,6 @@ function containerArguments(root, outputDirectory = null, nezRoot = null) {
     ];
     if (outputDirectory) {
         args.push("--mount", `type=bind,source=${outputDirectory},target=/artifacts`);
-    }
-    if (nezRoot) {
-        args.push("--mount", `type=bind,source=${nezRoot},target=/nez,readonly`);
     }
     return args;
 }
@@ -218,7 +213,6 @@ function main() {
     }
     const outputDirectory = resolvedValue(values, "--output-dir",
         path.join(repositoryRoot, ".local", "prebuilt"));
-    const nezRoot = resolvedValue(values, "--nez-root");
     if (process.platform === "win32") {
         if (command === "build") {
             runInWsl(distro, [
@@ -228,13 +222,11 @@ function main() {
             return;
         }
         if (command === "package") {
-            if (!nezRoot) fail("package requires --nez-root PATH");
             runInWsl(distro, [
                 "node", "tools/package-linux-clang-p2996.mjs",
                 "--root", root,
                 "--source-root", `${root}/clang-p2996/7220baffd57ea5b0f8cf59bee494dd5b7cc2b748/source`,
                 "--build-root", `${root}/clang-p2996/7220baffd57ea5b0f8cf59bee494dd5b7cc2b748/build`,
-                "--nez-root", wslPath(distro, nezRoot),
                 "--output-dir", wslPath(distro, outputDirectory),
                 "--minimum-glibc", "2.35", "--build-image", baseImage,
                 ...(flags.has("--force") ? ["--force"] : []),
@@ -256,14 +248,12 @@ function main() {
         return;
     }
     if (command === "package") {
-        if (!nezRoot) fail("package requires --nez-root PATH");
         run("docker", [
-            ...containerArguments(root, outputDirectory, nezRoot), image,
+            ...containerArguments(root, outputDirectory), image,
             "node", "tools/package-linux-clang-p2996.mjs",
             "--root", "/toolchain", "--output-dir", "/artifacts",
             "--source-root", "/toolchain/clang-p2996/7220baffd57ea5b0f8cf59bee494dd5b7cc2b748/source",
             "--build-root", "/toolchain/clang-p2996/7220baffd57ea5b0f8cf59bee494dd5b7cc2b748/build",
-            "--nez-root", "/nez",
             "--minimum-glibc", "2.35", "--build-image", imageIdentity,
             ...(flags.has("--force") ? ["--force"] : []),
         ]);

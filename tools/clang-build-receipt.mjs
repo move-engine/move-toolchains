@@ -1,15 +1,16 @@
 import {canonicalJson, sha256Bytes} from "./build-receipt.mjs";
 import {canonicalProfileIdentity} from "./toolchain-set.mjs";
 
-export const clangToolsVersion = "p2996-0ac75f2f";
-export const clangToolsPackageRevision = "move.1";
-export const clangSourceDateEpoch = 1787196636;
+export const clangToolsVersion = "p2996-a6abb679";
+export const clangToolsPackageRevision = "move.2";
+export const clangSourceDateEpoch = 1787339014;
 export const clangSourceIdentity = Object.freeze({
     repository: "https://github.com/move-engine/clang-p2996.git",
-    revision: "0ac75f2f9a8648feaa404e6b68513ce7d4121ece",
+    revision: "a6abb6795504a58ec3a0e2adb55e0d9dbabfa666",
     upstreamBaseRevision: "7220baffd57ea5b0f8cf59bee494dd5b7cc2b748",
     patchRevisions: Object.freeze([
         "0ac75f2f9a8648feaa404e6b68513ce7d4121ece",
+        "a6abb6795504a58ec3a0e2adb55e0d9dbabfa666",
     ]),
 });
 
@@ -19,7 +20,8 @@ export function clangQualificationCases() {
         "clangxx-version",
         "clangd-version",
         "reflection-feature",
-        "nez-compilation-database",
+        "import-std-reflection",
+        "compilation-database",
         "resource-headers",
         "staged-prefix-independence",
         "runtime-closure",
@@ -43,6 +45,7 @@ export function clangConfigureArguments(configuration) {
         "-DLLVM_ENABLE_ZSTD=OFF",
         "-DLLVM_ENABLE_LIBXML2=OFF",
         "-DLLVM_ENABLE_CURL=OFF",
+        "-DLIBCXX_INSTALL_MODULES=ON",
     ];
     if (configuration.cFlags) {
         result.push(`-DCMAKE_C_FLAGS=${configuration.cFlags}`);
@@ -70,6 +73,9 @@ export function clangReceiptInput(options) {
         buildEnvironment: options.builderIdentity,
         configuration: options.configuration,
         installTargets: options.installTargets,
+        libcxxModuleInstallStrategy: options.stageLibcxxHeaders
+            ? "staged-generated-sources"
+            : "nested-runtime-install-target",
         runtimeDependency: options.runtimeDependency ?? null,
     };
     return {
@@ -94,8 +100,15 @@ export function clangReceiptInput(options) {
                 observedVersion: options.bootstrapVersion,
             },
             buildCommands: [["cmake", "--build", "@build@", "--parallel"]],
-            installCommands: [["cmake", "--build", "@build@", "--target",
-                ...options.installTargets]],
+            installCommands: options.stageLibcxxHeaders ? [
+                ["cmake", "--build", "@build@", "--target", ...options.installTargets],
+                ["stage-libcxx-module-sources", "@source@/libcxx/modules",
+                    "@build@/modules/c++/v1", "@install@"],
+            ] : [
+                ["cmake", "--build", "@build@", "--target", ...options.installTargets],
+                ["cmake", "--build", "@build@/runtimes/runtimes-bins",
+                    "--target", "install-cxx-modules"],
+            ],
         },
         environment: {
             builderIdentity: options.builderIdentity,

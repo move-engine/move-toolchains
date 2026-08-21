@@ -127,7 +127,7 @@ npm start -- download toolchain
 For a reproducible setup, select an exact release:
 
 ```bash
-npm start -- download toolchain --tag toolchains-2026.08.9
+npm start -- download toolchain --tag toolchains-2026.08.10
 ```
 
 The manager verifies the complete release manifest and both components'

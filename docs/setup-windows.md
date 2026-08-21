@@ -135,7 +135,7 @@ partial or failed set never becomes selected.
 Use a specific published toolchain release when reproducibility matters:
 
 ```powershell
-npm start -- download toolchain --tag toolchains-2026.08.9
+npm start -- download toolchain --tag toolchains-2026.08.10
 ```
 
 If you already have an extracted qualified installation, integrate its

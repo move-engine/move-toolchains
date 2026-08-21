@@ -685,6 +685,7 @@ function cmakeArguments(profile, paths, python) {
         "-DLLVM_ENABLE_ZSTD=OFF",
         "-DLLVM_ENABLE_LIBXML2=OFF",
         "-DLLVM_ENABLE_CURL=OFF",
+        "-DLIBCXX_INSTALL_MODULES=ON",
     ];
     if (configuration.cFlags) {
         args.push(`-DCMAKE_C_FLAGS=${configuration.cFlags}`);
@@ -701,7 +702,10 @@ function cmakeArguments(profile, paths, python) {
         args.push("-DLLVM_STATIC_LINK_CXX_STDLIB=ON");
     }
     if (python?.executable) {
-        args.push(`-DPython3_EXECUTABLE=${python.executable}`);
+        const cmakePython = process.platform === "win32"
+            ? python.executable.replaceAll("\\", "/")
+            : python.executable;
+        args.push(`-DPython3_EXECUTABLE=${cmakePython}`);
     }
     return args;
 }
@@ -739,7 +743,7 @@ consteval bool Probe() {
     static constexpr auto annotations = std::define_static_array(
         std::meta::annotations_of(members.front()));
     static constexpr auto policies = std::define_static_array(
-        std::meta::annotations_of(members.front(), ^^MovePolicy));
+        std::meta::annotations_of_with_type(members.front(), ^^MovePolicy));
     if (annotations.size() != 2 || policies.size() != 2) return false;
     unsigned policyFlags = 0;
     for (const std::meta::info policy : policies)
@@ -760,6 +764,27 @@ static_assert(sizeof(MoveGenerated) >= sizeof(int) + sizeof(float));
 int main() {
     MoveGenerated generated{42, 1.0f};
     return Probe() && generated.GeneratedValue == 42 ? 0 : 1;
+}
+`;
+
+const importStdReflectionSmoke = `import std;
+
+struct MoveImportedMetaProbe {
+    int Value;
+};
+
+struct [[=42, =1.0f]] MoveImportedAnnotationProbe {};
+
+static_assert(std::meta::is_class_type(^^MoveImportedMetaProbe));
+static_assert(std::meta::annotations_of_with_type(
+                  ^^MoveImportedAnnotationProbe, ^^int).size() == 1);
+static_assert(std::meta::extract<int>(
+                  std::meta::annotations_of_with_type(
+                      ^^MoveImportedAnnotationProbe, ^^int)[0]) == 42);
+
+int main() {
+    std::vector<int> values;
+    return values.empty() ? 0 : 1;
 }
 `;
 
@@ -800,6 +825,54 @@ async function runtimeLibraryDirectory(install) {
         if (found.every(Boolean)) return candidate;
     }
     return null;
+}
+
+async function qualifyImportedStdModule(
+    profile, install, smokeRoot, ucrt64Root = null) {
+    const clangxx = path.join(install, "bin", executableName("clang++"));
+    const clangd = path.join(install, "bin", executableName("clangd"));
+    const moduleSource = path.join(
+        install, "share", "libc++", "v1", "std.cppm");
+    const metaExports = path.join(
+        install, "share", "libc++", "v1", "std", "meta.inc");
+    for (const required of [clangxx, clangd, moduleSource, metaExports]) {
+        if (!(await exists(required))) {
+            fail(`import std qualification is missing: ${required}`);
+        }
+    }
+    const moduleRoot = path.join(smokeRoot, "import-std");
+    await mkdir(moduleRoot, {recursive: true});
+    const source = path.join(moduleRoot, "import_std.cpp");
+    const pcm = path.join(moduleRoot, "std.pcm");
+    await writeFile(source, importStdReflectionSmoke);
+    const common = [
+        "-std=c++26",
+        "-freflection-latest",
+        "-fentity-proxy-reflection",
+        "-Wno-reserved-module-identifier",
+    ];
+    if (profile.qualificationKind === "language-server") {
+        common.push(
+            `--target=${profile.clangTarget}`,
+            `--sysroot=${ucrt64Root}`,
+            "-nostdinc++",
+            "-isystem", path.join(install, "include", "c++", "v1"));
+    } else {
+        common.push("-stdlib=libc++");
+    }
+    await run(clangxx, [...common, "--precompile", moduleSource, "-o", pcm]);
+    const importArguments = [...common, `-fmodule-file=std=${pcm}`];
+    await run(clangxx, [...importArguments, "-fsyntax-only", source]);
+    await writeFile(path.join(moduleRoot, "compile_commands.json"),
+        `${JSON.stringify([{
+            directory: moduleRoot,
+            arguments: [clangxx, ...importArguments, "-c", source],
+            file: source,
+        }], null, 2)}\n`);
+    await run(clangd, [
+        `--check=${source}`,
+        `--compile-commands-dir=${moduleRoot}`,
+    ]);
 }
 
 async function qualifyFullToolchain(config, profile, install, scratchRoot = null) {
@@ -875,6 +948,7 @@ async function qualifyFullToolchain(config, profile, install, scratchRoot = null
         `--check=${source}`,
         `--compile-commands-dir=${smokeRoot}`,
     ]);
+    await qualifyImportedStdModule(profile, install, smokeRoot);
     return qualificationMarker(config, profile, null);
 }
 
@@ -899,6 +973,59 @@ async function stageLibcxxHeaders(profile, paths) {
                 path.join(destination, entry),
                 {recursive: true, force: true});
         }
+    }
+}
+
+async function installLibcxxModules(profile, paths, jobs) {
+    if (!profile.configuration.runtimes.split(";").includes("libcxx")) return;
+    if (profile.stageLibcxxHeaders) {
+        const generated = path.join(paths.build, "modules", "c++", "v1");
+        const source = path.join(paths.source, "libcxx", "modules");
+        const destination = path.join(paths.staging, "share", "libc++", "v1");
+        const libraryDestination = path.join(paths.staging, "lib");
+        for (const required of [
+            path.join(generated, "CMakeLists.txt"),
+            path.join(generated, "std.cppm"),
+            path.join(generated, "std.compat.cppm"),
+            path.join(paths.build, "lib", "libc++.modules.json"),
+            path.join(source, "std", "meta.inc"),
+        ]) {
+            if (!(await exists(required))) {
+                fail(`libc++ module staging is missing: ${required}`);
+            }
+        }
+        await mkdir(destination, {recursive: true});
+        await mkdir(libraryDestination, {recursive: true});
+        for (const file of ["CMakeLists.txt", "std.cppm", "std.compat.cppm"]) {
+            await cp(path.join(generated, file), path.join(destination, file),
+                {force: true});
+        }
+        for (const directory of ["std", "std.compat"]) {
+            await cp(path.join(source, directory), path.join(destination, directory),
+                {recursive: true, force: true});
+        }
+        await cp(
+            path.join(paths.build, "lib", "libc++.modules.json"),
+            path.join(libraryDestination, "libc++.modules.json"),
+            {force: true});
+    } else {
+        await run("cmake", [
+            "--build", paths.build,
+            "--target", "runtimes-configure",
+            "--parallel", String(jobs),
+        ]);
+        const runtimeBuild = path.join(paths.build, "runtimes", "runtimes-bins");
+        await run("cmake", [
+            "--build", runtimeBuild,
+            "--target", "install-cxx-modules",
+            "--parallel", String(jobs),
+        ]);
+    }
+    for (const required of [
+        path.join(paths.staging, "share", "libc++", "v1", "std.cppm"),
+        path.join(paths.staging, "share", "libc++", "v1", "std", "meta.inc"),
+    ]) {
+        if (!(await exists(required))) fail(`libc++ module installation is missing: ${required}`);
     }
 }
 
@@ -943,6 +1070,8 @@ async function qualifyLanguageServer(
         `--check=${source}`,
         `--compile-commands-dir=${smokeRoot}`,
     ]);
+    await qualifyImportedStdModule(
+        profile, install, smokeRoot, ucrt64Root);
     return qualificationMarker(config, profile, ucrt64Root);
 }
 
@@ -1065,6 +1194,7 @@ async function install(
             ...profile.installTargets,
             "--parallel", String(jobs),
         ]);
+        await installLibcxxModules(profile, paths, jobs);
         await stageLibcxxHeaders(profile, paths);
         const stagingMarker = await qualify(
             config, profile, paths.staging, ucrt64Root);
@@ -1145,6 +1275,7 @@ async function importBuild(
             "--build", build, "--target", ...profile.installTargets,
             "--parallel", String(jobs),
         ]);
+        await installLibcxxModules(profile, externalPaths, jobs);
         await stageLibcxxHeaders(profile, externalPaths);
         const stagingMarker = await qualify(
             config, profile, paths.staging, ucrt64Root);

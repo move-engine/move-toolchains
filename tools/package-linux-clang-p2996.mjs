@@ -51,7 +51,7 @@ function usage() {
 
 Usage:
   npm run package:clang-p2996:linux -- --root PATH --source-root PATH
-      --build-root PATH --nez-root PATH --gcc-archive PATH [--output-dir PATH]
+      --build-root PATH --gcc-archive PATH [--output-dir PATH]
       --minimum-glibc VERSION --build-image ID [--force]
 
 The package is assembled from ROOT/clang-p2996/<revision>/install. Every ELF
@@ -71,7 +71,7 @@ function parseArguments(argv) {
             continue;
         }
         if (!["--root", "--output-dir", "--minimum-glibc", "--build-image",
-            "--source-root", "--build-root", "--nez-root", "--gcc-archive"]
+            "--source-root", "--build-root", "--gcc-archive"]
             .includes(name)) {
             fail(`unknown argument: ${name}`);
         }
@@ -80,7 +80,7 @@ function parseArguments(argv) {
         values.set(name, value);
     }
     for (const required of ["--root", "--minimum-glibc", "--build-image",
-        "--source-root", "--build-root", "--nez-root", "--gcc-archive"]) {
+        "--source-root", "--build-root", "--gcc-archive"]) {
         if (!values.has(required)) fail(`${required} is required`);
     }
     return {help: false, flags, values};
@@ -202,7 +202,6 @@ async function main() {
         path.join(repositoryRoot, ".local", "toolchains"));
     const sourceRoot = path.resolve(values.get("--source-root"));
     const buildRoot = path.resolve(values.get("--build-root"));
-    const nezRoot = path.resolve(values.get("--nez-root"));
     const gccArchive = path.resolve(values.get("--gcc-archive"));
     const outputDirectory = path.resolve(values.get("--output-dir") ??
         path.join(repositoryRoot, ".local", "prebuilt"));
@@ -326,8 +325,6 @@ async function main() {
         };
         await writeFile(path.join(stagedInstall, "move-artifact.json"),
             `${JSON.stringify(metadata, null, 2)}\n`);
-        run(process.execPath, [path.join(
-            nezRoot, "tools", "reflection", "compdb_test.mjs")]);
         const receiptInput = clangReceiptInput({
             profile,
             builderIdentity: values.get("--build-image"),
@@ -382,6 +379,7 @@ async function main() {
                 {id: "archive-relocation-path-with-spaces", status: "passed"},
                 {id: "archive-runtime-closure", status: "passed"},
                 {id: "archive-reflection-runtime", status: "passed"},
+                {id: "archive-import-std-reflection", status: "passed"},
             ],
             componentIdentity: {
                 version: clangToolsVersion,

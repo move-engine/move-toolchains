@@ -34,7 +34,7 @@ test("requires GCC reflection/modules evidence", () => {
 
 test("requires distinct clang runtime and module-LSP evidence", () => {
     const {artifact, evidence} = fixture("clangTools", [
-        ...common, "archive-reflection-runtime",
+        ...common, "archive-reflection-runtime", "archive-import-std-reflection",
     ]);
     assert.throws(() => validateReleaseEvidence(evidence, artifact),
         /archive-module-lsp/u);
@@ -56,7 +56,8 @@ test("requires distinct clang runtime and module-LSP evidence", () => {
 
 test("rejects status-only or mismatched clang module evidence", () => {
     const {artifact, evidence} = fixture("clangTools", [
-        ...common, "archive-reflection-runtime", "archive-module-lsp",
+        ...common, "archive-reflection-runtime", "archive-import-std-reflection",
+        "archive-module-lsp",
     ]);
     assert.throws(() => validateReleaseEvidence(evidence, artifact),
         /invalid module LSP identity/u);
