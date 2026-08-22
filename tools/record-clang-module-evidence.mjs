@@ -5,7 +5,7 @@ import {fileURLToPath} from "node:url";
 import {canonicalJson} from "./build-receipt.mjs";
 
 export const importedNamespaceProbeRevision =
-    "move-toolchains-import-std-lsp-v1";
+    "move-toolchains-import-std-lsp-v2";
 
 function fail(message) {
     throw new Error(message);

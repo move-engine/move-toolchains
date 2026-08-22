@@ -781,6 +781,12 @@ static_assert(std::meta::annotations_of_with_type(
 static_assert(std::meta::extract<int>(
                   std::meta::annotations_of_with_type(
                       ^^MoveImportedAnnotationProbe, ^^int)[0]) == 42);
+static constexpr auto MoveImportedStaticArray =
+    std::define_static_array(std::array{1, 2, 3});
+static_assert(MoveImportedStaticArray.size() == 3);
+static_assert(MoveImportedStaticArray[2] == 3);
+static_assert(std::string_view(std::define_static_string("import std")) ==
+              "import std");
 
 int main() {
     std::vector<int> values;

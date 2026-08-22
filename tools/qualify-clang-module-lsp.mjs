@@ -8,7 +8,7 @@ import process from "node:process";
 import {pathToFileURL} from "node:url";
 import {canonicalJson} from "./build-receipt.mjs";
 
-export const moduleLspProbeRevision = "move-toolchains-import-std-lsp-v1";
+export const moduleLspProbeRevision = "move-toolchains-import-std-lsp-v2";
 
 function fail(message) {
     throw new Error(message);
@@ -218,6 +218,10 @@ struct [[=42, =1.0f]] Tagged {};
 static_assert(std::meta::annotations_of_with_type(^^Tagged, ^^int).size() == 1);
 static_assert(std::meta::extract<int>(
     std::meta::annotations_of_with_type(^^Tagged, ^^int)[0]) == 42);
+static constexpr auto StaticValues = std::define_static_array(std::array{1, 2, 3});
+static_assert(StaticValues.size() == 3 && StaticValues[2] == 3);
+static_assert(std::string_view(std::define_static_string("module std")) ==
+              "module std");
 
 int main() {
     Move::Probe::Record record{};

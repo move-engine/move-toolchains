@@ -1,9 +1,9 @@
 {
   "schemaVersion": 2,
   "release": {
-    "tag": "toolchains-2026.08.10",
-    "title": "Move toolchains 2026.08.10",
-    "notes": "Publishes three complete, profile-coherent Move toolchain sets for native Windows UCRT64, Linux glibc 2.35, and Linux glibc 2.38. Every set reuses the exact qualified Move GCC 16.2.0 move.2 artifact from 2026.08.9 and pairs it with clang-p2996 a6abb679 move.2. The clang update exports the complete public reflection API from import std, adds annotations_of_with_type compatibility, and installs the libc++ named-module sources."
+    "tag": "toolchains-2026.08.11",
+    "title": "Move toolchains 2026.08.11",
+    "notes": "Publishes three complete, profile-coherent Move toolchain sets for native Windows UCRT64, Linux glibc 2.35, and Linux glibc 2.38. Every set reuses the exact qualified Move GCC 16.2.0 move.2 artifact from 2026.08.9 and pairs it with clang-p2996 46faf27e move.3. The clang update completes the import std reflection surface by exporting define_static_array and define_static_string alongside std::meta."
   },
   "components": {
     "gcc": {
@@ -19,13 +19,13 @@
       "releaseBaseUrl": "https://ftp.gnu.org/gnu/gcc"
     },
     "clangTools": {
-      "version": "p2996-a6abb679",
-      "packageRevision": "move.2",
+      "version": "p2996-46faf27e",
+      "packageRevision": "move.3",
       "source": {
         "repository": "https://github.com/move-engine/clang-p2996.git",
-        "revision": "a6abb6795504a58ec3a0e2adb55e0d9dbabfa666",
+        "revision": "46faf27e649c3398a49f2ecada43e4e3960dedb9",
         "upstreamBaseRevision": "7220baffd57ea5b0f8cf59bee494dd5b7cc2b748",
-        "patchRevisions": ["0ac75f2f9a8648feaa404e6b68513ce7d4121ece", "a6abb6795504a58ec3a0e2adb55e0d9dbabfa666"]
+        "patchRevisions": ["0ac75f2f9a8648feaa404e6b68513ce7d4121ece", "a6abb6795504a58ec3a0e2adb55e0d9dbabfa666", "46faf27e649c3398a49f2ecada43e4e3960dedb9"]
       },
       "qualificationSchemaVersion": 3,
       "minimumFreeGiB": 80,
@@ -106,19 +106,19 @@
       "id": "clang-tools-windows-x86_64-ucrt64",
       "component": "clangTools",
       "profile": "windows-x86_64-ucrt64",
-      "file": "clangd-p2996-a6abb679-windows-x86_64.zip",
-      "checksumFile": "clangd-p2996-a6abb679-windows-x86_64.zip.sha256",
-      "archiveRoot": "clang-p2996/a6abb6795504a58ec3a0e2adb55e0d9dbabfa666/install",
-      "sha256": "e4f79bbc4a6d314c5f82360cf187181bb75d91050c0124ae3ba811e339c01fb3",
-      "bytes": 157673098,
+      "file": "clangd-p2996-46faf27e-windows-x86_64.zip",
+      "checksumFile": "clangd-p2996-46faf27e-windows-x86_64.zip.sha256",
+      "archiveRoot": "clang-p2996/46faf27e649c3398a49f2ecada43e4e3960dedb9/install",
+      "sha256": "f42d1fd59f5e5c9b34137d37a650b12368ec597b55b41a7b020663dc6a89cdf7",
+      "bytes": 157673134,
       "derivation": {
-        "sourceRevision": "a6abb6795504a58ec3a0e2adb55e0d9dbabfa666",
+        "sourceRevision": "46faf27e649c3398a49f2ecada43e4e3960dedb9",
         "upstreamBaseRevision": "7220baffd57ea5b0f8cf59bee494dd5b7cc2b748",
-        "patchRevisions": ["0ac75f2f9a8648feaa404e6b68513ce7d4121ece", "a6abb6795504a58ec3a0e2adb55e0d9dbabfa666"],
-        "configurationDigest": "9ec117625eade3a89bdd82a5989863d1ea02ad2ab91e420f52c93726064dfaaa"
+        "patchRevisions": ["0ac75f2f9a8648feaa404e6b68513ce7d4121ece", "a6abb6795504a58ec3a0e2adb55e0d9dbabfa666", "46faf27e649c3398a49f2ecada43e4e3960dedb9"],
+        "configurationDigest": "41873f852d9c94fae589d22d1144e2f24b38baa8e3f85aabb7ad168e740cd2d7"
       },
-      "receipt": {"schemaVersion": 1, "file": "move-build-receipt.json", "sha256": "af643fa3531ec560954771d4ec022fa46690a15d7ded3947fc4aa368d3b17ff0", "installedTreeDigest": "d9df4f7beed346c7ddb01d797479b36a8e14acb3e7b558b89c294893a11cb429"},
-      "evidence": {"schemaVersion": 1, "file": "clangd-p2996-a6abb679-windows-x86_64.zip.evidence.json", "sha256": "891063780b6c87ac00da3c533331dfae281efe646fe05839f3a670a02417106b"}
+      "receipt": {"schemaVersion": 1, "file": "move-build-receipt.json", "sha256": "8fc6253842c3855c6bdf143d5063fd6faef2548c4e3bc7c41fc852a1467220f5", "installedTreeDigest": "b49497544b2e43cf259df4bed822dfe20111190fa6ec460e5ff9090f44264231"},
+      "evidence": {"schemaVersion": 1, "file": "clangd-p2996-46faf27e-windows-x86_64.zip.evidence.json", "sha256": "9e85222123064b4f9b691e786e52879001c99a96cb9e65cfc146e55b5c9cc0ff"}
     },
     {
       "id": "gcc-linux-x86_64-glibc2.38",
@@ -142,19 +142,19 @@
       "id": "clang-tools-linux-x86_64-glibc2.38",
       "component": "clangTools",
       "profile": "linux-x86_64-glibc2.38",
-      "file": "clangd-p2996-a6abb679-linux-x86_64-glibc2.38.tar.gz",
-      "checksumFile": "clangd-p2996-a6abb679-linux-x86_64-glibc2.38.tar.gz.sha256",
-      "archiveRoot": "clang-p2996/a6abb6795504a58ec3a0e2adb55e0d9dbabfa666/install",
-      "sha256": "87669804259a97d96d1e306abcf8ee8440d4f9b40f568bed1ed825a6bd3ef51a",
-      "bytes": 99511056,
+      "file": "clangd-p2996-46faf27e-linux-x86_64-glibc2.38.tar.gz",
+      "checksumFile": "clangd-p2996-46faf27e-linux-x86_64-glibc2.38.tar.gz.sha256",
+      "archiveRoot": "clang-p2996/46faf27e649c3398a49f2ecada43e4e3960dedb9/install",
+      "sha256": "9ed72759857e45cc119c7b3716dfa38ba8d0f878e2b05cab9e6836215b40fcb0",
+      "bytes": 99512065,
       "derivation": {
-        "sourceRevision": "a6abb6795504a58ec3a0e2adb55e0d9dbabfa666",
+        "sourceRevision": "46faf27e649c3398a49f2ecada43e4e3960dedb9",
         "upstreamBaseRevision": "7220baffd57ea5b0f8cf59bee494dd5b7cc2b748",
-        "patchRevisions": ["0ac75f2f9a8648feaa404e6b68513ce7d4121ece", "a6abb6795504a58ec3a0e2adb55e0d9dbabfa666"],
-        "configurationDigest": "24fac4930f097236f1c44eccd309008d1f115d63ba30b2a8bbbfa36e6b7c7fd8"
+        "patchRevisions": ["0ac75f2f9a8648feaa404e6b68513ce7d4121ece", "a6abb6795504a58ec3a0e2adb55e0d9dbabfa666", "46faf27e649c3398a49f2ecada43e4e3960dedb9"],
+        "configurationDigest": "cfc7e538e60c4959d46ad03d24cbc537ad3c36a2908a0f8f16e8f5a46bccf37c"
       },
-      "receipt": {"schemaVersion": 1, "file": "move-build-receipt.json", "sha256": "13cd9fd038544b34fa6f8972e43f89bf979f19eef054f00d0589f418622d0555", "installedTreeDigest": "f2c9066f4b18979b8029209835a217be8fc4170ba52bf75581d10bf76aef3c2b"},
-      "evidence": {"schemaVersion": 1, "file": "clangd-p2996-a6abb679-linux-x86_64-glibc2.38.tar.gz.evidence.json", "sha256": "94efb879bee1010a686fa8aca106be79b6c138de1fb61d9324f2bfaea5a469e0"}
+      "receipt": {"schemaVersion": 1, "file": "move-build-receipt.json", "sha256": "ce617c1b70169c952534631fce98d4c2802efd68f07e1625e693a49e3968d46a", "installedTreeDigest": "8729b51cdf1d0e7d1e5676bfecb25b5daad76326bbfdf2f935bde4fdff2dd246"},
+      "evidence": {"schemaVersion": 1, "file": "clangd-p2996-46faf27e-linux-x86_64-glibc2.38.tar.gz.evidence.json", "sha256": "45b8dfac0aa67eb5818d373ce0673918e59b17a3303baead74221bca87f02e51"}
     },
     {
       "id": "gcc-linux-x86_64-glibc2.35",
@@ -178,19 +178,19 @@
       "id": "clang-tools-linux-x86_64-glibc2.35",
       "component": "clangTools",
       "profile": "linux-x86_64-glibc2.35",
-      "file": "clangd-p2996-a6abb679-linux-x86_64-glibc2.35.tar.gz",
-      "checksumFile": "clangd-p2996-a6abb679-linux-x86_64-glibc2.35.tar.gz.sha256",
-      "archiveRoot": "clang-p2996/a6abb6795504a58ec3a0e2adb55e0d9dbabfa666/install",
-      "sha256": "febba6b5b1a663e19a3b5d752a29770579859e6badf61639c7e36a5778c641b2",
-      "bytes": 87220028,
+      "file": "clangd-p2996-46faf27e-linux-x86_64-glibc2.35.tar.gz",
+      "checksumFile": "clangd-p2996-46faf27e-linux-x86_64-glibc2.35.tar.gz.sha256",
+      "archiveRoot": "clang-p2996/46faf27e649c3398a49f2ecada43e4e3960dedb9/install",
+      "sha256": "cda86ea00279f56dd35511170c71f4177d53d9fa43c39da3f3c67a7964414f26",
+      "bytes": 87221019,
       "derivation": {
-        "sourceRevision": "a6abb6795504a58ec3a0e2adb55e0d9dbabfa666",
+        "sourceRevision": "46faf27e649c3398a49f2ecada43e4e3960dedb9",
         "upstreamBaseRevision": "7220baffd57ea5b0f8cf59bee494dd5b7cc2b748",
-        "patchRevisions": ["0ac75f2f9a8648feaa404e6b68513ce7d4121ece", "a6abb6795504a58ec3a0e2adb55e0d9dbabfa666"],
-        "configurationDigest": "3c82745fb627bb4ca74591af761f7298f6cf8442d330aaefcd6f8b93975ce26f"
+        "patchRevisions": ["0ac75f2f9a8648feaa404e6b68513ce7d4121ece", "a6abb6795504a58ec3a0e2adb55e0d9dbabfa666", "46faf27e649c3398a49f2ecada43e4e3960dedb9"],
+        "configurationDigest": "713c5ff81ccdec02e8d9ff680bab64617a0b7f4a8bb93335c76a2ca85a271fde"
       },
-      "receipt": {"schemaVersion": 1, "file": "move-build-receipt.json", "sha256": "ef0e17ff80d7a1a94a618c347f1322d6bf700e2670530f47eb53f71ad3adc078", "installedTreeDigest": "52528e77c48e08c028ad8e70df47160213fba299943900c40c545258a98255d0"},
-      "evidence": {"schemaVersion": 1, "file": "clangd-p2996-a6abb679-linux-x86_64-glibc2.35.tar.gz.evidence.json", "sha256": "3b6a7402d1a59a55ee9f88f3b6782e41057fe5cbdfd9adf68d88e037ca3b4997"}
+      "receipt": {"schemaVersion": 1, "file": "move-build-receipt.json", "sha256": "e70f80b0ef433d1d88c59935d925c555d5be3abc400182a30741f4b56eaf6018", "installedTreeDigest": "24ff0858f74c745408c3a0d478cb366f1be7bd7eab17a2242e7e713ceef20f87"},
+      "evidence": {"schemaVersion": 1, "file": "clangd-p2996-46faf27e-linux-x86_64-glibc2.35.tar.gz.evidence.json", "sha256": "f011b42721a5361e247f46a32c5a6b709a3e6b868352b9b19b45e7711175076f"}
     }
   ],
   "toolchainSets": [

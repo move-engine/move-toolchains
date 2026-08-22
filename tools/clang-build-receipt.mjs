@@ -1,16 +1,17 @@
 import {canonicalJson, sha256Bytes} from "./build-receipt.mjs";
 import {canonicalProfileIdentity} from "./toolchain-set.mjs";
 
-export const clangToolsVersion = "p2996-a6abb679";
-export const clangToolsPackageRevision = "move.2";
-export const clangSourceDateEpoch = 1787339014;
+export const clangToolsVersion = "p2996-46faf27e";
+export const clangToolsPackageRevision = "move.3";
+export const clangSourceDateEpoch = 1787376177;
 export const clangSourceIdentity = Object.freeze({
     repository: "https://github.com/move-engine/clang-p2996.git",
-    revision: "a6abb6795504a58ec3a0e2adb55e0d9dbabfa666",
+    revision: "46faf27e649c3398a49f2ecada43e4e3960dedb9",
     upstreamBaseRevision: "7220baffd57ea5b0f8cf59bee494dd5b7cc2b748",
     patchRevisions: Object.freeze([
         "0ac75f2f9a8648feaa404e6b68513ce7d4121ece",
         "a6abb6795504a58ec3a0e2adb55e0d9dbabfa666",
+        "46faf27e649c3398a49f2ecada43e4e3960dedb9",
     ]),
 });
 
